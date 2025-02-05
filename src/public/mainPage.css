@@ -1,0 +1,190 @@
+/* General Styles */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #FDB515; /* California Gold */
+    color: #333;
+}
+
+.container {
+    width: 90%;
+    margin: auto;
+    max-width: 1200px;
+    text-align: center;
+}
+
+/* Header */
+.main-header {
+    background: #003262; /* Berkeley Blue */
+    color: white;
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.main-header .title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.main-header .subtitle {
+    font-size: 1.2rem;
+}
+
+/* Navbar */
+.navbar {
+    background: #003262;
+    color: white;
+    padding: 10px 0;
+}
+
+.navbar ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+}
+
+.navbar ul li {
+    margin: 0 10px;
+    background: #FDB515;
+    font-weight: bold;
+    color: #003262;
+}
+
+.navbar ul li a {
+    color: #003262;
+    background: #FDB515;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold
+}
+
+.navbar ul li a.vote-button {
+    background: #FDB515; /* California Gold */
+    color: #003262; /* Berkeley Blue */
+    font-weight: bold;
+}
+
+.navbar ul li a.vote-button:hover {
+    background: #e0a814;
+}
+
+/* Main Container */
+.home-container {
+    padding: 30px 20px;
+}
+
+/* Highlight Section (Vote) */
+.highlight-section {
+    background: white;
+    padding: 40px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.highlight-section h2 {
+    color: #003262; /* Berkeley Blue */
+}
+
+.highlight-section .cta-button {
+    background: #FDB515; /* California Gold */
+    color: #003262; /* Berkeley Blue */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+
+
+.highlight-section .ct-button:hover {
+    background: #e0a814;
+}
+
+/* Feature Sections (Search & Join) */
+.feature-section {
+    background: #003262; /* Berkeley Blue */
+    color: white;
+    padding: 40px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.feature-section h2 {
+    margin-bottom: 20px;
+}
+.feature-section h3 {
+    font-size: small;
+    color: antiquewhite;
+    margin-bottom: 20px;
+}
+
+.feature-section p {
+    margin-bottom: 20px;
+}
+
+.feature-section .cta-button:hover {
+    background: #e0a814;
+}
+.feature-section .ct-button {
+    background: #FDB515; /* California Gold */
+    color: #003262; /* Berkeley Blue */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.feature-section button {
+    background: #FDB515; /* California Gold */
+    color: #003262; /* Berkeley Blue */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.feature-section button:hover {
+    background: #e0a814;
+}
+
+.feature-section form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.feature-section input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 50%;
+}
+
+.feature-section button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    background: #FDB515;
+    color: #003262;
+    border: none;
+    cursor: pointer;
+}
+
+/* Footer */
+.footer {
+    background: #003262; /* Berkeley Blue */
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+}

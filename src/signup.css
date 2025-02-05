@@ -1,0 +1,111 @@
+/* General Styles */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #e0a814; /* Light background for contrast */
+    color: #333;
+}
+
+.container {
+    width: 90%;
+    margin: auto;
+    max-width: 1200px;
+    text-align: center;
+}
+
+/* Header */
+.main-header {
+    background: #003262; /* Berkeley Blue */
+    color: white;
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.main-header .title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.main-header .subtitle {
+    font-size: 1.2rem;
+}
+
+/* Auth Container */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 150px); /* Full height minus header and footer */
+}
+
+.auth-box {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    text-align: center;
+}
+
+.auth-box h2 {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: black; /* California Gold */
+}
+
+.auth-box label {
+    display: block;
+    text-align: left;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.auth-box input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.auth-box button {
+    background: #FDB515; /* California Gold */
+    color: #003262; /* Berkeley Blue */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    width: 100%;
+    font-weight: bold;
+}
+
+.auth-box button:hover {
+    background: #e0a814;
+}
+
+.auth-box .signin-prompt {
+    margin-top: 15px;
+}
+
+.auth-box .signin-prompt a {
+    color: #003262; /* Berkeley Blue */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.auth-box .signin-prompt a:hover {
+    text-decoration: underline;
+}
+
+/* Footer */
+.footer {
+    background: #003262; /* Berkeley Blue */
+    color: #e0a814;
+    text-align: center;
+    padding: 10px 0;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}

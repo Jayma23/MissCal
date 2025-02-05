@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="details-container">
+    <!-- Student Photo -->
+    <div class="photo-section">
+        <img id="student-photo" src="default-photo.jpg" alt="Student Photo">
+    </div>
+
+    <!-- Student Information -->
+    <div class="info-section">
+        <h1 id="student-name">Student Name</h1>
+        <p><strong>Major:</strong> <span id="student-major">Computer Science</span></p>
+        <p><strong>GPA:</strong> <span id="student-gpa">3.9</span></p>
+        <p><strong>Campaign Line:</strong> <span id="student-campaign">"Building a better tomorrow!"</span></p>
+        <p><strong>Personal Story:</strong> <span id="student-story">"I started coding at age 10..."</span></p>
+        <p><strong>Experience:</strong> <span id="student-experience">"Interned at ABC Company..."</span></p>
+        <p><strong>Organizations:</strong> <span id="student-organizations">"Women in STEM, Robotics Club"</span></p>
+
+        <!-- Social Media Links -->
+        <div class="social-links">
+            <a id="student-instagram" href="#" target="_blank">Instagram</a>
+            <a id="student-linkedin" href="#" target="_blank">LinkedIn</a>
+            <a id="student-facebook" href="#" target="_blank">Facebook</a>
+            <a id="student-github" href="#" target="_blank">GitHub</a>
+            <a id="student-tiktok" href="#" target="_blank">TikTok</a>
+        </div>
+    </div>
+</div>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+    }
+
+    .details-container {
+        display: flex;
+        flex-wrap: wrap;
+        max-width: 1200px;
+        margin: 50px auto;
+        background: #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .photo-section {
+        flex: 1;
+        min-width: 300px;
+        max-width: 50%;
+        background-color: #eaeaea;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .photo-section img {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+
+    .info-section {
+        flex: 2;
+        padding: 20px;
+    }
+
+    .info-section h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .info-section p {
+        font-size: 1rem;
+        margin: 8px 0;
+        color: #333;
+    }
+
+    .info-section strong {
+        color: #555;
+    }
+
+    .social-links a {
+        display: inline-block;
+        margin-right: 15px;
+        color: #0073e6;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .social-links a:hover {
+        text-decoration: underline;
+    }
+
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            // Fetch student details
+            const response = await fetch("/getStudentDetails", { credentials: "include" });
+            if (!response.ok) throw new Error("Failed to load student details.");
+
+            const data = await response.json();
+
+            // Update page with student details
+            document.getElementById("student-photo").src = data.photo || "default-photo.jpg";
+            document.getElementById("student-name").textContent = data.name || "No Name Provided";
+            document.getElementById("student-major").textContent = data.major || "N/A";
+            document.getElementById("student-gpa").textContent = data.gpa || "N/A";
+            document.getElementById("student-campaign").textContent = data.campaign_line || "N/A";
+            document.getElementById("student-story").textContent = data.personal_story || "N/A";
+            document.getElementById("student-experience").textContent = data.experience || "N/A";
+            document.getElementById("student-organizations").textContent = data.organizations || "N/A";
+
+            // Update social links
+            const links = ["instagram", "linkedin", "facebook", "github", "tiktok"];
+            links.forEach((link) => {
+                const element = document.getElementById(`student-${link}`);
+                if (data[link]) {
+                    element.href = data[link];
+                    element.style.display = "inline-block";
+                } else {
+                    element.style.display = "none";
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            alert("Failed to load student details. Please try again.");
+        }
+    });
+
+</script>
+</body>
+</html>

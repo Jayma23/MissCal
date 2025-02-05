@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Miss Cal</title>
+    <link rel="stylesheet" href="../sign-in.css">
+</head>
+<body>
+<header class="main-header">
+    <div class="container">
+        <h1 class="title">Welcome to Miss Cal</h1>
+        <p class="subtitle">Sign in to participate today!</p>
+    </div>
+</header>
+
+<main class="auth-container">
+    <div class="auth-box">
+        <h2>Sign In</h2>
+        <form id="signInForm">
+            <label for="email">UC Berkeley Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter your @berkeley.edu email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+            <button type="submit">Sign In</button>
+        </form>
+        <p class="signup-prompt">
+            Don’t have an account? <a href="../signup.html">Sign Up</a>
+        </p>
+    </div>
+</main>
+
+<footer class="footer">
+    <p>&copy; 2024 Miss Cal. All rights reserved.</p>
+</footer>
+
+<script>
+    document.getElementById("signInForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        try {
+            const response = await fetch("http://localhost:3000/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                // Save the user_id in a cookie
+                document.cookie = `user_id=${data.user.id}; path=/; max-age=${24 * 60 * 60}; secure=${window.location.protocol === 'https:'};`;
+
+                // Redirect to main page
+                window.location.href = "mainPage.html";
+            } else {
+                const error = await response.json();
+                console.error("Login error:", error.message);
+                alert(error.message);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred while signing in. Please try again later.");
+        }
+    });
+</script>
+
+<style>
+    /* General Styles */
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #FDB515; /* California Gold */
+        color: #333;
+    }
+
+    .container {
+        width: 90%;
+        margin: auto;
+        max-width: 1200px;
+        text-align: center;
+    }
+
+    /* Header */
+    .main-header {
+        background: #003262; /* Berkeley Blue */
+        color: white;
+        text-align: center;
+        padding: 50px 20px;
+    }
+
+    .main-header .title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .main-header .subtitle {
+        font-size: 1.2rem;
+    }
+
+    /* Auth Container */
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: calc(100vh - 150px); /* Full height minus header and footer */
+    }
+
+    .auth-box {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 350px;
+        text-align: center;
+    }
+
+    .auth-box h2 {
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        color: #003262; /* Berkeley Blue */
+    }
+
+    .auth-box label {
+        display: block;
+        text-align: left;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .auth-box input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .auth-box button {
+        background: #003262; /* Berkeley Blue */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .footer {
+        background: #003262; /* Berkeley Blue */
+        color: #e0a814;
+        text-align: center;
+        padding: 10px 0;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+    }
+    @keyframes slide-down {
+        from {
+            transform: translateY(-20%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+</style>
+
+</body>
+</html>

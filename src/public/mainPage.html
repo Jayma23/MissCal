@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miss Cal - Home</title>
+    <link rel="stylesheet" type="text/css" href='mainPage.css'/>
+</head>
+<body>
+<header class="main-header">
+    <div class="container">
+        <h1 class="title">Welcome to Miss Cal</h1>
+        <p class="subtitle">Celebrate Confidence, Talent, and Community</p>
+    </div>
+</header>
+
+<nav class="navbar">
+    <ul>
+        <li><a href="http://localhost:3000/formPage.html">Join the Pageant</a></li>
+        <li><a href="http://localhost:3000/vote.html" class="vote-button">Vote Now</a></li>
+    </ul>
+</nav>
+
+<!-- Button to toggle sidebar -->
+<button id="sidebarToggle" class="sidebar-toggle">☰ </button>
+
+<div class="main-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar hidden" id="sidebar">
+        <h3>Dashboard</h3>
+        <ul>
+            <li><a href="http://localhost:3000/mainPage.html">Home</a></li>
+            <li><a href="http://localhost:3000/formPage.html">Join the Pageant</a></li>
+            <li><a href="http://localhost:3000/vote.html">Vote</a></li>
+            <li><a href="http://localhost:3000/rules.html">Rules</a></li>
+            <li><a href="http://localhost:3000/profile.html">My Profile</a></li>
+            <li><a href="#" onclick="logout()">Log Off</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="home-container">
+        <!-- Voting Section -->
+        <section id="vote" class="highlight-section">
+            <h2>Cast Your Vote!</h2>
+            <p>Your voice matters! Vote for your favorite participant and help crown Miss Cal.</p>
+            <a href="http://localhost:3000/vote.html" class="cta-button">Vote Now</a>
+        </section>
+
+        <!-- Join the Pageant Section -->
+        <section id="join" class="feature-section">
+            <h2>Join the Pageant</h2>
+            <p>Think you’ve got what it takes to be Miss Cal? Join the pageant today and showcase your confidence and talent!</p>
+            <a href="http://localhost:3000/formPage.html" class="ct-button">Join Now</a>
+        </section>
+    </main>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2024 Miss Cal. All rights reserved.</p>
+</footer>
+
+<style>
+    /* General Styles */
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #FDB515; /* California Gold */
+        color: #333;
+    }
+
+    .container {
+        width: 90%;
+        margin: auto;
+        max-width: 1200px;
+        text-align: center;
+    }
+
+    /* Header */
+    .main-header {
+        background: #003262; /* Berkeley Blue */
+        color: white;
+        text-align: center;
+        padding: 50px 20px;
+    }
+
+    .main-header .title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .main-header .subtitle {
+        font-size: 1.2rem;
+    }
+
+    /* Navbar */
+    .navbar {
+        background: #003262;
+        color: white;
+        padding: 10px 0;
+    }
+
+    .navbar ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        margin: 0;
+    }
+
+    .navbar ul li {
+        margin: 0 10px;
+        background: #FDB515;
+        font-weight: bold;
+        color: #003262;
+    }
+
+    .navbar ul li a {
+        color: #003262;
+        background: #FDB515;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+
+    .navbar ul li a.vote-button:hover {
+        background: #e0a814;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        background: #003262; /* Berkeley Blue */
+        color: white;
+        padding: 40px;
+        width: 250px;
+        height: 100vh;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        left: 0;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar h3 {
+        margin-bottom: 40px;
+        font-size: 1.5rem;
+        color: #FDB515; /* California Gold */
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .sidebar ul li {
+        margin: 10px 0;
+    }
+
+    .sidebar ul li a {
+        color: white;
+        text-decoration: none;
+        padding: 10px;
+        display: block;
+        border-radius: 5px;
+    }
+
+    .sidebar ul li a:hover {
+        background: #FDB515; /* California Gold */
+        color: #003262; /* Berkeley Blue */
+    }
+
+    .sidebar.hidden {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    /* Toggle Button */
+    .sidebar-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #FDB515;
+        color: #003262;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 1000;
+        font-size: 1.2rem;
+    }
+
+    /* Main Content */
+    .home-container {
+        padding: 30px 20px;
+        margin-left: 0;
+        flex: 1;
+    }
+
+    /* Highlight Section */
+    .highlight-section {
+        background: white;
+        padding: 40px;
+        margin-bottom: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    /* Feature Section */
+    .feature-section {
+        background: #003262; /* Berkeley Blue */
+        color: white;
+        padding: 40px;
+        margin-bottom: 30px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    /* Footer */
+    .footer {
+        background: #003262; /* Berkeley Blue */
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+    }
+</style>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get("user_id");
+
+    // Save back to localStorage
+    if (userId) localStorage.setItem("user_id", userId);
+
+    // Sidebar toggle functionality
+    const sidebar = document.getElementById("sidebar");
+    const sidebarToggle = document.getElementById("sidebarToggle");
+
+    sidebarToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+    });
+    function logout() {
+        // 1) Call your server's "/logout" endpoint (or whichever route you set up)
+        fetch("http://localhost:3000/logout", {
+            method: "POST",
+            credentials: "include"
+        })
+            .then(response => {
+                // 2) Optionally remove user info from localStorage
+                localStorage.removeItem("user_id");
+
+                // 3) Also clear any cookie on the client (helpful if you do a front-end check)
+                document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+                // 4) Redirect to a sign-in page or home page
+                window.location.href = "http://localhost:3000/signIn.html";
+            })
+            .catch(err => {
+                console.error("Logout error:", err);
+                alert("Error logging out. Please try again.");
+            });
+    }
+</script>
+</html>

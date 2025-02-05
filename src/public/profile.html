@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miss Cal - Profile</title>
+    <link rel="stylesheet" type="text/css" href='../styles.css'/>
+</head>
+<body>
+<header class="main-header">
+    <div class="container">
+        <h1 class="title">My Profile</h1>
+        <p class="subtitle">Your current profile information</p>
+    </div>
+</header>
+
+<nav class="navbar">
+    <ul>
+        <li><a href="/mainPage.html">Home</a></li>
+
+        <li><a href="/vote.html">Vote</a></li>
+    </ul>
+</nav>
+
+<main class="profile-container">
+    <h2 class="section-title">Profile Information</h2>
+    <div id="profileData" class="profile-info">
+        <p><strong>Name:</strong> <span id="name">Loading...</span></p>
+        <p><strong>Major:</strong> <span id="major">Loading...</span></p>
+        <p><strong>GPA:</strong> <span id="gpa">Loading...</span></p>
+        <p><strong>Campaign Line:</strong> <span id="campaign_line">Loading...</span></p>
+        <p><strong>Personal Story:</strong> <span id="personal_story">Loading...</span></p>
+        <p><strong>Professional Experience:</strong> <span id="experience">Loading...</span></p>
+        <p><strong>Organizations:</strong> <span id="organizations">Loading...</span></p>
+        <h3>Social Media Links</h3>
+        <div class="social-links">
+            <p><strong>Instagram:</strong> <a id="instagram" href="#" target="_blank">Loading...</a></p>
+            <p><strong>LinkedIn:</strong> <a id="linkedin" href="#" target="_blank">Loading...</a></p>
+            <p><strong>Facebook:</strong> <a id="facebook" href="#" target="_blank">Loading...</a></p>
+            <p><strong>GitHub:</strong> <a id="github" href="#" target="_blank">Loading...</a></p>
+            <p><strong>Snapchat:</strong> <a id="snapchat" href="#" target="_blank">Loading...</a></p>
+            <p><strong>TikTok:</strong> <a id="tiktok" href="#" target="_blank">Loading...</a></p>
+        </div>
+    </div>
+    <h3>Photos</h3>
+    <div id="imageContainer" class="profile-images"></div>
+    <button><a href="http://localhost:3000/editProfile.html" class="cta-button">Edit Profile</a></button>
+</main>
+
+<footer class="footer">
+    <p>&copy; 2024 Miss Cal. All rights reserved.</p>
+</footer>
+
+<style>
+    /* General Styles */
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #FDB515; /* California Gold */
+        color: #333;
+    }
+
+    .container {
+        width: 90%;
+        margin: auto;
+        max-width: 1200px;
+        text-align: center;
+    }
+
+    /* Header */
+    .main-header {
+        background: #003262; /* Berkeley Blue */
+        color: white;
+        text-align: center;
+        padding: 50px 20px;
+    }
+
+    .main-header .title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .main-header .subtitle {
+        font-size: 1.2rem;
+    }
+
+    /* Navbar */
+    .navbar {
+        background: #003262;
+        color: white;
+        padding: 10px 0;
+    }
+
+    .navbar ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        margin: 0;
+    }
+
+    .navbar ul li {
+        margin: 0 10px;
+    }
+
+    .navbar ul li a {
+        color: #003262;
+        background: #FDB515;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+
+    .navbar ul li a:hover {
+        background: #e0a814;
+    }
+
+    /* Profile Container */
+    .profile-container {
+        padding: 30px 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 20px auto;
+        max-width: 600px;
+    }
+
+    .profile-container h2 {
+        color: #003262; /* Berkeley Blue */
+        margin-bottom: 20px;
+    }
+
+    .profile-info p {
+        margin-bottom: 10px;
+        line-height: 1.5;
+        color: #333;
+    }
+
+    .profile-info a {
+        color: #003262; /* Berkeley Blue */
+        text-decoration: none;
+    }
+
+    .profile-info a:hover {
+        text-decoration: underline;
+    }
+
+    /* Social Links */
+    .social-links {
+        margin-top: 10px;
+    }
+
+    /* Images */
+    .profile-images {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .profile-images img {
+        width: 150px;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* CTA Button */
+    .cta-button {
+        display: inline-block;
+        background: #003262; /* Berkeley Blue */
+        color: white;
+
+        padding: 10px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: bold;
+        margin-top: 0px;
+        text-align: center;
+
+    }
+
+
+    /* Footer */
+    .footer {
+        background: #003262; /* Berkeley Blue */
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+    }
+</style>
+
+<script>
+
+
+    // Example usage: Fetch and display image for user with ID 2
+
+    async function fetchProfileData() {
+        try {
+            const response = await fetch("http://localhost:3000/getProfile", {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                // Update fields
+                document.getElementById("name").innerText = data.name || "Not provided";
+                document.getElementById("major").innerText = data.major || "Not provided";
+                document.getElementById("gpa").innerText = data.gpa || "Not provided";
+                document.getElementById("campaign_line").innerText = data.campaign_line || "Not provided";
+                document.getElementById("personal_story").innerText = data.personal_story || "Not provided";
+                document.getElementById("experience").innerText = data.experience || "Not provided";
+                document.getElementById("organizations").innerText = data.organizations || "Not provided";
+
+                // Update social links
+                ["instagram", "linkedin", "facebook", "github", "snapchat", "tiktok"].forEach((platform) => {
+                    const linkElement = document.getElementById(platform);
+                    linkElement.innerText = data[platform] || "Not provided";
+                    linkElement.href = data[platform] || "#";
+                });
+
+                // Handle photos
+                const imageContainer = document.getElementById("imageContainer");
+                imageContainer.innerHTML = ""; // Clear previous images
+
+                if (data.photos && data.photos.length > 0) {
+                    const photosArray = JSON.parse(data.photos); // Convert JSON string to an array
+                    const photoPath = photosArray[0]; // Get the first photo path
+                    const img = document.createElement("img");
+                    img.src = `http://localhost:3000/${photoPath}`; // Use the Base64 string directly
+                    img.alt = "Profile Photo";
+                    img.style.width = "150px";
+                    img.style.borderRadius = "10px";
+                    imageContainer.appendChild(img);
+                } else {
+                    imageContainer.innerHTML = "<p>No photos available</p>";
+                }
+
+            } else {
+                alert("Failed to load profile data.");
+            }
+        } catch (error) {
+            console.error("Error fetching profile data:", error);
+        }
+    }
+
+    // Load profile data on page load
+    fetchProfileData();
+
+</script>
+</body>
+</html>

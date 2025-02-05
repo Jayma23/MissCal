@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Miss Cal</title>
+    <link rel="stylesheet" href="formPage.css">
+</head>
+<body>
+<header class="main-header">
+    <div class="container">
+        <h1 class="title">Join Miss Cal</h1>
+        <p class="subtitle">Showcase your talent, confidence, and story to be part of Miss Cal!</p>
+    </div>
+</header>
+
+<main class="form-container">
+    <form id="joinForm" action="/submitForm" method="POST" enctype="multipart/form-data">
+        <!-- Required Fields -->
+        <h2>Required Information</h2>
+        <label for="name">Full Name:</label>
+        <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
+        <label for="photos">Upload Photos (1-10):</label>
+        <input type="file" id="photos" name="photos" multiple accept="image/*" required>
+
+        <!-- Optional Fields -->
+        <h2>Optional Information</h2>
+        <label for="major">Major:</label>
+        <input type="text" id="major" name="major" placeholder="Enter your major">
+
+        <label for="gpa">GPA:</label>
+        <input type="number" id="gpa" name="gpa" step="0.01" placeholder="Enter your GPA">
+
+        <label for="campaign_line">Campaign Line (50 words max):</label>
+        <textarea id="campaign_line" name="campaign_line" maxlength="250" placeholder="Write your campaign line"></textarea>
+
+        <label for="personal_story">Personal Story (200 words max):</label>
+        <textarea id="personal_story" name="personal_story" maxlength="1000" placeholder="Share your story"></textarea>
+
+        <label for="experience">Professional Experience:</label>
+        <textarea id="experience" name="experience" placeholder="List internships, jobs, or other experience"></textarea>
+
+        <label for="organizations">School Organizations:</label>
+        <textarea id="organizations" name="organizations" placeholder="Clubs, sororities, or other affiliations"></textarea>
+
+        <h2>Social Media Links</h2>
+        <label for="instagram">Instagram:</label>
+        <input type="url" id="instagram" name="instagram" placeholder="https://instagram.com/your-profile">
+
+        <label for="linkedin">LinkedIn:</label>
+        <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/your-profile">
+
+        <label for="facebook">Facebook:</label>
+        <input type="url" id="facebook" name="facebook" placeholder="https://facebook.com/your-profile">
+
+        <label for="github">GitHub:</label>
+        <input type="url" id="github" name="github" placeholder="https://github.com/your-profile">
+
+        <label for="snapchat">Snapchat:</label>
+        <input type="url" id="snapchat" name="snapchat" placeholder="Your Snapchat username or link">
+
+        <label for="tiktok">TikTok:</label>
+        <input type="url" id="tiktok" name="tiktok" placeholder="https://tiktok.com/@your-profile">
+
+        <button type="submit">Submit</button>
+    </form>
+</main>
+<script>
+    document.getElementById("joinForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+
+        // Retrieve user_id from the cookie
+        const getCookie = (name) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        };
+
+        const userId = getCookie("user_id");
+        if (!userId) {
+            alert("You need to log in first!");
+            return;
+        }
+
+        // Append the user_id to the form data
+        formData.append("user_id", userId);
+
+        try {
+            const response = await fetch("http://localhost:3000/submitForm", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (response.ok) {
+                alert("Form submitted successfully!");
+                window.location.href = "http://localhost:3000/mainPage.html";
+            } else {
+                const error = await response.json();
+                alert(error.message);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred while submitting the form. Please try again later.");
+        }
+    });
+</script>
+
+<footer class="footer">
+    <p>&copy; 2024 Miss Cal. All rights reserved.</p>
+</footer>
+
+
+</body>
+</html>
