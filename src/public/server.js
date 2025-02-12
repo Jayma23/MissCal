@@ -197,8 +197,8 @@ app.post("/submitForm", upload.array("photos", 10), (req, res) => {
     });
 });
 // Signup Endpoint
-const { sendVerificationEmail } = require("./sendVerificationEmail");
-const { generateVerificationToken } = require("./generateVerificationToken");
+const { sendVerificationEmail } = require("../sendVerificationEmail");
+const { generateVerificationToken } = require("../generateVerificationToken");
 
 
 // For demonstration, assume you have a 'Users' table with fields:
