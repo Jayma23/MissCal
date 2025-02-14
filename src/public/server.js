@@ -1,5 +1,5 @@
 const express = require("express");
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
@@ -28,10 +28,14 @@ const upload = multer({
 
 // MySQL Database Connection
 const db = mysql.createConnection({
-    host: "127.0.0.1",
-    user: "root",
-    password: "Mzy20020212",
-    database: "accountForStudent",
+    //host: "127.0.0.1",
+    host: "ep-little-cell-a6siaqa3-pooler.us-west-2.aws.neon.tech",
+    //user: "root",
+    user: "neondb_owner",
+    //password: "Mzy20020212",
+    password: "npg_N3jhmKgHalk6",
+    //database: "accountForStudent",
+    database: "neondb",
 });
 
 db.connect((err) => {
