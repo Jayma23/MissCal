@@ -306,6 +306,12 @@
 
     // Run this check on every protected page
     checkLoginStatus();
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = function () {
+        window.history.pushState(null, "", window.location.href);
+        alert("You are logged out. Please sign in again.");
+        window.location.href = "sign-in.html";
+    };
 
 
 </script>

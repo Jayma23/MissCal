@@ -19,7 +19,7 @@
         <li><a href="index.html">Home</a></li>
         <li><a href="#rules">Competition Rules</a></li>
         <li><a href="#privacy">Data Privacy Policy</a></li>
-        <li><a href="apply.html">Apply Now</a></li>
+        <li><a id="applyNowButton" class="btn btn-primary">Apply Now</a></li>
     </ul>
 </nav>
 
@@ -32,7 +32,7 @@
                 <li><strong>Application Process:</strong> Participants must upload:
                     <ul>
                         <li>Preferred name</li>
-                        <li>Up to 10 photos in JPEG or PNG format (max size: 5MB per image)</li>
+                        <li>One amazing photo in JPEG or PNG format</li>
                     </ul>
                     <p>Optional details include GPA, major, personal story, clubs joined, and jobs or internships.</p>
                 </li>
@@ -65,5 +65,24 @@
 <footer class="footer">
     <p>&copy; 2024 College Life. All rights reserved. | <a href="contact.html">Contact Us</a></p>
 </footer>
+
+<script>
+
+    document.getElementById("applyNowButton").addEventListener("click", function () {
+        // Check if the `user_id` cookie exists
+        const userId = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("user_id="))
+            ?.split("=")[1];
+
+        if (userId) {
+            // ✅ User is logged in, redirect to mainPage.html
+            window.location.href = "mainPage.html";
+        } else {
+            // ❌ User is NOT logged in, redirect to index.html
+            window.location.href = "index.html";
+        }
+    });
+</script>
 </body>
 </html>

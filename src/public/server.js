@@ -19,6 +19,12 @@ app.use(cors({
 }));
 // Middleware
 app.use(bodyParser.json());
+app.use((req, res, next) => {
+    if (!req.cookies.user_id && req.path !== "/login" && req.path !== "/signup") {
+        return res.status(401).json({ message: "Unauthorized: Please log in." });
+    }
+    next();
+});
 
 
 // Serve static files
