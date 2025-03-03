@@ -16,8 +16,9 @@
 
 <nav class="navbar">
     <ul>
-        <li><a href="http://localhost:3000/formPage.html">Join the Pageant</a></li>
-        <li><a href="http://localhost:3000/vote.html" class="vote-button">Vote Now</a></li>
+        <li><a href="formPage.html">Join the Pageant</a></li>
+        <li><a href="vote.html" class="vote-button">Vote Now</a></li>
+        <li><a href="leaderBoard.html" class="vote-button">Leader Board</a></li>
     </ul>
 </nav>
 
@@ -26,15 +27,20 @@
 
 <div class="main-layout">
     <!-- Sidebar -->
+
     <aside class="sidebar hidden" id="sidebar">
         <h3>Dashboard</h3>
+
+
         <ul>
-            <li><a href="http://localhost:3000/mainPage.html">Home</a></li>
-            <li><a href="http://localhost:3000/formPage.html">Join the Pageant</a></li>
-            <li><a href="http://localhost:3000/vote.html">Vote</a></li>
-            <li><a href="http://localhost:3000/rules.html">Rules</a></li>
-            <li><a href="http://localhost:3000/profile.html">My Profile</a></li>
-            <li><a href="#" onclick="logout()">Log Off</a></li>
+            <li><a href="mainPage.html">Home</a></li>
+            <li><a href="formPage.html">Join the Pageant</a></li>
+            <li><a href="vote.html">Vote</a></li>
+            <li><a href="rule.html">Rules</a></li>
+            <li><a href="profile.html">My Profile</a></li>
+            <li><a href="leaderBoard.html">Leader Board</a></li>
+            <li><a id="logoffButton" class="btn btn-danger w-100">Log Off</a></li>
+
         </ul>
     </aside>
 
@@ -44,20 +50,20 @@
         <section id="vote" class="highlight-section">
             <h2>Cast Your Vote!</h2>
             <p>Your voice matters! Vote for your favorite participant and help crown Miss Cal.</p>
-            <a href="http://localhost:3000/vote.html" class="cta-button">Vote Now</a>
+            <a href="vote.html" class="cta-button">Vote Now</a>
         </section>
 
         <!-- Join the Pageant Section -->
         <section id="join" class="feature-section">
             <h2>Join the Pageant</h2>
             <p>Think you’ve got what it takes to be Miss Cal? Join the pageant today and showcase your confidence and talent!</p>
-            <a href="http://localhost:3000/formPage.html" class="ct-button">Join Now</a>
+            <a href="formPage.html" class="ct-button">Join Now</a>
         </section>
     </main>
 </div>
 
 <footer class="footer">
-    <p>&copy; 2024 Miss Cal. All rights reserved.</p>
+    <p>&copy; 2024 College Life. All rights reserved.</p>
 </footer>
 
 <style>
@@ -259,12 +265,48 @@
                 document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
                 // 4) Redirect to a sign-in page or home page
-                window.location.href = "http://localhost:3000/signIn.html";
+                window.location.href = "sign-in.html";
             })
             .catch(err => {
                 console.error("Logout error:", err);
                 alert("Error logging out. Please try again.");
             });
     }
+    document.getElementById("logoffButton").addEventListener("click", async () => {
+        try {
+            const response = await fetch("http://localhost:3000/logout", {
+                method: "POST",
+                credentials: "include",
+            });
+
+            if (response.ok) {
+                // ✅ Remove user_id cookie manually (for frontend visibility)
+                document.cookie = "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+
+                alert("You have been logged out.");
+                window.location.href = "sign-in.html";  // ✅ Redirect to login page
+            } else {
+                alert("Logoff failed. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error logging out:", error);
+            alert("An error occurred while logging out.");
+        }
+    });
+    function checkLoginStatus() {
+        const userId = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("user_id="))
+            ?.split("=")[1];
+
+        if (!userId) {
+            window.location.href = "sign-in.html";  // ✅ Redirect if no login cookie
+        }
+    }
+
+    // Run this check on every protected page
+    checkLoginStatus();
+
+
 </script>
 </html>

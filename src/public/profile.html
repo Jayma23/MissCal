@@ -7,6 +7,19 @@
     <link rel="stylesheet" type="text/css" href='styles.css'/>
 </head>
 <body>
+<button id="sidebarToggle" class="sidebar-toggle">☰ </button>
+<aside class="sidebar hidden" id="sidebar">
+    <h3>Dashboard</h3>
+    <ul>
+        <li><a href="mainPage.html">Home</a></li>
+        <li><a href="formPage.html">Join the Pageant</a></li>
+        <li><a href="vote.html">Vote</a></li>
+        <li><a href="rule.html">Rules</a></li>
+        <li><a href="profile.html">My Profile</a></li>
+        <li><a href="leaderBoard.html">Leader Board</a></li>
+        <li><a href="#" onclick="logout()">Log Off</a></li>
+    </ul>
+</aside>
 <header class="main-header">
     <div class="container">
         <h1 class="title">My Profile</h1>
@@ -16,9 +29,9 @@
 
 <nav class="navbar">
     <ul>
-        <li><a href="/mainPage.html">Home</a></li>
+        <li><a href="mainPage.html">Home</a></li>
 
-        <li><a href="/vote.html">Vote</a></li>
+        <li><a href="vote.html">Vote</a></li>
     </ul>
 </nav>
 
@@ -41,14 +54,17 @@
             <p><strong>Snapchat:</strong> <a id="snapchat" href="#" target="_blank">Loading...</a></p>
             <p><strong>TikTok:</strong> <a id="tiktok" href="#" target="_blank">Loading...</a></p>
         </div>
+
+
     </div>
     <h3>Photos</h3>
     <div id="imageContainer" class="profile-images"></div>
-    <button><a href="http://localhost:3000/editProfile.html" class="cta-button">Edit Profile</a></button>
+    <button><a href="editProfile.html" class="cta-button">Edit Profile</a></button>
+
 </main>
 
 <footer class="footer">
-    <p>&copy; 2024 Miss Cal. All rights reserved.</p>
+    <p>&copy; 2024 College Life. All rights reserved.</p>
 </footer>
 
 <style>
@@ -194,9 +210,79 @@
         bottom: 0;
         width: 100%;
     }
+    .sidebar {
+        background: #003262; /* Berkeley Blue */
+        color: white;
+        padding: 40px;
+        width: 250px;
+        height: 100vh;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        left: 0;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar h3 {
+        margin-bottom: 40px;
+        font-size: 1.5rem;
+        color: #FDB515; /* California Gold */
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .sidebar ul li {
+        margin: 10px 0;
+    }
+
+    .sidebar ul li a {
+        color: white;
+        text-decoration: none;
+        padding: 10px;
+        display: block;
+        border-radius: 5px;
+    }
+
+    .sidebar ul li a:hover {
+        background: #FDB515; /* California Gold */
+        color: #003262; /* Berkeley Blue */
+    }
+
+    .sidebar.hidden {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    /* Toggle Button */
+    .sidebar-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #FDB515;
+        color: #003262;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 1000;
+        font-size: 1.2rem;
+    }
 </style>
 
 <script>
+    const sidebar = document.getElementById("sidebar");
+    const sidebarToggle = document.getElementById("sidebarToggle");
+
+    sidebarToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+    });
 
 
     // Example usage: Fetch and display image for user with ID 2
@@ -207,6 +293,7 @@
                 method: "GET",
                 credentials: "include"
             });
+
 
             if (response.ok) {
                 const data = await response.json();
@@ -232,17 +319,39 @@
                 imageContainer.innerHTML = ""; // Clear previous images
 
                 if (data.photos && data.photos.length > 0) {
-                    const photosArray = JSON.parse(data.photos); // Convert JSON string to an array
-                    const photoPath = photosArray[0]; // Get the first photo path
-                    const img = document.createElement("img");
-                    img.src = `http://localhost:3000/${photoPath}`; // Use the Base64 string directly
-                    img.alt = "Profile Photo";
-                    img.style.width = "150px";
-                    img.style.borderRadius = "10px";
-                    imageContainer.appendChild(img);
+                    let photosArray;
+                    try {
+                        photosArray = typeof data.photos === "string" ? JSON.parse(data.photos) : data.photos;
+                    } catch (error) {
+                        console.error("Error parsing photos:", error);
+                        photosArray = [];
+                    }
+
+                    if (Array.isArray(photosArray) && photosArray.length > 0) {
+                        const photoPath = photosArray[0];
+                        const img = document.createElement("img");
+
+                        if (!photoPath) {
+                            console.log("No valid photo path found.");
+                            img.src = "default-profile.png"; // Fallback placeholder
+                        } else {
+                            img.src = `http://localhost:3000/${photoPath}`;
+                        }
+
+                        img.alt = "Profile Photo";
+                        img.style.width = "150px";
+                        img.style.borderRadius = "10px";
+                        imageContainer.appendChild(img);
+
+                        console.log("Image URL:", img.src);
+                    } else {
+                        imageContainer.innerHTML = "<p>No photos available</p>";
+                    }
                 } else {
                     imageContainer.innerHTML = "<p>No photos available</p>";
                 }
+
+
 
             } else {
                 alert("Failed to load profile data.");

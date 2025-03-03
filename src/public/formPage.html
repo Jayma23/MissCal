@@ -1,27 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join Miss Cal</title>
     <link rel="stylesheet" href="formPage.css">
 </head>
+
 <body>
+
 <header class="main-header">
+
     <div class="container">
+
         <h1 class="title">Join Miss Cal</h1>
         <p class="subtitle">Showcase your talent, confidence, and story to be part of Miss Cal!</p>
     </div>
 </header>
 
+
 <main class="form-container">
+
+    <button id="sidebarToggle" class="sidebar-toggle">☰ </button>
+    <aside class="sidebar hidden" id="sidebar">
+        <h3>Dashboard</h3>
+        <ul>
+            <li><a href="mainPage.html">Home</a></li>
+            <li><a href="formPage.html">Join the Pageant</a></li>
+            <li><a href="vote.html">Vote</a></li>
+            <li><a href="rule.html">Rules</a></li>
+            <li><a href="profile.html">My Profile</a></li>
+            <li><a href="#" onclick="logout()">Log Off</a></li>
+        </ul>
+    </aside>
     <form id="joinForm" action="/submitForm" method="POST" enctype="multipart/form-data">
         <!-- Required Fields -->
         <h2>Required Information</h2>
         <label for="name">Full Name:</label>
         <input type="text" id="name" name="name" placeholder="Enter your name" required>
 
-        <label for="photos">Upload Photos (1-10):</label>
+        <label for="photos">Upload Photos (Only One please pick the best one):</label>
         <input type="file" id="photos" name="photos" multiple accept="image/*" required>
 
         <!-- Optional Fields -->
@@ -67,6 +86,15 @@
     </form>
 </main>
 <script>
+
+
+    // Sidebar toggle functionality
+    const sidebar = document.getElementById("sidebar");
+    const sidebarToggle = document.getElementById("sidebarToggle");
+
+    sidebarToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+    });
     document.getElementById("joinForm").addEventListener("submit", async (event) => {
         event.preventDefault();
 
@@ -96,7 +124,7 @@
 
             if (response.ok) {
                 alert("Form submitted successfully!");
-                window.location.href = "http://localhost:3000/mainPage.html";
+                window.location.href = "mainPage.html";
             } else {
                 const error = await response.json();
                 alert(error.message);
@@ -109,7 +137,7 @@
 </script>
 
 <footer class="footer">
-    <p>&copy; 2024 Miss Cal. All rights reserved.</p>
+    <p>&copy; 2024 College Life. All rights reserved.</p>
 </footer>
 
 

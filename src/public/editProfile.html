@@ -119,9 +119,85 @@
             text-align: center;
             padding: 10px 0;
         }
+        .sidebar {
+            background: #003262; /* Berkeley Blue */
+            color: white;
+            padding: 40px;
+            width: 250px;
+            height: 100vh;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 40px;
+            font-size: 1.5rem;
+            color: #FDB515; /* California Gold */
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 10px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            display: block;
+            border-radius: 5px;
+        }
+
+        .sidebar ul li a:hover {
+            background: #FDB515; /* California Gold */
+            color: #003262; /* Berkeley Blue */
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+
+        /* Toggle Button */
+        .sidebar-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #FDB515;
+            color: #003262;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 <body>
+<button id="sidebarToggle" class="sidebar-toggle">☰ </button>
+<aside class="sidebar hidden" id="sidebar">
+    <h3>Dashboard</h3>
+    <ul>
+        <li><a href="mainPage.html">Home</a></li>
+        <li><a href="formPage.html">Join the Pageant</a></li>
+        <li><a href="vote.html">Vote</a></li>
+        <li><a href="rule.html">Rules</a></li>
+        <li><a href="profile.html">My Profile</a></li>
+        <li><a href="#" onclick="logout()">Log Off</a></li>
+    </ul>
+</aside>
 <header class="main-header">
     <h1>Edit Profile</h1>
     <p>Update your profile information below</p>
@@ -129,8 +205,8 @@
 
 <nav class="navbar">
     <ul>
-        <li><a href="http://localhost:3000/mainPage.html">Home</a></li>
-        <li><a href="http://localhost:3000/profile.html">Profile</a></li>
+        <li><a href="mainPage.html">Home</a></li>
+        <li><a href="profile.html">Profile</a></li>
     </ul>
 </nav>
 
@@ -203,16 +279,29 @@
             <label for="tiktok">TikTok:</label>
             <input type="text" id="tiktok" name="tiktok" placeholder="Enter URL or 'NULL'">
         </div>
+        <div class="field-group">
+            <label for="photo">Profile Photo:</label>
+            <input type="file" id="photo" name="photo" accept="image/*">
+        </div>
+
+
+
 
         <button type="submit" class="cta-button">Save Changes</button>
     </form>
 </main>
 
 <footer class="footer">
-    <p>&copy; 2024 Miss Cal. All rights reserved.</p>
+    <p>&copy; 2024 College Life. All rights reserved.</p>
 </footer>
 
 <script>
+    const sidebar = document.getElementById("sidebar");
+    const sidebarToggle = document.getElementById("sidebarToggle");
+
+    sidebarToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+    });
     // Load existing data
     async function loadProfileData() {
         try {
@@ -263,7 +352,7 @@
 
         // Ensure that if "None" is entered, it is passed correctly
         for (let [key, value] of formData.entries()) {
-            if (value.toLowerCase() === 'none') {
+            if (typeof value === "string" && value.toLowerCase() === "none") {
                 formData.set(key, '');  // Replace 'None' with an empty string or handle as required
             }
         }
@@ -277,7 +366,7 @@
 
             if (response.ok) {
                 alert("Profile updated successfully!");
-                window.location.href = "http://localhost:3000/profile.html";
+                window.location.href = "profile.html";
             } else {
                 alert("Failed to update profile.");
             }
