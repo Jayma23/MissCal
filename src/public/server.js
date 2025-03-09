@@ -13,10 +13,8 @@ const PORT = process.env.PORT || 3000;
 const cookieParser = require('cookie-parser');
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(cookieParser());
-app.use(cors({
-    origin: "https://www.misscal.net", // Allow your frontend domain
-    credentials: true, // Allow cookies, authentication headers, etc.
-}));
+
+
 // Middleware
 app.use(bodyParser.json());
 app.use((req, res, next) => {
@@ -35,7 +33,7 @@ const upload = multer({
     limits: { files: 10 } // Limit to a maximum of 10 files
 });
 const corsOptions = {
-    origin: ["http://localhost:63342", "https://www.misscal.net", "http://misscal.net"], // Allow your frontend
+    origin: "*", // Allow your frontend
     credentials: true, // Allow cookies, authentication headers, etc.
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type, Authorization",
