@@ -305,7 +305,7 @@
     // Load existing data
     async function loadProfileData() {
         try {
-            const response = await fetch("http://localhost:3000/getProfile", {
+            const response = await fetch("http://44.223.188.52:3000/getProfile", {
                 method: "GET",
                 credentials: "include",
             });
@@ -358,7 +358,7 @@
         }
 
         try {
-            const response = await fetch("http://localhost:3000/updateProfile", {
+            const response = await fetch("http://44.223.188.52:3000/updateProfile", {
                 method: "POST",
                 body: formData,
                 credentials: "include",

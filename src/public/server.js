@@ -14,8 +14,8 @@ const cookieParser = require('cookie-parser');
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(cookieParser());
 app.use(cors({
-    origin: "http://localhost:63342", // Allow only your frontend
-    credentials: true // Allow cookies, authentication headers, etc.
+    origin: "https://www.misscal.net", // Allow your frontend domain
+    credentials: true, // Allow cookies, authentication headers, etc.
 }));
 // Middleware
 app.use(bodyParser.json());
@@ -277,8 +277,8 @@ app.post("/submitForm", upload.array("photos", 10), (req, res) => {
     });
 });
 // Signup Endpoint
-const { sendVerificationEmail } = require("../sendVerificationEmail");
-const { generateVerificationToken } = require("../generateVerificationToken");
+//const { sendVerificationEmail } = require("../sendVerificationEmail");
+//const { generateVerificationToken } = require("../generateVerificationToken");
 
 
 // For demonstration, assume you have a 'Users' table with fields:
@@ -318,13 +318,13 @@ app.post("/signup", async (req, res) => {
         }
 
         // 3) Attempt to send the email *before* inserting user into DB
-        try {
-            await sendVerificationEmail(email, verificationToken);
-        } catch (mailErr) {
-            console.error("Error sending verification email:", mailErr);
+        //try {
+         //   await sendVerificationEmail(email, verificationToken);
+        ///} catch (mailErr) {
+        //    console.error("Error sending verification email:", mailErr);
             // If we fail here, we do *not* insert the user
-            return res.status(500).json({ message: "Failed to send verification email." });
-        }
+        //    return res.status(500).json({ message: "Failed to send verification email." });
+       // }
 
         // 4) If email sent successfully, now insert user with is_verified=0
         const queryInsert = `
@@ -828,7 +828,8 @@ app.get("/getLeaderboard", (req, res) => {
 
 
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
+
 

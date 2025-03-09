@@ -108,7 +108,7 @@
     document.addEventListener("DOMContentLoaded", async () => {
         try {
             // Fetch student details
-            const response = await fetch("/getStudentDetails", { credentials: "include" });
+            const response = await fetch("http://44.223.188.52:3000/getStudentDetails", { credentials: "include" });
             if (!response.ok) throw new Error("Failed to load student details.");
 
             const data = await response.json();
