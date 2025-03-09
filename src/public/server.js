@@ -24,7 +24,17 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use(cors({
+    origin: ['https://www.misscal.net', 'http://localhost:63342'], // Allow your frontend domain
+    credentials: true, // Allow cookies if using sessions
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
+// Now define routes
+app.get('/test', (req, res) => {
+    res.json({ message: 'CORS working!' });
+});
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -32,14 +42,9 @@ const upload = multer({
     dest: 'uploads/', // Temporary storage folder
     limits: { files: 10 } // Limit to a maximum of 10 files
 });
-const corsOptions = {
-    origin: "*", // Allow your frontend
-    credentials: true, // Allow cookies, authentication headers, etc.
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: "Content-Type, Authorization",
-};
 
-app.use(cors(corsOptions));
+
+
 const { Pool } = require("pg");
 require("dotenv").config(); // Load environment variables
 
