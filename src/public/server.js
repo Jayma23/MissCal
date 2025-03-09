@@ -35,7 +35,7 @@ const upload = multer({
     limits: { files: 10 } // Limit to a maximum of 10 files
 });
 const corsOptions = {
-    origin: "http://localhost:63342", // Allow your frontend
+    origin: ["http://localhost:63342", "https://www.misscal.net", "http://misscal.net"], // Allow your frontend
     credentials: true, // Allow cookies, authentication headers, etc.
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type, Authorization",
