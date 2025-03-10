@@ -13,6 +13,12 @@ const PORT = process.env.PORT || 3000;
 const cookieParser = require('cookie-parser');
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(cookieParser());
+app.use((req, res, next) => {
+    if (!req.cookies.user_id && req.path !== "/login" && req.path !== "/signup") {
+        return res.status(401).json({ message: "Unauthorized: Please log in." });
+    }
+    next();
+});
 
 
 // Middleware
@@ -24,12 +30,28 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(cors({
-    origin: ['https://www.misscal.net', 'http://localhost:63342'], // Allow your frontend domain
-    credentials: true, // Allow cookies if using sessions
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+
+const corsOptions = {
+    origin: ['https://www.misscal.net', 'https://misscal.net'],  // Ensure both versions are included
+    credentials: true,  // ✅ Required for cookies/sessions
+    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],  // ✅ Allow all necessary methods
+    allowedHeaders: ['Content-Type', 'Authorization'],  // ✅ Allow necessary headers
+};
+
+app.use(cors(corsOptions));
+
+// ❌ Remove this duplicate CORS setup in the error handler (causing conflicts)
+// app.use((err, req, res, next) => {
+//     res.header("Access-Control-Allow-Origin", "https://misscal.net");
+//     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+//     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//     res.header("Access-Control-Allow-Credentials", "true");
+//     next(err);
+// });
+
+// ✅ Handle preflight OPTIONS request properly
+app.options('*', cors(corsOptions));
+
 
 // Now define routes
 app.get('/test', (req, res) => {
@@ -400,7 +422,6 @@ app.post("/login", (req, res) => {
             return res.status(500).json({ message: "Database error." });
         }
 
-        //if (results.length === 0) {
         if (!results.rows || results.rows.length === 0) {
             return res.status(404).json({ message: "Email not found." });
         }
@@ -413,16 +434,28 @@ app.post("/login", (req, res) => {
                 return res.status(401).json({ message: "Incorrect password." });
             }
 
+            // ✅ Explicitly set the HTTP-only, Secure cookie for HTTPS
+            res.cookie("user_id", user.user_id, {
+                httpOnly: true,
+                secure: true,  // ✅ Required for HTTPS
+                sameSite: "None", // ✅ Must be None for cross-origin requests
+                path: "/",
+            });
+
+            console.log("✅ Cookie Set: user_id =", user.user_id);
+
             res.status(200).json({
                 message: "Login successful!",
                 user: { id: user.user_id, full_name: user.full_name, email: user.email },
             });
+
         } catch (error) {
             console.error("Password comparison error:", error);
             return res.status(500).json({ message: "Internal server error." });
         }
     });
 });
+
 
 app.get("/getProfile", (req, res) => {
     const userId = req.cookies.user_id;
