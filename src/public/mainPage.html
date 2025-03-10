@@ -253,7 +253,7 @@
     });
     function logout() {
         // 1) Call your server's "/logout" endpoint (or whichever route you set up)
-        fetch("http://44.223.188.52:3000/logout", {
+        fetch("https://sanostutor.com/logout", {
             method: "POST",
             credentials: "include"
         })
@@ -274,7 +274,7 @@
     }
     document.getElementById("logoffButton").addEventListener("click", async () => {
         try {
-            const response = await fetch("http://44.223.188.52:3000/logout", {
+            const response = await fetch("https://sanostutor.com/logout", {
                 method: "POST",
                 credentials: "include",
             });
