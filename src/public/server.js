@@ -31,7 +31,7 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 app.use((req, res, next) => {
     if (req.method === "OPTIONS") {
-        return res.sendStatus(200); 
+        return res.sendStatus(200);
     }
 
     if (!req.cookies.user_id && req.path !== "/login" && req.path !== "/signup") {
