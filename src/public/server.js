@@ -10,6 +10,12 @@ const fs = require('fs');
 
 const app = express(); // Initialize 'app'
 const PORT = process.env.PORT || 3000;
+const corsOptions = {
+    origin: ['https://www.misscal.net', 'https://misscal.net'],  // Ensure both versions are included
+    credentials: true,  // ✅ Required for cookies/sessions
+    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],  // ✅ Allow all necessary methods
+    allowedHeaders: ['Content-Type', 'Authorization'],  // ✅ Allow necessary headers
+};
 const cookieParser = require('cookie-parser');
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(cookieParser());
@@ -24,6 +30,10 @@ app.use((req, res, next) => {
 // Middleware
 app.use(bodyParser.json());
 app.use((req, res, next) => {
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(200); 
+    }
+
     if (!req.cookies.user_id && req.path !== "/login" && req.path !== "/signup") {
         return res.status(401).json({ message: "Unauthorized: Please log in." });
     }
@@ -31,12 +41,8 @@ app.use((req, res, next) => {
 });
 
 
-const corsOptions = {
-    origin: ['https://www.misscal.net', 'https://misscal.net'],  // Ensure both versions are included
-    credentials: true,  // ✅ Required for cookies/sessions
-    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],  // ✅ Allow all necessary methods
-    allowedHeaders: ['Content-Type', 'Authorization'],  // ✅ Allow necessary headers
-};
+
+
 
 app.use(cors(corsOptions));
 
