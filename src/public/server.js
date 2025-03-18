@@ -103,7 +103,7 @@ db.connect((err) => {
 });
 */
 const db = new Pool({
-    connectionString: process.env.DATABASE_URL, // Using the Neon Database URL
+    connectionString: "postgresql://neondb_owner:npg_N3jhmKgHalk6@ep-little-cell-a6siaqa3-pooler.us-west-2.aws.neon.tech/neondb?sslmode=require", // Using the Neon Database URL
     ssl: {
         rejectUnauthorized: false, // Required for Neon
     },
