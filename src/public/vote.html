@@ -266,7 +266,7 @@
 
         try {
             const response = await fetch(
-                `https://sanostutor.com/searchStudents?query=${encodeURIComponent(query)}`,
+                `https://server1.misscal.net/searchStudents?query=${encodeURIComponent(query)}`,
                 { credentials: "include" }
             );
 
@@ -375,7 +375,7 @@
 
                         // Otherwise, proceed with the vote
                         try {
-                            const response = await fetch("https://sanostutor.com/vote", {
+                            const response = await fetch("https://server1.misscal.net/vote", {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json"
