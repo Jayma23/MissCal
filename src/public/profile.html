@@ -335,7 +335,8 @@
                             console.log("No valid photo path found.");
                             img.src = "default-profile.png"; // Fallback placeholder
                         } else {
-                            img.src = `https://misscal.net/${photoPath}`;
+                            const timestamp = new Date().getTime(); // Unique timestamp
+                            img.src = `https://misscal.net/${photoPath}?t=${timestamp}`; // Append timestamp
                         }
 
                         img.alt = "Profile Photo";
