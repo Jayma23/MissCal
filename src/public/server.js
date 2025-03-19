@@ -10,12 +10,12 @@ const fs = require('fs');
 
 const app = express(); // Initialize 'app'
 const PORT = process.env.PORT || 3000;
-const corsOptions = {
-    origin: ['https://www.misscal.net', 'https://misscal.net'],  // Ensure both versions are included
-    credentials: true,  // ✅ Required for cookies/sessions
-    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],  // ✅ Allow all necessary methods
-    allowedHeaders: ['Content-Type', 'Authorization'],  // ✅ Allow necessary headers
-};
+app.use(cors({
+    origin: ["https://misscal.net", "https://www.misscal.net"],  // ✅ Allow your front-end origins
+    credentials: true,  // ✅ Required for cookies and authentication
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],  // ✅ Allow these methods
+    allowedHeaders: ["Content-Type", "Authorization"],  // ✅ Allow necessary headers
+}));
 const cookieParser = require('cookie-parser');
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(cookieParser());
@@ -44,7 +44,7 @@ app.use((req, res, next) => {
 
 
 
-app.use(cors(corsOptions));
+
 
 // ❌ Remove this duplicate CORS setup in the error handler (causing conflicts)
 // app.use((err, req, res, next) => {
@@ -56,7 +56,7 @@ app.use(cors(corsOptions));
 // });
 
 // ✅ Handle preflight OPTIONS request properly
-app.options('*', cors(corsOptions));
+
 
 
 // Now define routes
