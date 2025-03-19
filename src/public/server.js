@@ -118,9 +118,6 @@ db.connect()
 
 module.exports = db;
 app.post("/submitForm", upload.array("photos", 10), (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*"); // Allow requests from all origins
-    res.header("Access-Control-Allow-Methods", "POST");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     const {
         user_id,
         name,
