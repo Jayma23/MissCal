@@ -118,6 +118,9 @@ db.connect()
 
 module.exports = db;
 app.post("/submitForm", upload.array("photos", 10), (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*"); // Allow requests from all origins
+    res.header("Access-Control-Allow-Methods", "POST");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     const {
         user_id,
         name,
@@ -339,7 +342,7 @@ app.post("/signup", async (req, res) => {
         }
 
         // 2) Generate token & hashed password (in memory)
-        const verificationToken = generateVerificationToken();
+        //const verificationToken = generateVerificationToken();
         let hashedPassword;
         try {
             hashedPassword = await bcrypt.hash(password, 10);
@@ -359,10 +362,13 @@ app.post("/signup", async (req, res) => {
 
         // 4) If email sent successfully, now insert user with is_verified=0
         const queryInsert = `
-      INSERT INTO Users (full_name, email, password, email_verification_token, is_verified)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO Users (full_name, email, password, is_verified)
+      VALUES ($1, $2, $3, $4)
+      
     `;
-        db.query(queryInsert, [full_name, email, hashedPassword, verificationToken, false], (err, insertResults) => {
+
+        //db.query(queryInsert, [full_name, email, hashedPassword, verificationToken, false], (err, insertResults) => {
+        db.query(queryInsert, [full_name, email, hashedPassword, false], (err, insertResults) => {
             if (err) {
                 console.error("Database insertion error:", err);
                 return res.status(500).json({ message: "Database error." });
