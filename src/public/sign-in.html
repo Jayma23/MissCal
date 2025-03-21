@@ -203,7 +203,7 @@
 
             if (response.ok) {
                 const data = await response.json();
-                document.cookie = user_id=${data.user.id}; path=/; max-age=${24 * 60 * 60}; secure=${window.location.protocol === 'https:'};;
+                document.cookie = `user_id=${data.user.id}; path=/; max-age=${24 * 60 * 60}; secure=${window.location.protocol === 'https:'};`;
                 showToast("Login successful! Redirecting...", "success");
                 setTimeout(() => window.location.href = "mainPage.html", 1000);
             } else {
@@ -221,14 +221,14 @@
 
     function showToast(message, type) {
         const toast = document.createElement("div");
-        toast.className = toast align-items-center text-bg-${type} border-0 show;
+        toast.className = `toast align-items-center text-bg-${type} border-0 show`;
         toast.role = "alert";
-        toast.innerHTML =
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        ;
+        toast.innerHTML = `
+      <div class="d-flex">
+        <div class="toast-body">${message}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    `;
         document.getElementById("toast-container").appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
