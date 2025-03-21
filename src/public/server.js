@@ -118,6 +118,11 @@ db.connect()
 
 module.exports = db;
 app.post("/submitForm", upload.array("photos", 10), (req, res) => {
+    res.header("Access-Control-Allow-Origin", "https://www.misscal.net");  // Set only your frontend domain
+    res.header("Access-Control-Allow-Credentials", "true");  // Allow credentials (cookies, auth headers)
+    res.header("Access-Control-Allow-Methods", "POST");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
     const {
         user_id,
         name,
