@@ -8,7 +8,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts for elegance -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto&display=swap" rel="stylesheet">
 
     <style>
@@ -29,12 +29,24 @@
             text-align: center;
         }
 
+        .main-header .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .main-header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
         .auth-container {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 40px 15px;
+            background: transparent;
         }
 
         .auth-box {
@@ -47,6 +59,56 @@
             animation: fadeInUp 0.6s ease-out;
         }
 
+        .auth-box h2 {
+            color: #003262;
+            margin-bottom: 30px;
+            font-size: 1.9rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #003262;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 10px 14px;
+        }
+
+        .form-control:focus {
+            border-color: #003262;
+            box-shadow: 0 0 0 0.2rem rgba(0, 50, 98, 0.25);
+        }
+
+        .btn-custom {
+            background: linear-gradient(to right, #003262, #005599);
+            color: white;
+            border: none;
+            padding: 10px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background: linear-gradient(to right, #002147, #004488);
+        }
+
+        .signup-prompt {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .signup-prompt a {
+            color: #003262;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .signup-prompt a:hover {
+            text-decoration: underline;
+        }
+
         .footer {
             background: #003262;
             color: #e0a814;
@@ -56,20 +118,14 @@
         }
 
         @keyframes fadeInUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* 🔥 自定义错误提示框样式 */
-        .error-alert {
-            display: none;
-            margin-bottom: 15px;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -85,10 +141,6 @@
 <main class="auth-container">
     <div class="auth-box">
         <h2 class="text-center">Sign In</h2>
-
-        <!-- 🔥 美化后的错误提示框 -->
-        <div id="errorAlert" class="alert alert-danger error-alert" role="alert"></div>
-
         <form id="signInForm">
             <div class="mb-3">
                 <label for="email" class="form-label">UC Berkeley Email:</label>
@@ -98,7 +150,7 @@
                 <label for="password" class="form-label">Password:</label>
                 <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required />
             </div>
-            <button type="submit" class="btn btn-custom w-100" id="signInBtn">Sign In</button>
+            <button type="submit" class="btn btn-custom w-100">Sign In</button>
         </form>
         <p class="signup-prompt">Don’t have an account? <a href="signup.html">Sign Up</a></p>
     </div>
@@ -113,21 +165,12 @@
     // Initialize Firebase
 </script>
 
-<!-- 🚀 登录逻辑（100% 保持后端逻辑不变） -->
+<!-- Login logic (unchanged) -->
 <script>
     document.getElementById("signInForm").addEventListener("submit", async (event) => {
         event.preventDefault();
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
-        const errorAlert = document.getElementById("errorAlert");
-        const btn = document.getElementById("signInBtn");
-
-        // 隐藏之前的错误提示
-        errorAlert.style.display = "none";
-        errorAlert.innerHTML = "";
-
-        btn.disabled = true;
-        btn.innerHTML = 'Signing in... <span class="spinner-border spinner-border-sm ms-2"></span>';
 
         try {
             const response = await fetch("https://server1.misscal.net/login", {
@@ -143,27 +186,14 @@
                 window.location.href = "mainPage.html";
             } else {
                 const error = await response.json();
-                showError(error.message || "Login failed. Please try again.");
+                console.error("Login error:", error.message);
+                alert(error.message);
             }
         } catch (error) {
             console.error("Error:", error);
-            showError("Network error. Please check your connection.");
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = "Sign In";
+            alert("An error occurred while signing in. Please try again later.");
         }
     });
-
-    function showError(message) {
-        const errorAlert = document.getElementById("errorAlert");
-        errorAlert.innerHTML = `<i class="bi bi-exclamation-circle-fill"></i> ${message}`;
-        errorAlert.style.display = "block";
-
-        // ⏳ 3 秒后自动隐藏错误信息
-        setTimeout(() => {
-            errorAlert.style.display = "none";
-        }, 3000);
-    }
 </script>
 
 <!-- Bootstrap JS -->
