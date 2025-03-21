@@ -142,7 +142,6 @@
 <main class="auth-container">
     <div class="auth-box">
         <h2 class="text-center">Sign In</h2>
-        
         <form id="signInForm">
             <div class="mb-3">
                 <label for="email" class="form-label">UC Berkeley Email:</label>
@@ -190,23 +189,13 @@
             } else {
                 const error = await response.json();
                 console.error("Login error:", error.message);
-                showError(error.message);
+                alert(error.message);
             }
         } catch (error) {
             console.error("Error:", error);
-            showError("An error occurred while signing in. Please try again later.");
+            alert("An error occurred while signing in. Please try again later.");
         }
     });
-    function showError(message) {
-        const errorAlert = document.getElementById("errorAlert");
-        errorAlert.innerHTML = `<i class="bi bi-exclamation-circle-fill"></i> ${message}`;
-        errorAlert.style.display = "block";
-
-        // ⏳ 3 秒后自动隐藏错误信息
-        setTimeout(() => {
-            errorAlert.style.display = "none";
-        }, 3000);
-    }
 </script>
 
 <!-- Bootstrap JS -->
