@@ -8,7 +8,10 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-    <!-- Google Fonts for elegance -->
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto&display=swap" rel="stylesheet">
 
     <style>
@@ -144,13 +147,19 @@
         <form id="signInForm">
             <div class="mb-3">
                 <label for="email" class="form-label">UC Berkeley Email:</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="you@berkeley.edu" required />
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-envelope-fill text-secondary"></i></span>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="you@berkeley.edu" required />
+                </div>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password:</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required />
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-lock-fill text-secondary"></i></span>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required />
+                </div>
             </div>
-            <button type="submit" class="btn btn-custom w-100">Sign In</button>
+            <button type="submit" class="btn btn-custom w-100" id="signInBtn">Sign In</button>
         </form>
         <p class="signup-prompt">Don’t have an account? <a href="signup.html">Sign Up</a></p>
     </div>
@@ -160,17 +169,29 @@
     <p>&copy; 2024 Miss Cal. All rights reserved.</p>
 </footer>
 
+<!-- Toast Container -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+    <div id="toast-container"></div>
+</div>
+
 <!-- Firebase Placeholder -->
 <script type="module">
     // Initialize Firebase
 </script>
 
-<!-- Login logic (unchanged) -->
+<!-- Login logic with toast and button enhancements -->
 <script>
-    document.getElementById("signInForm").addEventListener("submit", async (event) => {
+    const form = document.getElementById("signInForm");
+    const btn = document.getElementById("signInBtn");
+
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
+
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
+
+        btn.disabled = true;
+        btn.innerHTML = 'Signing in... <span class="spinner-border spinner-border-sm ms-2"></span>';
 
         try {
             const response = await fetch("https://server1.misscal.net/login", {
@@ -183,20 +204,38 @@
             if (response.ok) {
                 const data = await response.json();
                 document.cookie = `user_id=${data.user.id}; path=/; max-age=${24 * 60 * 60}; secure=${window.location.protocol === 'https:'};`;
-                window.location.href = "mainPage.html";
+                showToast("Login successful! Redirecting...", "success");
+                setTimeout(() => window.location.href = "mainPage.html", 1000);
             } else {
                 const error = await response.json();
-                console.error("Login error:", error.message);
-                alert(error.message);
+                showToast(error.message || "Login failed", "danger");
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("An error occurred while signing in. Please try again later.");
+            showToast("Something went wrong. Try again.", "danger");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = "Sign In";
         }
     });
+
+    function showToast(message, type) {
+        const toast = document.createElement("div");
+        toast.className = `toast align-items-center text-bg-${type} border-0 show`;
+        toast.role = "alert";
+        toast.innerHTML = `
+      <div class="d-flex">
+        <div class="toast-body">${message}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    `;
+        document.getElementById("toast-container").appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
 </script>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
