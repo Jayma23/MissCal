@@ -17,7 +17,7 @@
         <li><a href="rule.html">Rules</a></li>
         <li><a href="profile.html">My Profile</a></li>
         <li><a href="leaderBoard.html">Leader Board</a></li>
-        <li><a href="#" onclick="logout()">Log Off</a></li>
+        <li><a id="logoffButton" class="btn btn-danger w-100">Log Off</a></li>
     </ul>
 </aside>
 <header class="main-header">
@@ -282,6 +282,27 @@
 
     sidebarToggle.addEventListener("click", () => {
         sidebar.classList.toggle("show");
+    });
+    document.getElementById("logoffButton").addEventListener("click", async () => {
+        try {
+            const response = await fetch("https://server1.misscal.net/logout", {
+                method: "POST",
+                credentials: "include",
+            });
+
+            if (response.ok) {
+                // ✅ Remove user_id cookie manually (for frontend visibility)
+                document.cookie = "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+
+                alert("You have been logged out.");
+                window.location.href = "sign-in.html";  // ✅ Redirect to login page
+            } else {
+                alert("Logoff failed. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error logging out:", error);
+            alert("An error occurred while logging out.");
+        }
     });
 
 
