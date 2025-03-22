@@ -5,19 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Miss Cal - Home</title>
     <link rel="stylesheet" type="text/css" href='mainPage.css'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 <header class="main-header">
     <div class="container">
         <h1 class="title">Welcome to Miss Cal</h1>
         <p class="subtitle">Celebrate Confidence, Talent, and Community</p>
+        <!-- Added countdown timer -->
+        <div class="countdown-timer">
+            <p>Voting closes in: <span id="countdown">00:00:00</span></p>
+        </div>
     </div>
 </header>
 
 <nav class="navbar">
     <ul>
         <li><a href="formPage.html">Join the Pageant</a></li>
-        <li><a href="vote.html" class="vote-button">Vote Now</a></li>
+        <li><a href="vote.html" class="vote-button pulse-button">Vote Now</a></li>
         <li><a href="leaderBoard.html" class="vote-button">Leader Board</a></li>
     </ul>
 </nav>
@@ -27,42 +32,158 @@
 
 <div class="main-layout">
     <!-- Sidebar -->
-
     <aside class="sidebar hidden" id="sidebar">
         <h3>Dashboard</h3>
-
+        <div class="user-profile">
+            <div class="profile-image">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <p>Welcome, <span id="username">User</span>!</p>
+        </div>
 
         <ul>
-            <li><a href="mainPage.html">Home</a></li>
-            <li><a href="formPage.html">Join the Pageant</a></li>
-            <li><a href="vote.html">Vote</a></li>
-            <li><a href="rule.html">Rules</a></li>
-            <li><a href="profile.html">My Profile</a></li>
-            <li><a href="leaderBoard.html">Leader Board</a></li>
-            <li><a id="logoffButton" class="btn btn-danger w-100">Log Off</a></li>
-
+            <li><a href="mainPage.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="formPage.html"><i class="fas fa-user-plus"></i> Join the Pageant</a></li>
+            <li><a href="vote.html"><i class="fas fa-vote-yea"></i> Vote</a></li>
+            <li><a href="rule.html"><i class="fas fa-book"></i> Rules</a></li>
+            <li><a href="profile.html"><i class="fas fa-user-cog"></i> My Profile</a></li>
+            <li><a href="leaderBoard.html"><i class="fas fa-trophy"></i> Leader Board</a></li>
+            <li><a id="logoffButton" class="btn btn-danger w-100"><i class="fas fa-sign-out-alt"></i> Log Off</a></li>
         </ul>
     </aside>
 
     <!-- Main Content -->
     <main class="home-container">
+        <!-- News ticker -->
+        <div class="news-ticker">
+            <span id="news-content">Welcome to Miss Cal 2024! Voting is now open for all contestants.</span>
+        </div>
+
+        <!-- Carousel -->
+        <section class="carousel-container">
+            <div class="carousel-slides" id="carousel">
+                <div class="carousel-slide active">
+                    <img src="/api/placeholder/800/400" alt="Miss Cal Event">
+                    <div class="slide-caption">Join us for the Grand Finale on April 15th!</div>
+                </div>
+                <div class="carousel-slide">
+                    <img src="/api/placeholder/800/400" alt="Contestants">
+                    <div class="slide-caption">Meet our amazing contestants</div>
+                </div>
+                <div class="carousel-slide">
+                    <img src="/api/placeholder/800/400" alt="Last Year Winner">
+                    <div class="slide-caption">Last year's winner shares her journey</div>
+                </div>
+            </div>
+            <button class="carousel-btn prev" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+            <button class="carousel-btn next" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+            <div class="carousel-dots" id="carouselDots">
+                <span class="dot active" data-index="0"></span>
+                <span class="dot" data-index="1"></span>
+                <span class="dot" data-index="2"></span>
+            </div>
+        </section>
+
         <!-- Voting Section -->
         <section id="vote" class="highlight-section">
             <h2>Cast Your Vote!</h2>
             <p>Your voice matters! Vote for your favorite participant and help crown Miss Cal.</p>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <i class="fas fa-users"></i>
+                    <span id="participantCount">24</span>
+                    <p>Participants</p>
+                </div>
+                <div class="stat-box">
+                    <i class="fas fa-vote-yea"></i>
+                    <span id="voteCount">1,587</span>
+                    <p>Votes Cast</p>
+                </div>
+                <div class="stat-box">
+                    <i class="fas fa-clock"></i>
+                    <span id="daysLeft">5</span>
+                    <p>Days Left</p>
+                </div>
+            </div>
             <a href="vote.html" class="cta-button">Vote Now</a>
         </section>
 
         <!-- Join the Pageant Section -->
         <section id="join" class="feature-section">
             <h2>Join the Pageant</h2>
-            <p>Think you’ve got what it takes to be Miss Cal? Join the pageant today and showcase your confidence and talent!</p>
-            <a href="formPage.html" class="ct-button">Join Now</a>
+            <p>Think you've got what it takes to be Miss Cal? Join the pageant today and showcase your confidence and talent!</p>
+            <div class="benefits">
+                <div class="benefit-item">
+                    <i class="fas fa-crown"></i>
+                    <h3>Recognition</h3>
+                    <p>Gain campus-wide recognition</p>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-award"></i>
+                    <h3>Scholarships</h3>
+                    <p>Win valuable scholarships</p>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-users"></i>
+                    <h3>Community</h3>
+                    <p>Join a supportive community</p>
+                </div>
+            </div>
+            <a href="formPage.html" class="cta-button">Join Now</a>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="testimonials-section">
+            <h2>What Our Contestants Say</h2>
+            <div class="testimonial-container" id="testimonials">
+                <div class="testimonial active">
+                    <p>"Participating in Miss Cal was one of the best decisions I made in college. It boosted my confidence and helped me make amazing friends!"</p>
+                    <h4>- Sarah Johnson, 2023 Winner</h4>
+                </div>
+                <div class="testimonial">
+                    <p>"The pageant challenged me in ways I never expected. I learned so much about myself and gained skills that will help me throughout my career."</p>
+                    <h4>- Emma Williams, Finalist</h4>
+                </div>
+                <div class="testimonial">
+                    <p>"Miss Cal isn't just about beauty - it's about showcasing your talents, your voice, and your passion for making a difference."</p>
+                    <h4>- Olivia Chen, Participant</h4>
+                </div>
+            </div>
+            <div class="testimonial-controls">
+                <button id="prevTestimonial"><i class="fas fa-arrow-left"></i></button>
+                <button id="nextTestimonial"><i class="fas fa-arrow-right"></i></button>
+            </div>
         </section>
     </main>
 </div>
 
 <footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="mainPage.html">Home</a></li>
+                <li><a href="formPage.html">Join</a></li>
+                <li><a href="vote.html">Vote</a></li>
+                <li><a href="leaderBoard.html">Results</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Connect With Us</h3>
+            <div class="social-icons">
+                <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+        <div class="footer-section">
+            <h3>Subscribe for Updates</h3>
+            <form id="subscription-form">
+                <input type="email" placeholder="Your email" required>
+                <button type="submit">Subscribe</button>
+            </form>
+        </div>
+    </div>
     <p>&copy; 2024 College Life. All rights reserved.</p>
 </footer>
 
@@ -73,6 +194,7 @@
         font-family: Arial, sans-serif;
         background: #FDB515; /* California Gold */
         color: #333;
+        transition: background 0.3s ease;
     }
 
     .container {
@@ -88,16 +210,49 @@
         color: white;
         text-align: center;
         padding: 50px 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .main-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        
+        opacity: 0.15;
+        z-index: 0;
     }
 
     .main-header .title {
         font-family: 'Playfair Display', serif;
         font-size: 2.5rem;
         margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
     }
 
     .main-header .subtitle {
         font-size: 1.2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .countdown-timer {
+        margin-top: 20px;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
+        display: inline-block;
+        position: relative;
+        z-index: 1;
+    }
+
+    .countdown-timer span {
+        font-weight: bold;
+        color: #FDB515;
     }
 
     /* Navbar */
@@ -105,6 +260,10 @@
         background: #003262;
         color: white;
         padding: 10px 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
     .navbar ul {
@@ -117,9 +276,11 @@
 
     .navbar ul li {
         margin: 0 10px;
-        background: #FDB515;
-        font-weight: bold;
-        color: #003262;
+        transition: transform 0.2s ease;
+    }
+
+    .navbar ul li:hover {
+        transform: translateY(-3px);
     }
 
     .navbar ul li a {
@@ -129,17 +290,36 @@
         padding: 10px 20px;
         border-radius: 5px;
         font-weight: bold;
+        transition: all 0.3s ease;
+        display: block;
     }
 
-    .navbar ul li a.vote-button:hover {
+    .navbar ul li a:hover {
         background: #e0a814;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .pulse-button {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(253, 181, 21, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(253, 181, 21, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(253, 181, 21, 0);
+        }
     }
 
     /* Sidebar */
     .sidebar {
         background: #003262; /* Berkeley Blue */
         color: white;
-        padding: 40px;
+        padding: 40px 25px;
         width: 250px;
         height: 100vh;
         box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -148,12 +328,28 @@
         left: 0;
         transform: translateX(-100%);
         transition: transform 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
     }
 
     .sidebar h3 {
-        margin-bottom: 40px;
+        margin-bottom: 20px;
         font-size: 1.5rem;
         color: #FDB515; /* California Gold */
+        text-align: center;
+    }
+
+    .user-profile {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .profile-image {
+        font-size: 3rem;
+        color: #FDB515;
+        margin-bottom: 10px;
     }
 
     .sidebar ul {
@@ -162,20 +358,28 @@
     }
 
     .sidebar ul li {
-        margin: 10px 0;
+        margin: 5px 0;
     }
 
     .sidebar ul li a {
         color: white;
         text-decoration: none;
-        padding: 10px;
+        padding: 12px 15px;
         display: block;
         border-radius: 5px;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar ul li a i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
     }
 
     .sidebar ul li a:hover {
         background: #FDB515; /* California Gold */
         color: #003262; /* Berkeley Blue */
+        transform: translateX(5px);
     }
 
     .sidebar.hidden {
@@ -197,8 +401,132 @@
         padding: 10px 20px;
         border-radius: 5px;
         cursor: pointer;
-        z-index: 1000;
+        z-index: 1001;
         font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+        background: #e0a814;
+        transform: scale(1.05);
+    }
+
+    /* News Ticker */
+    .news-ticker {
+        background: #003262;
+        color: white;
+        padding: 12px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        position: relative;
+        border-radius: 5px;
+    }
+
+    .news-ticker span {
+        display: inline-block;
+        white-space: nowrap;
+        animation: ticker 20s linear infinite;
+        padding-left: 100%;
+    }
+
+    @keyframes ticker {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-100%); }
+    }
+
+    /* Carousel */
+    .carousel-container {
+        position: relative;
+        max-width: 100%;
+        margin: 0 auto 30px;
+        overflow: hidden;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .carousel-slides {
+        display: flex;
+        transition: transform 0.5s ease;
+    }
+
+    .carousel-slide {
+        min-width: 100%;
+        position: relative;
+        display: none;
+    }
+
+    .carousel-slide.active {
+        display: block;
+    }
+
+    .carousel-slide img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .slide-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 50, 98, 0.7);
+        color: white;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+    }
+
+    .carousel-btn:hover {
+        opacity: 1;
+    }
+
+    .carousel-btn.prev {
+        left: 10px;
+    }
+
+    .carousel-btn.next {
+        right: 10px;
+    }
+
+    .carousel-dots {
+        position: absolute;
+        bottom: 50px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .dot.active {
+        background: white;
     }
 
     /* Main Content */
@@ -216,6 +544,49 @@
         border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .highlight-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .stats-container {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        margin: 30px 0;
+    }
+
+    .stat-box {
+        padding: 20px;
+        margin: 10px;
+        background: #f8f8f8;
+        border-radius: 10px;
+        min-width: 120px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .stat-box:hover {
+        transform: scale(1.05);
+        background: #003262;
+        color: white;
+    }
+
+    .stat-box i {
+        font-size: 2rem;
+        color: #FDB515;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .stat-box span {
+        font-size: 1.5rem;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
     }
 
     /* Feature Section */
@@ -226,6 +597,142 @@
         margin-bottom: 30px;
         border-radius: 10px;
         text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .feature-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .benefits {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        margin: 30px 0;
+    }
+
+    .benefit-item {
+        padding: 20px;
+        margin: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        width: 30%;
+        min-width: 200px;
+        transition: all 0.3s ease;
+    }
+
+    .benefit-item:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-5px);
+    }
+
+    .benefit-item i {
+        font-size: 2.5rem;
+        color: #FDB515;
+        margin-bottom: 15px;
+    }
+
+    .benefit-item h3 {
+        margin-bottom: 10px;
+    }
+
+    /* CTA Buttons */
+    .cta-button {
+        display: inline-block;
+        background: #FDB515;
+        color: #003262;
+        font-weight: bold;
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        font-size: 1.1rem;
+        margin-top: 20px;
+    }
+
+    .cta-button:hover {
+        background: #003262;
+        color: #FDB515;
+        border-color: #FDB515;
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Testimonials */
+    .testimonials-section {
+        background: white;
+        padding: 40px;
+        margin-bottom: 30px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .testimonial-container {
+        position: relative;
+        height: 200px;
+        margin: 30px 0;
+    }
+
+    .testimonial {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.5s ease;
+        padding: 20px;
+        display: none;
+    }
+
+    .testimonial.active {
+        opacity: 1;
+        transform: translateY(0);
+        display: block;
+    }
+
+    .testimonial p {
+        font-style: italic;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        position: relative;
+    }
+
+    .testimonial p::before,
+    .testimonial p::after {
+        content: '"';
+        font-size: 1.5rem;
+        color: #FDB515;
+    }
+
+    .testimonial h4 {
+        margin-top: 20px;
+        color: #003262;
+    }
+
+    .testimonial-controls {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .testimonial-controls button {
+        background: #003262;
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .testimonial-controls button:hover {
+        background: #FDB515;
+        color: #003262;
     }
 
     /* Footer */
@@ -233,7 +740,99 @@
         background: #003262; /* Berkeley Blue */
         color: white;
         text-align: center;
-        padding: 10px 0;
+        padding: 40px 0 10px;
+    }
+
+    .footer-content {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        max-width: 1200px;
+        margin: 0 auto 30px;
+    }
+
+    .footer-section {
+        margin: 0 20px 20px;
+        min-width: 200px;
+    }
+
+    .footer-section h3 {
+        color: #FDB515;
+        margin-bottom: 15px;
+    }
+
+    .footer-section ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .footer-section ul li {
+        margin-bottom: 8px;
+    }
+
+    .footer-section ul li a {
+        color: white;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .footer-section ul li a:hover {
+        color: #FDB515;
+    }
+
+    .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .social-icon {
+        color: white;
+        font-size: 1.5rem;
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .social-icon:hover {
+        color: #FDB515;
+        transform: scale(1.2);
+    }
+
+    #subscription-form {
+        display: flex;
+        margin-top: 15px;
+    }
+
+    #subscription-form input {
+        padding: 10px;
+        border: none;
+        border-radius: 5px 0 0 5px;
+        width: 70%;
+    }
+
+    #subscription-form button {
+        background: #FDB515;
+        color: #003262;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 0 5px 5px 0;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .stat-box, .benefit-item {
+            width: 100%;
+        }
+
+        .footer-section {
+            width: 100%;
+            text-align: center;
+        }
+
+        .social-icons {
+            justify-content: center;
+        }
     }
 </style>
 

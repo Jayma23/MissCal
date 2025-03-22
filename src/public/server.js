@@ -523,14 +523,14 @@ app.post("/updateProfile", upload.single("photo"), (req, res) => {
     const {
         name, major, gpa, campaign_line, personal_story,
         experience, organizations, instagram, linkedin,
-        facebook, github, snapchat, tiktok
+        facebook, github, snapchat, tiktok, year
     } = req.body;
 
     // Prepare fields for update
     const fieldsToUpdate = {
         name, major, gpa, campaign_line, personal_story,
         experience, organizations, instagram, linkedin,
-        facebook, github, snapchat, tiktok
+        facebook, github, snapchat, tiktok, year
     };
 
     // Convert "None" values to empty strings
