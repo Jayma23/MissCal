@@ -133,6 +133,7 @@ app.post("/submitForm", upload.array("photos", 10), (req, res) => {
         experience,
         organizations,
         instagram,
+        year,
         linkedin,
         facebook,
         github,
@@ -191,6 +192,10 @@ app.post("/submitForm", upload.array("photos", 10), (req, res) => {
                 if (gpa && gpa !== existingData.gpa) {
                     fieldsToUpdate.gpa = "?";
                     valuesToUpdate.push(gpa);
+                }
+                if (gpa && gpa !== existingData.year) {
+                    fieldsToUpdate.year = "?";
+                    valuesToUpdate.push(year);
                 }
                 if (campaign_line && campaign_line !== existingData.campaign_line) {
                     fieldsToUpdate.campaign_line = "?";
@@ -268,8 +273,8 @@ app.post("/submitForm", upload.array("photos", 10), (req, res) => {
                     INSERT INTO ContestEntries (user_id, major, gpa, name, campaign_line, personal_story, experience,
                                                 organizations,
                                                 instagram, linkedin, facebook, github, snapchat, tiktok, photos,
-                                                form_submitted)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+                                                form_submitted, year)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
                 `;
                 db.query(
                     queryInsert,
@@ -278,6 +283,7 @@ app.post("/submitForm", upload.array("photos", 10), (req, res) => {
                         major,
                         gpa || null,
                         name,
+                        year || null,
                         campaign_line,
                         personal_story,
                         experience,
