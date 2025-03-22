@@ -5,19 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Miss Cal - Profile</title>
     <link rel="stylesheet" type="text/css" href='styles.css'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 <button id="sidebarToggle" class="sidebar-toggle">☰ </button>
 <aside class="sidebar hidden" id="sidebar">
     <h3>Dashboard</h3>
     <ul>
-        <li><a href="mainPage.html">Home</a></li>
-        <li><a href="formPage.html">Join the Pageant</a></li>
-        <li><a href="vote.html">Vote</a></li>
-        <li><a href="rule.html">Rules</a></li>
-        <li><a href="profile.html">My Profile</a></li>
-        <li><a href="leaderBoard.html">Leader Board</a></li>
-        <li><a id="logoffButton" class="btn btn-danger w-100">Log Off</a></li>
+        <li><a href="mainPage.html"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="formPage.html"><i class="fas fa-user-plus"></i> Join the Pageant</a></li>
+        <li><a href="vote.html"><i class="fas fa-vote-yea"></i> Vote</a></li>
+        <li><a href="rule.html"><i class="fas fa-gavel"></i> Rules</a></li>
+        <li><a href="profile.html" class="active"><i class="fas fa-user-circle"></i> My Profile</a></li>
+        <li><a href="leaderBoard.html"><i class="fas fa-trophy"></i> Leader Board</a></li>
+        <li><a id="logoffButton" class="btn btn-danger w-100"><i class="fas fa-sign-out-alt"></i> Log Off</a></li>
     </ul>
 </aside>
 <header class="main-header">
@@ -30,38 +31,94 @@
 <nav class="navbar">
     <ul>
         <li><a href="mainPage.html">Home</a></li>
-
         <li><a href="vote.html">Vote</a></li>
     </ul>
 </nav>
 
 <main class="profile-container">
-    <h2 class="section-title">Profile Information</h2>
-    <div id="profileData" class="profile-info">
-        <p><strong>Name:</strong> <span id="name">Loading...</span></p>
-        <p><strong>Major:</strong> <span id="major">Loading...</span></p>
-        <p><strong>GPA:</strong> <span id="gpa">Loading...</span></p>
-        <p><strong>Year:</strong> <span id="year">Loading...</span></p>
-        <p><strong>Campaign Line:</strong> <span id="campaign_line">Loading...</span></p>
-        <p><strong>Personal Story:</strong> <span id="personal_story">Loading...</span></p>
-        <p><strong>Professional Experience:</strong> <span id="experience">Loading...</span></p>
-        <p><strong>Organizations:</strong> <span id="organizations">Loading...</span></p>
-        <h3>Social Media Links</h3>
-        <div class="social-links">
-            <p><strong>Instagram:</strong> <a id="instagram" href="#" target="_blank">Loading...</a></p>
-            <p><strong>LinkedIn:</strong> <a id="linkedin" href="#" target="_blank">Loading...</a></p>
-            <p><strong>Facebook:</strong> <a id="facebook" href="#" target="_blank">Loading...</a></p>
-            <p><strong>GitHub:</strong> <a id="github" href="#" target="_blank">Loading...</a></p>
-            <p><strong>Snapchat:</strong> <a id="snapchat" href="#" target="_blank">Loading...</a></p>
-            <p><strong>TikTok:</strong> <a id="tiktok" href="#" target="_blank">Loading...</a></p>
-        </div>
-
-
+    <div class="profile-tabs">
+        <button class="tab-button active" data-tab="basicInfo">Basic Info</button>
+        <button class="tab-button" data-tab="story">My Story</button>
+        <button class="tab-button" data-tab="experience">Experience</button>
+        <button class="tab-button" data-tab="social">Social Media</button>
+        <button class="tab-button" data-tab="photos">Photos</button>
     </div>
-    <h3>Photos</h3>
-    <div id="imageContainer" class="profile-images"></div>
-    <button><a href="editProfile.html" class="cta-button">Edit Profile</a></button>
 
+    <div id="basicInfo" class="tab-content active">
+        <h2 class="section-title">Basic Information</h2>
+        <div class="profile-card">
+            <div class="profile-header">
+                <div id="profileImage" class="profile-avatar">
+                    <img src="default-profile.png" alt="Profile Photo">
+                </div>
+                <div class="profile-details">
+                    <h3 id="name">Loading...</h3>
+                    <p><span class="badge">Class of <span id="year">Loading...</span></span></p>
+                </div>
+            </div>
+            <div class="profile-body">
+                <p><i class="fas fa-graduation-cap"></i> <strong>Major:</strong> <span id="major">Loading...</span></p>
+                <p><i class="fas fa-award"></i> <strong>GPA:</strong> <span id="gpa">Loading...</span></p>
+                <p><i class="fas fa-quote-left"></i> <strong>Campaign Line:</strong> <span id="campaign_line">Loading...</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="story" class="tab-content">
+        <h2 class="section-title">My Story</h2>
+        <div class="story-container">
+            <p id="personal_story">Loading...</p>
+        </div>
+    </div>
+
+    <div id="experience" class="tab-content">
+        <h2 class="section-title">Experience & Organizations</h2>
+        <div class="experience-container">
+            <h3><i class="fas fa-briefcase"></i> Professional Experience</h3>
+            <div id="experience-content" class="content-block">Loading...</div>
+
+            <h3><i class="fas fa-users"></i> Organizations</h3>
+            <div id="organizations-content" class="content-block">Loading...</div>
+        </div>
+    </div>
+
+    <div id="social" class="tab-content">
+        <h2 class="section-title">Social Media</h2>
+        <div class="social-links-grid">
+            <a id="instagram" href="#" target="_blank" class="social-link instagram">
+                <i class="fab fa-instagram"></i> Instagram
+            </a>
+            <a id="linkedin" href="#" target="_blank" class="social-link linkedin">
+                <i class="fab fa-linkedin"></i> LinkedIn
+            </a>
+            <a id="facebook" href="#" target="_blank" class="social-link facebook">
+                <i class="fab fa-facebook"></i> Facebook
+            </a>
+            <a id="github" href="#" target="_blank" class="social-link github">
+                <i class="fab fa-github"></i> GitHub
+            </a>
+            <a id="snapchat" href="#" target="_blank" class="social-link snapchat">
+                <i class="fab fa-snapchat"></i> Snapchat
+            </a>
+            <a id="tiktok" href="#" target="_blank" class="social-link tiktok">
+                <i class="fab fa-tiktok"></i> TikTok
+            </a>
+        </div>
+    </div>
+
+    <div id="photos" class="tab-content">
+        <h2 class="section-title">My Photos</h2>
+        <div id="imageContainer" class="photo-gallery"></div>
+        <div class="photo-controls">
+            <button id="prevPhoto" class="photo-nav-button"><i class="fas fa-chevron-left"></i></button>
+            <span id="photoCounter">Photo 0 of 0</span>
+            <button id="nextPhoto" class="photo-nav-button"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <div class="edit-button-container">
+        <a href="editProfile.html" class="cta-button"><i class="fas fa-edit"></i> Edit Profile</a>
+    </div>
 </main>
 
 <footer class="footer">
@@ -75,6 +132,7 @@
         font-family: Arial, sans-serif;
         background: #FDB515; /* California Gold */
         color: #333;
+        transition: all 0.3s ease;
     }
 
     .container {
@@ -90,16 +148,24 @@
         color: white;
         text-align: center;
         padding: 50px 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .main-header .title {
         font-family: 'Playfair Display', serif;
         font-size: 2.5rem;
         margin-bottom: 10px;
+        animation: fadeIn 1s ease;
     }
 
     .main-header .subtitle {
         font-size: 1.2rem;
+        opacity: 0.9;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     /* Navbar */
@@ -107,6 +173,7 @@
         background: #003262;
         color: white;
         padding: 10px 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .navbar ul {
@@ -128,10 +195,12 @@
         padding: 10px 20px;
         border-radius: 5px;
         font-weight: bold;
+        transition: all 0.3s ease;
     }
 
     .navbar ul li a:hover {
         background: #e0a814;
+        transform: translateY(-2px);
     }
 
     /* Profile Container */
@@ -139,96 +208,339 @@
         padding: 30px 20px;
         background: white;
         border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         margin: 20px auto;
-        max-width: 600px;
+        max-width: 800px;
+        animation: slideUp 0.5s ease;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .profile-container h2 {
         color: #003262; /* Berkeley Blue */
         margin-bottom: 20px;
+        position: relative;
+        display: inline-block;
     }
 
-    .profile-info p {
-        margin-bottom: 10px;
-        line-height: 1.5;
-        color: #333;
+    .profile-container h2::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: #FDB515;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
     }
 
-    .profile-info a {
-        color: #003262; /* Berkeley Blue */
-        text-decoration: none;
+    .profile-container h2:hover::after {
+        transform: scaleX(1);
     }
 
-    .profile-info a:hover {
-        text-decoration: underline;
+    /* Tabs */
+    .profile-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 20px;
+        gap: 5px;
+    }
+
+    .tab-button {
+        background: #f0f0f0;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        color: #003262;
+    }
+
+    .tab-button:hover {
+        background: #e0e0e0;
+    }
+
+    .tab-button.active {
+        background: #003262;
+        color: white;
+    }
+
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Profile Card */
+    .profile-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        border: 1px solid #eee;
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        background: #f9f9f9;
+    }
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 20px;
+        border: 3px solid #FDB515;
+    }
+
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-details {
+        flex: 1;
+    }
+
+    .profile-details h3 {
+        margin: 0 0 5px 0;
+        color: #003262;
+    }
+
+    .badge {
+        background: #FDB515;
+        color: #003262;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    .profile-body {
+        padding: 20px;
+    }
+
+    .profile-body p {
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+
+    .profile-body i {
+        color: #003262;
+        margin-right: 8px;
+    }
+
+    /* Story Container */
+    .story-container {
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 10px;
+        line-height: 1.8;
+        border-left: 5px solid #FDB515;
+    }
+
+    /* Experience Container */
+    .experience-container {
+        padding: 0 10px;
+    }
+
+    .experience-container h3 {
+        color: #003262;
+        margin: 20px 0 10px;
+        display: flex;
+        align-items: center;
+    }
+
+    .experience-container h3 i {
+        margin-right: 10px;
+    }
+
+    .content-block {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        line-height: 1.6;
     }
 
     /* Social Links */
-    .social-links {
-        margin-top: 10px;
-    }
-
-    /* Images */
-    .profile-images {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+    .social-links-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
         margin-top: 20px;
     }
 
-    .profile-images img {
-        width: 150px;
-        height: auto;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    .social-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s ease;
     }
 
-    /* CTA Button */
+    .social-link:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .social-link i {
+        margin-right: 8px;
+        font-size: 1.2rem;
+    }
+
+    .instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+    .linkedin { background: #0077b5; }
+    .facebook { background: #3b5998; }
+    .github { background: #333; }
+    .snapchat { background: #fffc00; color: black; }
+    .tiktok { background: #000000; }
+
+    /* Photo Gallery */
+    .photo-gallery {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+        min-height: 300px;
+    }
+
+    .photo-gallery img {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .photo-gallery img:hover {
+        transform: scale(1.02);
+    }
+
+    .photo-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .photo-nav-button {
+        background: #003262;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 0 15px;
+    }
+
+    .photo-nav-button:hover {
+        background: #FDB515;
+        color: #003262;
+    }
+
+    #photoCounter {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    /* Edit Button */
+    .edit-button-container {
+        text-align: center;
+        margin-top: 30px;
+    }
+
     .cta-button {
         display: inline-block;
         background: #003262; /* Berkeley Blue */
         color: white;
-
-        padding: 10px 20px;
+        text-decoration: none;
+        padding: 12px 25px;
         border-radius: 10px;
         cursor: pointer;
         font-size: 1rem;
         font-weight: bold;
-        margin-top: 0px;
-        text-align: center;
-
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
+    .cta-button:hover {
+        background: #00254a;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .cta-button i {
+        margin-right: 8px;
+    }
 
     /* Footer */
     .footer {
         background: #003262; /* Berkeley Blue */
         color: white;
         text-align: center;
-        padding: 10px 0;
+        padding: 15px 0;
         position: relative;
         bottom: 0;
         width: 100%;
+        margin-top: 30px;
     }
+
+    /* Sidebar */
     .sidebar {
         background: #003262; /* Berkeley Blue */
         color: white;
-        padding: 40px;
+        padding: 40px 25px;
         width: 250px;
         height: 100vh;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
         position: fixed;
         top: 0;
         left: 0;
         transform: translateX(-100%);
         transition: transform 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
     }
 
     .sidebar h3 {
         margin-bottom: 40px;
         font-size: 1.5rem;
         color: #FDB515; /* California Gold */
+        text-align: center;
+        position: relative;
+    }
+
+    .sidebar h3::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 50px;
+        height: 3px;
+        background: #FDB515;
     }
 
     .sidebar ul {
@@ -237,20 +549,28 @@
     }
 
     .sidebar ul li {
-        margin: 10px 0;
+        margin: 15px 0;
     }
 
     .sidebar ul li a {
         color: white;
         text-decoration: none;
-        padding: 10px;
+        padding: 12px;
         display: block;
         border-radius: 5px;
+        transition: all 0.3s ease;
     }
 
-    .sidebar ul li a:hover {
+    .sidebar ul li a:hover, .sidebar ul li a.active {
         background: #FDB515; /* California Gold */
         color: #003262; /* Berkeley Blue */
+        transform: translateX(5px);
+    }
+
+    .sidebar ul li a i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
     }
 
     .sidebar.hidden {
@@ -272,39 +592,79 @@
         padding: 10px 20px;
         border-radius: 5px;
         cursor: pointer;
-        z-index: 1000;
+        z-index: 1001;
         font-size: 1.2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-toggle:hover {
+        background: #e0a814;
+        transform: scale(1.05);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .profile-tabs {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tab-button {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            margin-right: 0;
+            margin-bottom: 15px;
+        }
+
+        .social-links-grid {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
     }
 </style>
 
 <script>
+    // Sidebar Toggle
     const sidebar = document.getElementById("sidebar");
     const sidebarToggle = document.getElementById("sidebarToggle");
 
     sidebarToggle.addEventListener("click", () => {
         sidebar.classList.toggle("show");
     });
-    function logout() {
-        // 1) Call your server's "/logout" endpoint (or whichever route you set up)
-        fetch("https://server1.misscal.net/logout", {
-            method: "POST",
-            credentials: "include"
-        })
-            .then(response => {
-                // 2) Optionally remove user info from localStorage
-                localStorage.removeItem("user_id");
 
-                // 3) Also clear any cookie on the client (helpful if you do a front-end check)
-                document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    // Close sidebar when clicking outside
+    document.addEventListener("click", (event) => {
+        if (!sidebar.contains(event.target) && event.target !== sidebarToggle) {
+            sidebar.classList.remove("show");
+        }
+    });
 
-                // 4) Redirect to a sign-in page or home page
-                window.location.href = "sign-in.html";
-            })
-            .catch(err => {
-                console.error("Logout error:", err);
-                alert("Error logging out. Please try again.");
-            });
-    }
+    // Tab functionality
+    const tabButtons = document.querySelectorAll(".tab-button");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    tabButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            // Remove active class from all buttons and contents
+            tabButtons.forEach(btn => btn.classList.remove("active"));
+            tabContents.forEach(content => content.classList.remove("active"));
+
+            // Add active class to clicked button and corresponding content
+            button.classList.add("active");
+            const tabId = button.getAttribute("data-tab");
+            document.getElementById(tabId).classList.add("active");
+        });
+    });
+
+    // Logout functionality
     document.getElementById("logoffButton").addEventListener("click", async () => {
         try {
             const response = await fetch("https://server1.misscal.net/logout", {
@@ -313,11 +673,11 @@
             });
 
             if (response.ok) {
-                // ✅ Remove user_id cookie manually (for frontend visibility)
+                // Remove user_id cookie manually (for frontend visibility)
                 document.cookie = "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
 
                 alert("You have been logged out.");
-                window.location.href = "sign-in.html";  // ✅ Redirect to login page
+                window.location.href = "sign-in.html";  // Redirect to login page
             } else {
                 alert("Logoff failed. Please try again.");
             }
@@ -327,9 +687,54 @@
         }
     });
 
+    // Photo gallery navigation
+    let currentPhotoIndex = 0;
+    let photos = [];
 
-    // Example usage: Fetch and display image for user with ID 2
+    function updatePhotoDisplay() {
+        const imageContainer = document.getElementById("imageContainer");
 
+        if (photos.length === 0) {
+            imageContainer.innerHTML = "<p>No photos available</p>";
+            document.getElementById("photoCounter").textContent = "No photos";
+            return;
+        }
+
+        // Clear previous image
+        imageContainer.innerHTML = "";
+
+        // Create image element
+        const img = document.createElement("img");
+        const timestamp = new Date().getTime(); // Unique timestamp
+        img.src = `https://misscal.net/${photos[currentPhotoIndex]}?t=${timestamp}`;
+        img.alt = `Profile Photo ${currentPhotoIndex + 1}`;
+
+        // Add loading animation
+        img.onload = function() {
+            img.classList.add("loaded");
+        };
+
+        imageContainer.appendChild(img);
+
+        // Update counter
+        document.getElementById("photoCounter").textContent = `Photo ${currentPhotoIndex + 1} of ${photos.length}`;
+    }
+
+    document.getElementById("prevPhoto").addEventListener("click", () => {
+        if (photos.length === 0) return;
+
+        currentPhotoIndex = (currentPhotoIndex - 1 + photos.length) % photos.length;
+        updatePhotoDisplay();
+    });
+
+    document.getElementById("nextPhoto").addEventListener("click", () => {
+        if (photos.length === 0) return;
+
+        currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
+        updatePhotoDisplay();
+    });
+
+    // Fetch profile data
     async function fetchProfileData() {
         try {
             const response = await fetch("https://server1.misscal.net/getProfile", {
@@ -337,31 +742,39 @@
                 credentials: "include"
             });
 
-
             if (response.ok) {
                 const data = await response.json();
 
-                // Update fields
+                // Update basic info fields
                 document.getElementById("name").innerText = data.name || "Not provided";
                 document.getElementById("major").innerText = data.major || "Not provided";
                 document.getElementById("gpa").innerText = data.gpa || "Not provided";
                 document.getElementById("year").innerText = data.year || "Not provided";
                 document.getElementById("campaign_line").innerText = data.campaign_line || "Not provided";
-                document.getElementById("personal_story").innerText = data.personal_story || "Not provided";
-                document.getElementById("experience").innerText = data.experience || "Not provided";
-                document.getElementById("organizations").innerText = data.organizations || "Not provided";
+
+                // Story tab
+                document.getElementById("personal_story").innerText = data.personal_story || "No personal story provided yet.";
+
+                // Experience tab
+                document.getElementById("experience-content").innerText = data.experience || "No professional experience listed yet.";
+                document.getElementById("organizations-content").innerText = data.organizations || "No organizations listed yet.";
 
                 // Update social links
                 ["instagram", "linkedin", "facebook", "github", "snapchat", "tiktok"].forEach((platform) => {
                     const linkElement = document.getElementById(platform);
-                    linkElement.innerText = data[platform] || "Not provided";
-                    linkElement.href = data[platform] || "#";
+                    const url = data[platform] || "#";
+
+                    // Only show "Not provided" text for non-clickable links
+                    if (url === "#") {
+                        linkElement.innerHTML = `<i class="fab fa-${platform}"></i> Not provided`;
+                        linkElement.classList.add("disabled-link");
+                    } else {
+                        linkElement.innerHTML = `<i class="fab fa-${platform}"></i> ${platform.charAt(0).toUpperCase() + platform.slice(1)}`;
+                        linkElement.href = url;
+                    }
                 });
 
-                // Handle photos
-                const imageContainer = document.getElementById("imageContainer");
-                imageContainer.innerHTML = ""; // Clear previous images
-
+                // Handle profile photo
                 if (data.photos && data.photos.length > 0) {
                     let photosArray;
                     try {
@@ -372,43 +785,53 @@
                     }
 
                     if (Array.isArray(photosArray) && photosArray.length > 0) {
-                        const photoPath = photosArray[0];
-                        const img = document.createElement("img");
+                        // Set global photos array for navigation
+                        photos = photosArray.filter(photo => photo); // Filter out any null values
 
-                        if (!photoPath) {
-                            console.log("No valid photo path found.");
-                            img.src = "default-profile.png"; // Fallback placeholder
-                        } else {
-                            const timestamp = new Date().getTime(); // Unique timestamp
-                            img.src = `https://misscal.net/${photoPath}?t=${timestamp}`; // Append timestamp
+                        // Set profile image
+                        if (photos.length > 0) {
+                            const profileImg = document.querySelector("#profileImage img");
+                            const timestamp = new Date().getTime();
+                            profileImg.src = `https://misscal.net/${photos[0]}?t=${timestamp}`;
                         }
 
-                        img.alt = "Profile Photo";
-                        img.style.width = "150px";
-                        img.style.borderRadius = "10px";
-                        imageContainer.appendChild(img);
-
-                        console.log("Image URL:", img.src);
-                    } else {
-                        imageContainer.innerHTML = "<p>No photos available</p>";
+                        // Initialize photo gallery
+                        currentPhotoIndex = 0;
+                        updatePhotoDisplay();
                     }
-                } else {
-                    imageContainer.innerHTML = "<p>No photos available</p>";
                 }
 
-
+                // Add animation to profile card after data is loaded
+                document.querySelector(".profile-card").classList.add("loaded");
 
             } else {
-                alert("Failed to load profile data.");
+                console.error("Failed to load profile data");
+                document.getElementById("name").innerText = "Error loading profile";
             }
         } catch (error) {
             console.error("Error fetching profile data:", error);
         }
     }
 
-    // Load profile data on page load
-    fetchProfileData();
+    // Add visual feedback on interactive elements
+    document.querySelectorAll(".tab-button, .social-link, .cta-button, .photo-nav-button").forEach(elem => {
+        elem.addEventListener("mousedown", function() {
+            this.style.transform = "scale(0.95)";
+        });
 
+        elem.addEventListener("mouseup", function() {
+            this.style.transform = "";
+        });
+
+        elem.addEventListener("mouseleave", function() {
+            this.style.transform = "";
+        });
+    });
+
+    // Load profile data on page load
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchProfileData();
+    });
 </script>
 </body>
 </html>
