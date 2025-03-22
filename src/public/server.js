@@ -283,7 +283,6 @@ app.post("/submitForm", upload.array("photos", 10), (req, res) => {
                         major,
                         gpa || null,
                         name,
-                        year || null,
                         campaign_line,
                         personal_story,
                         experience,
@@ -296,6 +295,7 @@ app.post("/submitForm", upload.array("photos", 10), (req, res) => {
                         tiktok,
                         JSON.stringify(photos),
                         true,
+                        year || null,
                     ],
                     (err, results) => {
                         if (err) {
