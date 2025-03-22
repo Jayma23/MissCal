@@ -228,6 +228,11 @@
         </div>
 
         <div class="field-group">
+            <label for="year">Year:</label>
+            <input type="text" id="year" name="year">
+        </div>
+
+        <div class="field-group">
             <label for="campaign_line">Campaign Line:</label>
             <input type="text" id="campaign_line" name="campaign_line">
         </div>
@@ -317,6 +322,7 @@
                 document.getElementById("name").value = data.name || "";
                 document.getElementById("major").value = data.major || "";
                 document.getElementById("gpa").value = data.gpa || "";
+                document.getElementById("year").value = data.year || "";
                 document.getElementById("campaign_line").value = data.campaign_line || "";
                 document.getElementById("personal_story").value = data.personal_story || "";
                 document.getElementById("experience").value = data.experience || "";
