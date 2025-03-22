@@ -1,27 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join Miss Cal</title>
     <link rel="stylesheet" href="formPage.css">
+    <style>
+        /* Additional styles for interactive elements */
+        .progress-container {
+            width: 100%;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .form-step {
+            display: none;
+        }
+        .form-step.active {
+            display: block;
+        }
+        .preview-container {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .character-counter {
+            color: #666;
+            font-size: 0.8em;
+            text-align: right;
+            margin-top: 5px;
+        }
+        .field-tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            cursor: help;
+        }
+        .field-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .field-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
 </head>
 
 <body>
-
 <header class="main-header">
-
     <div class="container">
-
         <h1 class="title">Join Miss Cal</h1>
         <p class="subtitle">Showcase your talent, confidence, and story to be part of Miss Cal!</p>
     </div>
 </header>
 
-
 <main class="form-container">
-
     <button id="sidebarToggle" class="sidebar-toggle">☰ </button>
     <aside class="sidebar hidden" id="sidebar">
         <h3>Dashboard</h3>
@@ -34,60 +105,115 @@
             <li><a id="logoffButton" class="btn btn-danger w-100">Log Off</a></li>
         </ul>
     </aside>
+
+    <!-- Progress tracker -->
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p id="progressText">Step 1 of 4: Basic Information</p>
+    </div>
+
     <form id="joinForm" action="/submitForm" method="POST" enctype="multipart/form-data">
-        <!-- Required Fields -->
-        <h2>Required Information</h2>
-        <label for="name">Full Name:</label>
-        <input type="text" id="name" name="name" placeholder="Enter your name" required>
+        <!-- Step 1: Basic Information -->
+        <div class="form-step active" id="step1">
+            <h2>Basic Information</h2>
+            <label for="name">Full Name: <span class="field-tooltip">ⓘ<span class="tooltip-text">Please enter your full legal name as it appears on your ID</span></span></label>
+            <input type="text" id="name" name="name" placeholder="Enter your name" required>
 
-        <label for="photos">Upload Photos (Only One please pick the best one):</label>
-        <input type="file" id="photos" name="photos" multiple accept="image/*" required>
+            <label for="major">Major: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your current academic major</span></span></label>
+            <input type="text" id="major" name="major" placeholder="Enter your major">
 
-        <!-- Optional Fields -->
-        <h2>Optional Information</h2>
-        <label for="major">Major:</label>
-        <input type="text" id="major" name="major" placeholder="Enter your major">
+            <label for="gpa">GPA: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your current cumulative GPA on a 4.0 scale</span></span></label>
+            <input type="number" id="gpa" name="gpa" step="0.01" placeholder="Enter your GPA" min="0" max="4.0">
 
-        <label for="gpa">GPA:</label>
-        <input type="number" id="gpa" name="gpa" step="0.01" placeholder="Enter your GPA">
+            <div class="nav-buttons">
+                <div></div> <!-- Empty div for spacing -->
+                <button type="button" id="nextToStep2">Next: Photo Upload</button>
+            </div>
+        </div>
 
-        <label for="campaign_line">Campaign Line (50 words max):</label>
-        <textarea id="campaign_line" name="campaign_line" maxlength="250" placeholder="Write your campaign line"></textarea>
+        <!-- Step 2: Photo Upload -->
+        <div class="form-step" id="step2">
+            <h2>Photo Upload</h2>
+            <label for="photos">Upload Photos (Only One please pick the best one): <span class="field-tooltip">ⓘ<span class="tooltip-text">Choose a high-quality photo that best represents you</span></span></label>
+            <input type="file" id="photos" name="photos" accept="image/*" required>
 
-        <label for="personal_story">Personal Story (200 words max):</label>
-        <textarea id="personal_story" name="personal_story" maxlength="1000" placeholder="Share your story"></textarea>
+            <div class="preview-container">
+                <h3>Photo Preview</h3>
+                <img id="imagePreview" class="image-preview" src="#" alt="Your image preview">
+            </div>
 
-        <label for="experience">Professional Experience:</label>
-        <textarea id="experience" name="experience" placeholder="List internships, jobs, or other experience"></textarea>
+            <div class="nav-buttons">
+                <button type="button" id="backToStep1">Back</button>
+                <button type="button" id="nextToStep3">Next: Your Story</button>
+            </div>
+        </div>
 
-        <label for="organizations">School Organizations:</label>
-        <textarea id="organizations" name="organizations" placeholder="Clubs, sororities, or other affiliations"></textarea>
+        <!-- Step 3: Personal Story -->
+        <div class="form-step" id="step3">
+            <h2>Your Story</h2>
+            <label for="campaign_line">Campaign Line (50 words max): <span class="field-tooltip">ⓘ<span class="tooltip-text">A short, memorable slogan or phrase that represents your candidacy</span></span></label>
+            <textarea id="campaign_line" name="campaign_line" maxlength="250" placeholder="Write your campaign line"></textarea>
+            <div class="character-counter" id="campaignLineCounter">0/50 words</div>
 
-        <h2>Social Media Links</h2>
-        <label for="instagram">Instagram:</label>
-        <input type="url" id="instagram" name="instagram" placeholder="https://instagram.com/your-profile">
+            <label for="personal_story">Personal Story (200 words max): <span class="field-tooltip">ⓘ<span class="tooltip-text">Share your journey, challenges overcome, and what makes you unique</span></span></label>
+            <textarea id="personal_story" name="personal_story" maxlength="1000" placeholder="Share your story"></textarea>
+            <div class="character-counter" id="personalStoryCounter">0/200 words</div>
 
-        <label for="linkedin">LinkedIn:</label>
-        <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/your-profile">
+            <label for="experience">Professional Experience: <span class="field-tooltip">ⓘ<span class="tooltip-text">List relevant internships, jobs, or other professional experience</span></span></label>
+            <textarea id="experience" name="experience" placeholder="List internships, jobs, or other experience"></textarea>
 
-        <label for="facebook">Facebook:</label>
-        <input type="url" id="facebook" name="facebook" placeholder="https://facebook.com/your-profile">
+            <label for="organizations">School Organizations: <span class="field-tooltip">ⓘ<span class="tooltip-text">Clubs, sororities, or other campus affiliations</span></span></label>
+            <textarea id="organizations" name="organizations" placeholder="Clubs, sororities, or other affiliations"></textarea>
 
-        <label for="github">GitHub:</label>
-        <input type="url" id="github" name="github" placeholder="https://github.com/your-profile">
+            <div class="nav-buttons">
+                <button type="button" id="backToStep2">Back</button>
+                <button type="button" id="nextToStep4">Next: Social Media</button>
+            </div>
+        </div>
 
-        <label for="snapchat">Snapchat:</label>
-        <input type="url" id="snapchat" name="snapchat" placeholder="Your Snapchat username or link">
+        <!-- Step 4: Social Media -->
+        <div class="form-step" id="step4">
+            <h2>Social Media Links</h2>
+            <label for="instagram">Instagram: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your Instagram profile URL</span></span></label>
+            <input type="url" id="instagram" name="instagram" placeholder="https://instagram.com/your-profile">
 
-        <label for="tiktok">TikTok:</label>
-        <input type="url" id="tiktok" name="tiktok" placeholder="https://tiktok.com/@your-profile">
+            <label for="linkedin">LinkedIn: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your LinkedIn profile URL</span></span></label>
+            <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/your-profile">
 
-        <button type="submit">Submit</button>
+            <label for="facebook">Facebook: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your Facebook profile URL</span></span></label>
+            <input type="url" id="facebook" name="facebook" placeholder="https://facebook.com/your-profile">
+
+            <label for="github">GitHub: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your GitHub profile URL</span></span></label>
+            <input type="url" id="github" name="github" placeholder="https://github.com/your-profile">
+
+            <label for="snapchat">Snapchat: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your Snapchat username</span></span></label>
+            <input type="url" id="snapchat" name="snapchat" placeholder="Your Snapchat username or link">
+
+            <label for="tiktok">TikTok: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your TikTok profile URL</span></span></label>
+            <input type="url" id="tiktok" name="tiktok" placeholder="https://tiktok.com/@your-profile">
+
+            <div class="preview-container">
+                <h3>Application Preview</h3>
+                <div id="applicationPreview">
+                    <p>Complete the form to see your application preview</p>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button type="button" id="backToStep3">Back</button>
+                <button type="submit" id="submitButton">Submit Application</button>
+            </div>
+        </div>
     </form>
 </main>
+
+<footer class="footer">
+    <p>&copy; 2024 College Life. All rights reserved.</p>
+</footer>
+
 <script>
-
-
     // Sidebar toggle functionality
     const sidebar = document.getElementById("sidebar");
     const sidebarToggle = document.getElementById("sidebarToggle");
@@ -95,27 +221,8 @@
     sidebarToggle.addEventListener("click", () => {
         sidebar.classList.toggle("show");
     });
-    function logout() {
-        // 1) Call your server's "/logout" endpoint (or whichever route you set up)
-        fetch("https://server1.misscal.net/logout", {
-            method: "POST",
-            credentials: "include"
-        })
-            .then(response => {
-                // 2) Optionally remove user info from localStorage
-                localStorage.removeItem("user_id");
 
-                // 3) Also clear any cookie on the client (helpful if you do a front-end check)
-                document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-                // 4) Redirect to a sign-in page or home page
-                window.location.href = "sign-in.html";
-            })
-            .catch(err => {
-                console.error("Logout error:", err);
-                alert("Error logging out. Please try again.");
-            });
-    }
+    // Logout functionality
     document.getElementById("logoffButton").addEventListener("click", async () => {
         try {
             const response = await fetch("https://server1.misscal.net/logout", {
@@ -124,11 +231,9 @@
             });
 
             if (response.ok) {
-                // ✅ Remove user_id cookie manually (for frontend visibility)
                 document.cookie = "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-
                 alert("You have been logged out.");
-                window.location.href = "sign-in.html";  // ✅ Redirect to login page
+                window.location.href = "sign-in.html";
             } else {
                 alert("Logoff failed. Please try again.");
             }
@@ -138,8 +243,178 @@
         }
     });
 
+    // Multi-step form navigation
+    const steps = ["step1", "step2", "step3", "step4"];
+    let currentStep = 0;
+
+    function updateProgressBar() {
+        const progressPercentage = (currentStep / (steps.length - 1)) * 100;
+        document.getElementById("progressFill").style.width = `${progressPercentage}%`;
+        document.getElementById("progressText").textContent = `Step ${currentStep + 1} of ${steps.length}: ${getStepName(currentStep)}`;
+    }
+
+    function getStepName(step) {
+        const names = ["Basic Information", "Photo Upload", "Your Story", "Social Media"];
+        return names[step];
+    }
+
+    function showStep(stepIndex) {
+        // Hide all steps
+        document.querySelectorAll('.form-step').forEach(step => {
+            step.classList.remove('active');
+        });
+
+        // Show the selected step
+        document.getElementById(steps[stepIndex]).classList.add('active');
+
+        // Update progress bar
+        currentStep = stepIndex;
+        updateProgressBar();
+    }
+
+    // Navigation buttons
+    document.getElementById("nextToStep2").addEventListener("click", () => {
+        if (!document.getElementById("name").value) {
+            alert("Please enter your name before proceeding.");
+            return;
+        }
+        showStep(1);
+    });
+
+    document.getElementById("nextToStep3").addEventListener("click", () => {
+        if (!document.getElementById("photos").files.length) {
+            alert("Please upload a photo before proceeding.");
+            return;
+        }
+        showStep(2);
+    });
+
+    document.getElementById("nextToStep4").addEventListener("click", () => {
+        showStep(3);
+        updateApplicationPreview();
+    });
+
+    document.getElementById("backToStep1").addEventListener("click", () => {
+        showStep(0);
+    });
+
+    document.getElementById("backToStep2").addEventListener("click", () => {
+        showStep(1);
+    });
+
+    document.getElementById("backToStep3").addEventListener("click", () => {
+        showStep(2);
+    });
+
+    // Word counters
+    function countWords(text) {
+        return text.trim().split(/\s+/).filter(Boolean).length;
+    }
+
+    document.getElementById("campaign_line").addEventListener("input", function() {
+        const wordCount = countWords(this.value);
+        const counter = document.getElementById("campaignLineCounter");
+        counter.textContent = `${wordCount}/50 words`;
+
+        if (wordCount > 50) {
+            counter.style.color = "red";
+        } else {
+            counter.style.color = "#666";
+        }
+    });
+
+    document.getElementById("personal_story").addEventListener("input", function() {
+        const wordCount = countWords(this.value);
+        const counter = document.getElementById("personalStoryCounter");
+        counter.textContent = `${wordCount}/200 words`;
+
+        if (wordCount > 200) {
+            counter.style.color = "red";
+        } else {
+            counter.style.color = "#666";
+        }
+    });
+
+    // Image preview
+    document.getElementById("photos").addEventListener("change", function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById("imagePreview");
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Application preview
+    function updateApplicationPreview() {
+        const name = document.getElementById("name").value;
+        const major = document.getElementById("major").value;
+        const campaignLine = document.getElementById("campaign_line").value;
+
+        let previewHTML = "";
+
+        if (name) {
+            previewHTML += `<p><strong>Name:</strong> ${name}</p>`;
+        }
+
+        if (major) {
+            previewHTML += `<p><strong>Major:</strong> ${major}</p>`;
+        }
+
+        if (campaignLine) {
+            previewHTML += `<p><strong>Campaign Line:</strong> ${campaignLine}</p>`;
+        }
+
+        if (document.getElementById("photos").files.length) {
+            previewHTML += `<p><strong>Photo:</strong> Uploaded ✓</p>`;
+        }
+
+        if (previewHTML === "") {
+            previewHTML = "<p>Complete the form to see your application preview</p>";
+        }
+
+        document.getElementById("applicationPreview").innerHTML = previewHTML;
+    }
+
+    // Form submission
     document.getElementById("joinForm").addEventListener("submit", async (event) => {
         event.preventDefault();
+
+        // Validate form
+        const name = document.getElementById("name").value;
+        const photos = document.getElementById("photos").files;
+
+        if (!name) {
+            alert("Please enter your name.");
+            showStep(0);
+            return;
+        }
+
+        if (!photos.length) {
+            alert("Please upload a photo.");
+            showStep(1);
+            return;
+        }
+
+        // Check word counts
+        const campaignLineWordCount = countWords(document.getElementById("campaign_line").value);
+        const personalStoryWordCount = countWords(document.getElementById("personal_story").value);
+
+        if (campaignLineWordCount > 50) {
+            alert("Your campaign line exceeds the 50-word limit. Please edit it before submitting.");
+            showStep(2);
+            return;
+        }
+
+        if (personalStoryWordCount > 200) {
+            alert("Your personal story exceeds the 200-word limit. Please edit it before submitting.");
+            showStep(2);
+            return;
+        }
 
         const formData = new FormData(event.target);
 
@@ -171,19 +446,26 @@
                 window.location.href = "mainPage.html";
             } else {
                 const error = await response.json();
-                alert(error.message);
+                alert(error.message || "Form submission failed. Please try again.");
             }
         } catch (error) {
             console.error("Error:", error);
             alert("An error occurred while submitting the form. Please try again later.");
         }
     });
+
+    // Initialize progress bar
+    updateProgressBar();
+
+    // Add event listeners for real-time validation and preview updates
+    const formInputs = document.querySelectorAll('input, textarea');
+    formInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            if (currentStep === 3) {
+                updateApplicationPreview();
+            }
+        });
+    });
 </script>
-
-<footer class="footer">
-    <p>&copy; 2024 College Life. All rights reserved.</p>
-</footer>
-
-
 </body>
 </html>
