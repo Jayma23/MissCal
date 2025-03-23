@@ -792,7 +792,7 @@
                         if (photos.length > 0) {
                             const profileImg = document.querySelector("#profileImage img");
                             const timestamp = new Date().getTime();
-                            profileImg.src = `https://misscal.net/${photos[0]}?t=${timestamp}`;
+                            profileImg.src = `https://server1.misscal.net/photos/${photos[0]}?t=${timestamp}`;
                         }
 
                         // Initialize photo gallery
