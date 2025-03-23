@@ -1,54 +1,162 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Miss Cal - Leader Board</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --berkeley-blue: #003262;
+            --california-gold: #FDB515;
+            --light-gray: #f4f4f4;
+            --white: #ffffff;
+            --dark: #222222;
+            --transition-speed: 0.3s;
+        }
+
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #FDB515;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--california-gold);
             color: #333;
             text-align: center;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        body.dark-mode {
+            background: #222;
+            color: #f0f0f0;
         }
 
         .leaderboard-container {
-            max-width: 600px;
+            max-width: 700px;
             margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             overflow: hidden;
+            transition: all var(--transition-speed);
+            transform: translateY(0);
+        }
+
+        body.dark-mode .leaderboard-container {
+            background: #333;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
         .leaderboard-title {
-            font-size: 2rem;
-            color: #003262;
-            margin-bottom: 20px;
+            font-size: 2.5rem;
+            color: var(--berkeley-blue);
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
+            transition: color var(--transition-speed);
+        }
+
+        body.dark-mode .leaderboard-title {
+            color: var(--california-gold);
+        }
+
+        .leaderboard-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--california-gold);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .leaderboard-title:hover::after {
+            width: 120px;
         }
 
         .leaderboard {
-            max-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: #003262 #FDB515;
+            scrollbar-color: var(--berkeley-blue) var(--california-gold);
+            padding: 10px;
+        }
+
+        .leaderboard::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .leaderboard::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .leaderboard::-webkit-scrollbar-thumb {
+            background: var(--berkeley-blue);
+            border-radius: 10px;
         }
 
         .leaderboard-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-            transition: background 0.3s;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            background: var(--white);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all var(--transition-speed);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark-mode .leaderboard-item {
+            background: #444;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
 
         .leaderboard-item:hover {
-            background: #f4f4f4;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .rank {
+            font-size: 1.8rem;
+            font-weight: bold;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 15px;
+            transition: all var(--transition-speed);
+        }
+
+        .rank-1 {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+        }
+
+        .rank-2 {
+            background: linear-gradient(45deg, #C0C0C0, #A9A9A9);
+            color: white;
+            box-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
+        }
+
+        .rank-3 {
+            background: linear-gradient(45deg, #CD7F32, #8B4513);
+            color: white;
+            box-shadow: 0 0 10px rgba(205, 127, 50, 0.5);
+        }
+
+        .rank-other {
+            background: var(--berkeley-blue);
+            color: white;
         }
 
         .leaderboard-item img {
@@ -56,68 +164,179 @@
             height: 80px;
             border-radius: 50%;
             object-fit: cover;
-            margin-right: 15px;
+            margin-right: 20px;
+            border: 3px solid var(--california-gold);
+            transition: all var(--transition-speed);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .leaderboard-item span {
+        .leaderboard-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .participant-info {
             flex-grow: 1;
             text-align: left;
+            padding-right: 15px;
+        }
+
+        .participant-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--berkeley-blue);
+            transition: color var(--transition-speed);
+        }
+
+        body.dark-mode .participant-name {
+            color: var(--california-gold);
         }
 
         .vote-button {
-            background: #003262;
+            background: var(--berkeley-blue);
             color: white;
-            padding: 8px 15px;
-            border-radius: 10px;
+            padding: 10px 20px;
+            border-radius: 25px;
             border: none;
             cursor: pointer;
-            transition: transform 0.3s;
+            transition: all var(--transition-speed);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .vote-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        .vote-button:hover::before {
+            left: 100%;
         }
 
         .vote-button:hover {
-            transform: scale(1.1);
-            background: #001F3F;
+            background: var(--california-gold);
+            color: var(--berkeley-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 50, 98, 0.3);
         }
+
+        .vote-button:active {
+            transform: translateY(0);
+        }
+
         .sidebar {
-            background: #003262; /* Berkeley Blue */
+            background: var(--berkeley-blue);
             color: white;
-            padding: 40px;
-            width: 250px;
+            padding: 40px 30px;
+            width: 280px;
             height: 100vh;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
             position: fixed;
             top: 0;
             left: 0;
             transform: translateX(-100%);
-            transition: transform 0.3s ease;
+            transition: transform var(--transition-speed);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        body.dark-mode .sidebar {
+            background: #111;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
         }
 
         .sidebar h3 {
             margin-bottom: 40px;
-            font-size: 1.5rem;
-            color: #FDB515; /* California Gold */
+            font-size: 1.8rem;
+            color: var(--california-gold);
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .sidebar h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--california-gold);
+            border-radius: 3px;
         }
 
         .sidebar ul {
             list-style: none;
             padding: 0;
+            margin-top: 30px;
         }
 
         .sidebar ul li {
-            margin: 10px 0;
+            margin: 15px 0;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all var(--transition-speed);
         }
+
+        .sidebar.show ul li {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Staggered animation for menu items */
+        .sidebar.show ul li:nth-child(1) { transition-delay: 0.1s; }
+        .sidebar.show ul li:nth-child(2) { transition-delay: 0.2s; }
+        .sidebar.show ul li:nth-child(3) { transition-delay: 0.3s; }
+        .sidebar.show ul li:nth-child(4) { transition-delay: 0.4s; }
+        .sidebar.show ul li:nth-child(5) { transition-delay: 0.5s; }
+        .sidebar.show ul li:nth-child(6) { transition-delay: 0.6s; }
+        .sidebar.show ul li:nth-child(7) { transition-delay: 0.7s; }
 
         .sidebar ul li a {
             color: white;
             text-decoration: none;
-            padding: 10px;
-            display: block;
-            border-radius: 5px;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            border-radius: 10px;
+            transition: all var(--transition-speed);
+            font-weight: 500;
+            gap: 15px;
+        }
+
+        .sidebar ul li a i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.2rem;
         }
 
         .sidebar ul li a:hover {
-            background: #FDB515; /* California Gold */
-            color: #003262; /* Berkeley Blue */
+            background: var(--california-gold);
+            color: var(--berkeley-blue);
+            transform: translateX(5px);
+        }
+
+        #logoffButton {
+            background: #dc3545;
+            color: white;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+
+        #logoffButton:hover {
+            background: #bd2130;
+            color: white;
         }
 
         .sidebar.hidden {
@@ -133,42 +352,298 @@
             position: fixed;
             top: 20px;
             left: 20px;
-            background: #FDB515;
-            color: #003262;
+            background: var(--berkeley-blue);
+            color: var(--california-gold);
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 15px;
+            border-radius: 10px;
             cursor: pointer;
-            z-index: 1000;
+            z-index: 1001;
             font-size: 1.2rem;
+            transition: all var(--transition-speed);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--california-gold);
+            color: var(--berkeley-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar-toggle:active {
+            transform: translateY(0);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            max-width: 350px;
+            background: var(--berkeley-blue);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 1000;
+        }
+
+        .toast.success {
+            background: #28a745;
+        }
+
+        .toast.error {
+            background: #dc3545;
+        }
+
+        .toast.info {
+            background: var(--berkeley-blue);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .toast-icon {
+            font-size: 1.5rem;
+        }
+
+        .toast-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 0;
+            margin-left: 15px;
+        }
+
+        .toast-close:hover {
+            transform: scale(1.2);
+        }
+
+        /* Floating buttons */
+        .floating-actions {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 999;
+        }
+
+        .floating-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--berkeley-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all var(--transition-speed);
+            font-size: 1.2rem;
+        }
+
+        .floating-btn:hover {
+            background: var(--california-gold);
+            color: var(--berkeley-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Loader */
+        .loader-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 5px solid var(--california-gold);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .leaderboard-container {
+                margin: 70px 20px;
+                padding: 20px;
+            }
+
+            .leaderboard-item {
+                flex-direction: column;
+                text-align: center;
+                padding: 15px 10px;
+            }
+
+            .rank {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .leaderboard-item img {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .participant-info {
+                text-align: center;
+                padding-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        /* Pulse animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge-new {
+            background: #ff4757;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        .vote-animation {
+            position: absolute;
+            font-size: 24px;
+            color: var(--california-gold);
+            animation: float-up 2s forwards;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50px);
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body>
-<button id="sidebarToggle" class="sidebar-toggle">☰ </button>
+<button id="sidebarToggle" class="sidebar-toggle"><i class="fas fa-bars"></i></button>
+
+<!-- Floating Action Buttons -->
+<div class="floating-actions">
+    <div class="floating-btn" id="darkModeToggle" title="Toggle Dark Mode">
+        <i class="fas fa-moon"></i>
+    </div>
+    <div class="floating-btn" id="refreshBtn" title="Refresh Leaderboard">
+        <i class="fas fa-sync-alt"></i>
+    </div>
+    <div class="floating-btn" id="scrollTopBtn" title="Back to Top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+</div>
+
+<!-- Loader -->
+<div class="loader-container" id="loaderContainer">
+    <div class="loader"></div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast">
+    <div class="toast-content">
+        <div class="toast-icon">
+            <i class="fas fa-info-circle"></i>
+        </div>
+        <div class="toast-message">This is a notification</div>
+    </div>
+    <button class="toast-close"><i class="fas fa-times"></i></button>
+</div>
 
 <div class="main-layout">
     <!-- Sidebar -->
     <aside class="sidebar hidden" id="sidebar">
         <h3>Dashboard</h3>
         <ul>
-            <li><a href="mainPage.html">Home</a></li>
-            <li><a href="formPage.html">Join the Pageant</a></li>
-            <li><a href="vote.html">Vote</a></li>
-            <li><a href="rule.html">Rules</a></li>
-            <li><a href="profile.html">My Profile</a></li>
-            <li><a href="leaderBoard.html">Leader Board</a></li>
-            <li><a id="logoffButton" class="btn btn-danger w-100">Log Off</a></li>
+            <li><a href="mainPage.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="formPage.html"><i class="fas fa-user-plus"></i> Join the Pageant</a></li>
+            <li><a href="vote.html"><i class="fas fa-vote-yea"></i> Vote</a></li>
+            <li><a href="rule.html"><i class="fas fa-gavel"></i> Rules</a></li>
+            <li><a href="profile.html"><i class="fas fa-user-circle"></i> My Profile</a></li>
+            <li><a href="leaderBoard.html"><i class="fas fa-trophy"></i> Leader Board <span class="badge badge-new">Live</span></a></li>
+            <li><a id="logoffButton" class="btn btn-danger w-100"><i class="fas fa-sign-out-alt"></i> Log Off</a></li>
         </ul>
     </aside>
-<div class="leaderboard-container animate__animated animate__fadeInUp">
-    <h2 class="leaderboard-title">Leaderboard</h2>
-    <div class="leaderboard" id="leaderboard">
-        <!-- Leaderboard data will be inserted here dynamically -->
+    <div class="leaderboard-container animate__animated animate__fadeInUp">
+        <h2 class="leaderboard-title">Leaderboard</h2>
+        <div class="leaderboard" id="leaderboard">
+            <!-- Leaderboard data will be inserted here dynamically -->
+        </div>
     </div>
 </div>
 
 <script>
+    // Get elements
+    const sidebar = document.getElementById("sidebar");
+    const sidebarToggle = document.getElementById("sidebarToggle");
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    const scrollTopBtn = document.getElementById("scrollTopBtn");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const loaderContainer = document.getElementById("loaderContainer");
+    const toast = document.getElementById("toast");
+    const toastClose = document.querySelector(".toast-close");
+    const toastMessage = document.querySelector(".toast-message");
+    const toastIcon = document.querySelector(".toast-icon i");
+
+    // Cookie helper function (keeping your original function)
     function getCookieValue(name) {
         const cookies = document.cookie.split(";");
         for (let c of cookies) {
@@ -179,132 +654,260 @@
         }
         return null;
     }
-    const sidebar = document.getElementById("sidebar");
-    const sidebarToggle = document.getElementById("sidebarToggle");
 
+    // Get logged in user
+    const loggedInUserId = getCookieValue("user_id");
+
+    // Toggle sidebar
     sidebarToggle.addEventListener("click", () => {
         sidebar.classList.toggle("show");
+        sidebar.classList.toggle("hidden");
     });
 
-    const loggedInUserId = getCookieValue("user_id");
-    function logout() {
-        // 1) Call your server's "/logout" endpoint (or whichever route you set up)
-        fetch("https://server1.misscal.net/logout", {
-            method: "POST",
-            credentials: "include"
-        })
-            .then(response => {
-                // 2) Optionally remove user info from localStorage
-                localStorage.removeItem("user_id");
+    // Toggle dark mode
+    darkModeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
 
-                // 3) Also clear any cookie on the client (helpful if you do a front-end check)
-                document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        // Update icon
+        if (document.body.classList.contains("dark-mode")) {
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            localStorage.setItem("darkMode", "enabled");
+        } else {
+            darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            localStorage.setItem("darkMode", "disabled");
+        }
+    });
 
-                // 4) Redirect to a sign-in page or home page
-                window.location.href = "sign-in.html";
-            })
-            .catch(err => {
-                console.error("Logout error:", err);
-                alert("Error logging out. Please try again.");
-            });
+    // Check for saved dark mode preference
+    if (localStorage.getItem("darkMode") === "enabled") {
+        document.body.classList.add("dark-mode");
+        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
     }
+
+    // Scroll to top
+    scrollTopBtn.addEventListener("click", () => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    });
+
+    // Refresh leaderboard
+    refreshBtn.addEventListener("click", () => {
+        // Add rotation animation to refresh icon
+        refreshBtn.querySelector('i').classList.add('fa-spin');
+
+        // Fetch the leaderboard data
+        fetchLeaderboard();
+
+        // Remove animation after a short delay
+        setTimeout(() => {
+            refreshBtn.querySelector('i').classList.remove('fa-spin');
+            showToast("Leaderboard refreshed!", "success");
+        }, 1000);
+    });
+
+    // Toast functionality
+    function showToast(message, type = "info") {
+        toastMessage.textContent = message;
+        toast.className = "toast";
+        toast.classList.add(type);
+        toast.classList.add("show");
+
+        // Update icon based on type
+        if (type === "success") {
+            toastIcon.className = "fas fa-check-circle";
+        } else if (type === "error") {
+            toastIcon.className = "fas fa-exclamation-circle";
+        } else {
+            toastIcon.className = "fas fa-info-circle";
+        }
+
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 5000);
+    }
+
+    // Close toast manually
+    toastClose.addEventListener("click", () => {
+        toast.classList.remove("show");
+    });
+
+    // Logout function (keeping your original implementation)
     document.getElementById("logoffButton").addEventListener("click", async () => {
         try {
+            // Show loader
+            loaderContainer.style.display = "flex";
+
             const response = await fetch("https://server1.misscal.net/logout", {
                 method: "POST",
                 credentials: "include",
             });
 
+            // Hide loader
+            loaderContainer.style.display = "none";
+
             if (response.ok) {
-                // ✅ Remove user_id cookie manually (for frontend visibility)
+                // Remove user_id cookie manually (for frontend visibility)
                 document.cookie = "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
 
-                alert("You have been logged out.");
-                window.location.href = "sign-in.html";  // ✅ Redirect to login page
+                showToast("You have been logged out. Redirecting...", "success");
+
+                // Redirect after a short delay
+                setTimeout(() => {
+                    window.location.href = "sign-in.html";
+                }, 1500);
             } else {
-                alert("Logoff failed. Please try again.");
+                showToast("Logoff failed. Please try again.", "error");
             }
         } catch (error) {
+            // Hide loader
+            loaderContainer.style.display = "none";
             console.error("Error logging out:", error);
-            alert("An error occurred while logging out.");
+            showToast("An error occurred while logging out.", "error");
         }
     });
 
-    async function fetchLeaderboard() {
-        try {
-            const response = await fetch("https://server1.misscal.net/getLeaderboard", { credentials: "include" });
-            const data = await response.json();
+    // Create vote animation
+    function createVoteAnimation(button) {
+        const heart = document.createElement('div');
+        heart.className = 'vote-animation';
+        heart.innerHTML = '<i class="fas fa-heart"></i>';
+        heart.style.left = button.offsetLeft + (button.offsetWidth / 2) + 'px';
+        heart.style.top = button.offsetTop + 'px';
 
-            const leaderboard = document.getElementById("leaderboard");
-            leaderboard.innerHTML = "";
+        document.body.appendChild(heart);
 
-            // Get top 5 participants only
-            const top5Participants = data.slice(0, 5);
-
-            top5Participants.forEach((participant, index) => {
-                const entry = document.createElement("div");
-                entry.classList.add("leaderboard-item");
-
-                entry.innerHTML = `
-                <span>${index + 1}.</span>
-                <img src="${participant.photo}" alt="${participant.name}">
-                <span>${participant.name}</span>
-                <button class="vote-button" id="vote-btn-${participant.user_id}">Vote</button>
-            `;
-
-                leaderboard.appendChild(entry);
-
-                // ✅ Attach event listener dynamically to each vote button
-
-                    const voteButton = document.getElementById(`vote-btn-${participant.user_id}`);
-                    if (voteButton) {
-                        voteButton.addEventListener("click", () => vote(participant.user_id));
-                    } else {
-                        console.error(`❌ Vote button not found for ${participant.name} (${participant.user_id})`);
-                    }
-                });
-
-        } catch (error) {
-            console.error("Error fetching leaderboard:", error);
-        }
+        // Remove after animation
+        setTimeout(() => {
+            heart.remove();
+        }, 2000);
     }
 
-
-    // ✅ Fixed `vote` function to work correctly for top 5
+    // Vote function - keeping your original implementation
     async function vote(candidateId) {
         try {
             if (!candidateId) {
-                alert("Error: No candidate ID provided.");
+                showToast("Error: No candidate ID provided.", "error");
                 return;
             }
+
+            // Show loader
+            loaderContainer.style.display = "flex";
 
             const response = await fetch("https://server1.misscal.net/vote", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
-                body: JSON.stringify({ candidateId })  // ✅ Ensure correct format
+                body: JSON.stringify({ candidateId })
             });
+
+            // Hide loader
+            loaderContainer.style.display = "none";
 
             const data = await response.json();
             if (!response.ok) {
-                alert(`Vote failed: ${data.message}`);
+                showToast(`Vote failed: ${data.message}`, "error");
             } else {
-                alert(data.message);  // "Vote successful!"
-                fetchLeaderboard();  // ✅ Refresh leaderboard after voting
+                showToast(data.message || "Vote successful!", "success");
+                fetchLeaderboard();  // Refresh leaderboard after voting
             }
         } catch (error) {
+            // Hide loader
+            loaderContainer.style.display = "none";
             console.error("Error while voting:", error);
-            alert("An error occurred while casting your vote.");
+            showToast("An error occurred while casting your vote.", "error");
         }
     }
 
+    // Fetch leaderboard data - keeping your original implementation with enhanced UI
+    async function fetchLeaderboard() {
+        try {
+            // Show loader
+            loaderContainer.style.display = "flex";
 
-    // Call fetchLeaderboard when the page loads
-    fetchLeaderboard();
+            const response = await fetch("https://server1.misscal.net/getLeaderboard", { credentials: "include" });
+            const data = await response.json();
 
+            // Hide loader
+            loaderContainer.style.display = "none";
 
+            const leaderboard = document.getElementById("leaderboard");
+            leaderboard.innerHTML = "";
 
-    fetchLeaderboard();
+            // Get top 5 participants
+            const top5Participants = data.slice(0, 5);
+
+            top5Participants.forEach((participant, index) => {
+                const entry = document.createElement("div");
+                entry.className = "leaderboard-item animate__animated animate__fadeInUp";
+
+                // Add animation delay based on index
+                entry.style.animationDelay = `${index * 0.1}s`;
+
+                // Determine rank class
+                let rankClass = "rank-other";
+                if (index === 0) rankClass = "rank-1";
+                else if (index === 1) rankClass = "rank-2";
+                else if (index === 2) rankClass = "rank-3";
+
+                entry.innerHTML = `
+                    <div class="rank ${rankClass}">${index + 1}</div>
+                    <img src="${participant.photo || 'https://randomuser.me/api/portraits/lego/0.jpg'}"
+                         alt="${participant.name}"
+                         onerror="this.src='https://randomuser.me/api/portraits/lego/0.jpg'">
+                    <div class="participant-info">
+                        <div class="participant-name">${participant.name}</div>
+                    </div>
+                    <button class="vote-button" id="vote-btn-${participant.user_id}">
+                        <i class="fas fa-heart"></i> Vote
+                    </button>
+                `;
+
+                leaderboard.appendChild(entry);
+
+                // Attach event listener to vote button (keeping your original implementation)
+                const voteButton = document.getElementById(`vote-btn-${participant.user_id}`);
+                if (voteButton) {
+                    voteButton.addEventListener("click", () => {
+                        // Add vote animation
+                        createVoteAnimation(voteButton);
+
+                        // Add button animation
+                        voteButton.style.animation = 'pulse 0.5s';
+
+                        // Call original vote function
+                        vote(participant.user_id);
+
+                        // Remove animation after it completes
+                        setTimeout(() => {
+                            voteButton.style.animation = '';
+                        }, 500);
+                    });
+                } else {
+                    console.error(`Vote button not found for ${participant.name} (${participant.user_id})`);
+                }
+            });
+
+        } catch (error) {
+            // Hide loader
+            loaderContainer.style.display = "none";
+            console.error("Error fetching leaderboard:", error);
+            showToast("Failed to load leaderboard. Please try again.", "error");
+        }
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+        // Call fetchLeaderboard when the page loads
+        fetchLeaderboard();
+
+        // Show welcome toast
+        setTimeout(() => {
+            showToast("Welcome to the Miss Cal Leaderboard!", "info");
+        }, 1000);
+    });
 </script>
 </body>
 </html>
