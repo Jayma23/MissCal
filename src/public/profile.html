@@ -779,10 +779,12 @@
     }
 
     // Display photos in gallery
+    // Modify your photo handling code to safely handle single photo uploads
     function updatePhotoDisplay() {
         const imageContainer = document.getElementById("imageContainer");
 
-        if (photos.length === 0) {
+        // Check if photos is defined, an array, and has content
+        if (!photos || !Array.isArray(photos) || photos.length === 0) {
             imageContainer.innerHTML = "<p>No photos available</p>";
             document.getElementById("photoCounter").textContent = "No photos";
             return;
@@ -791,23 +793,48 @@
         // Clear previous image
         imageContainer.innerHTML = "";
 
+        // Ensure currentPhotoIndex is within bounds
+        if (currentPhotoIndex >= photos.length) {
+            currentPhotoIndex = 0;
+        }
+
         // Create image element
         const img = document.createElement("img");
-        img.src = photos[currentPhotoIndex];
+        const photoSrc = photos[currentPhotoIndex];
+
+        // Verify we have a valid string for the photo source
+        if (photoSrc && typeof photoSrc === 'string') {
+            img.src = photoSrc;
+        } else {
+            // Inline data URI for a placeholder - no HTTP request needed
+            img.src = 'data:image/svg+xml;charset=utf-8,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 viewBox%3D%220 0 100 100%22%3E%3Crect width%3D%22100%22 height%3D%22100%22 fill%3D%22%23eee%22%2F%3E%3Ctext x%3D%2250%25%22 y%3D%2250%25%22 dominant-baseline%3D%22middle%22 text-anchor%3D%22middle%22 font-family%3D%22sans-serif%22 font-size%3D%2220%22 fill%3D%22%23999%22%3EPhoto%3C%2Ftext%3E%3C%2Fsvg%3E';
+        }
+
         img.alt = `Profile Photo ${currentPhotoIndex + 1}`;
 
-        // Add robust error handling
+        // Add error handling that won't cause infinite loops
         img.onerror = function() {
-            // Use a relative path from your website root
-            this.src = '/assets/default-photo.jpg'; // Update this path to your default image
-            this.alt = 'Default Profile Photo';
-            console.log('Using default photo due to loading error');
+            // Only use the fallback if we're not already using it
+            if (!this.src.includes('data:image/svg')) {
+                this.src = 'data:image/svg+xml;charset=utf-8,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 viewBox%3D%220 0 100 100%22%3E%3Crect width%3D%22100%22 height%3D%22100%22 fill%3D%22%23eee%22%2F%3E%3Ctext x%3D%2250%25%22 y%3D%2250%25%22 dominant-baseline%3D%22middle%22 text-anchor%3D%22middle%22 font-family%3D%22sans-serif%22 font-size%3D%2220%22 fill%3D%22%23999%22%3EPhoto%3C%2Ftext%3E%3C%2Fsvg%3E';
+                console.log('Using inline fallback image');
+            }
         };
 
         imageContainer.appendChild(img);
 
-        // Update counter
-        document.getElementById("photoCounter").textContent = `Photo ${currentPhotoIndex + 1} of ${photos.length}`;
+        // Update counter - handle the case with only one photo
+        if (photos.length === 1) {
+            document.getElementById("photoCounter").textContent = "Photo 1 of 1";
+
+            // Optionally disable navigation buttons if there's only one photo
+            const prevButton = document.getElementById("prevPhoto");
+            const nextButton = document.getElementById("nextPhoto");
+            if (prevButton) prevButton.disabled = true;
+            if (nextButton) nextButton.disabled = true;
+        } else {
+            document.getElementById("photoCounter").textContent = `Photo ${currentPhotoIndex + 1} of ${photos.length}`;
+        }
     }
 
     // Initialize event listeners for gallery navigation
