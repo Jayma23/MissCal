@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Vote for Students</title>
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,11 +12,30 @@
             background: #FDB515; /* California Gold */
             color: #333;
             min-height: 100vh;
+            transition: background 0.5s ease;
+        }
+
+        .dark-mode {
+            background: #222;
+            color: #f0f0f0;
+        }
+
+        .dark-mode .container {
+            background: #333;
+            color: #f0f0f0;
+        }
+
+        .dark-mode .student-card {
+            background: #444;
+            border-color: #FDB515;
+            color: #f0f0f0;
+        }
+
+        .dark-mode h1 {
+            color: #FDB515;
         }
 
         .container {
-            /* We'll remove the "display: flex; justify-content: center; align-items: center;"
-               so the sidebar can stay at the left side */
             width: 90%;
             max-width: 800px;
             background: white;
@@ -25,6 +44,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             margin: 40px auto; /* center horizontally, margin at top for the toggle btn */
             text-align: center;
+            transition: all 0.3s ease;
         }
 
         h1 {
@@ -32,6 +52,7 @@
             margin-bottom: 20px;
             font-size: 2rem;
             font-family: 'Playfair Display', serif;
+            transition: color 0.3s ease;
         }
 
         .search-container {
@@ -47,6 +68,12 @@
             border: 2px solid #003262; /* Berkeley Blue */
             border-radius: 5px;
             font-size: 1rem;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .search-container input:focus {
+            box-shadow: 0 0 5px #FDB515;
+            outline: none;
         }
 
         .search-container button {
@@ -57,33 +84,81 @@
             border-radius: 5px;
             font-size: 1rem;
             cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
 
         .search-container button:hover {
             background: #e0a814;
+            transform: translateY(-2px);
+        }
+
+        .search-container button:active {
+            transform: translateY(1px);
+        }
+
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            background: #003262;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: #FDB515;
+            color: #003262;
+        }
+
+        .filter-btn.active {
+            background: #FDB515;
+            color: #003262;
         }
 
         .results {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 20px;
+            transition: all 0.5s ease;
         }
 
         .student-card {
             background: white;
             border: 1px solid #003262; /* Berkeley Blue */
-            padding: 10px;
+            padding: 15px;
             border-radius: 10px;
             text-align: center;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .student-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
         }
 
         .student-card img {
             max-width: 100%;
-            height: 150px;
+            height: 180px;
             object-fit: cover;
             border-radius: 8px;
             margin-bottom: 10px;
+            transition: transform 0.5s ease;
+        }
+
+        .student-card:hover img {
+            transform: scale(1.05);
         }
 
         .student-card p {
@@ -93,17 +168,55 @@
         }
 
         .extra-fields {
-            display: none; /* Hide by default */
-            margin-top: 10px;
-            text-align: left; /* Make sure the extra fields align left */
+            max-height: 0;
+            overflow: hidden;
+            margin-top: 0;
+            text-align: left;
+            transition: max-height 0.5s ease, margin-top 0.3s ease;
+        }
+
+        .extra-fields.show {
+            max-height: 1000px;
+            margin-top: 15px;
         }
 
         .student-card .social-links a {
-            display: block;
+            display: inline-block;
             color: #003262;
             text-decoration: none;
-            margin: 5px 0;
-            word-break: break-all; /* handle long URLs */
+            margin: 5px 8px;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .student-card .social-links a:hover {
+            transform: translateY(-3px);
+            color: #FDB515;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .social-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #003262;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            background: #FDB515;
+            color: #003262;
+            transform: scale(1.1);
         }
 
         /* Button container for show more / show less and vote */
@@ -122,16 +235,50 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .student-card button:hover {
             background: #e0a814;
+            transform: translateY(-2px);
         }
 
         /* Make Vote button bigger and centered */
         .vote-button {
             font-size: 1.2rem;
             padding: 12px 25px;
+            background: linear-gradient(135deg, #003262, #0a4d8c);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vote-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .vote-button:hover::before {
+            left: 100%;
+        }
+
+        .vote-count {
+            display: inline-block;
+            background: #FDB515;
+            color: #003262;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 0.8rem;
+            line-height: 24px;
+            text-align: center;
+            margin-left: 8px;
+            transition: transform 0.3s ease;
         }
 
         /* SIDEBAR STYLES */
@@ -147,6 +294,7 @@
             left: 0;
             transform: translateX(-100%); /* hidden by default */
             transition: transform 0.3s ease;
+            z-index: 1000;
         }
 
         .sidebar h3 {
@@ -161,8 +309,23 @@
         }
 
         .sidebar ul li {
-            margin: 10px 0;
+            margin: 15px 0;
+            transform: translateX(-20px);
+            opacity: 0;
+            transition: all 0.3s ease;
         }
+
+        .sidebar.show ul li {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Staggered animation for menu items */
+        .sidebar.show ul li:nth-child(1) { transition-delay: 0.1s; }
+        .sidebar.show ul li:nth-child(2) { transition-delay: 0.2s; }
+        .sidebar.show ul li:nth-child(3) { transition-delay: 0.3s; }
+        .sidebar.show ul li:nth-child(4) { transition-delay: 0.4s; }
+        .sidebar.show ul li:nth-child(5) { transition-delay: 0.5s; }
 
         .sidebar ul li a {
             color: white;
@@ -170,11 +333,13 @@
             padding: 10px;
             display: block;
             border-radius: 5px;
+            transition: all 0.3s ease;
         }
 
         .sidebar ul li a:hover {
             background: #FDB515; /* California Gold */
             color: #003262; /* Berkeley Blue */
+            transform: translateX(5px);
         }
 
         .sidebar.hidden {
@@ -193,47 +358,363 @@
             background: #003262;
             color: #FDB515;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 15px;
             border-radius: 5px;
             cursor: pointer;
-            z-index: 1000; /* so it stays above the sidebar */
+            z-index: 1001; /* so it stays above the sidebar */
             font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: #FDB515;
+            color: #003262;
+        }
+
+        /* Floating action buttons */
+        .floating-actions {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .floating-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #003262;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .floating-btn:hover {
+            background: #FDB515;
+            color: #003262;
+            transform: translateY(-3px);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #003262;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Loading animation */
+        .loader {
+            display: none;
+            margin: 20px auto;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #003262;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 5px;
+        }
+
+        .pagination button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #003262;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover {
+            background: #FDB515;
+            color: #003262;
+        }
+
+        .pagination button.active {
+            background: #FDB515;
+            color: #003262;
+        }
+
+        /* Motion effects */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .student-card {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Staggered animation for cards */
+        .student-card:nth-child(1) { animation-delay: 0.1s; }
+        .student-card:nth-child(2) { animation-delay: 0.2s; }
+        .student-card:nth-child(3) { animation-delay: 0.3s; }
+        .student-card:nth-child(4) { animation-delay: 0.4s; }
+        .student-card:nth-child(5) { animation-delay: 0.5s; }
+        .student-card:nth-child(6) { animation-delay: 0.6s; }
+
+        /* Pulse animation for vote button */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 
 <body>
 <!-- Sidebar Toggle Button -->
-<button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+<button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+<!-- Floating Action Buttons -->
+<div class="floating-actions">
+    <div class="floating-btn" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+        <i class="fas fa-moon" id="theme-icon"></i>
+    </div>
+    <div class="floating-btn" onclick="scrollToTop()" title="Back to Top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
 
 <!-- The Sidebar -->
 <aside class="sidebar hidden" id="sidebar">
     <h3>Dashboard</h3>
     <ul>
-        <li><a href="mainPage.html">Home</a></li>
-        <li><a href="formPage.html">Join the Pageant</a></li>
-        <li><a href="vote.html">Vote</a></li>
-        <li><a href="rule.html">Rules</a></li>
-        <li><a href="profile.html">My Profile</a></li>
+        <li><a href="mainPage.html"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="formPage.html"><i class="fas fa-user-plus"></i> Join the Pageant</a></li>
+        <li><a href="vote.html"><i class="fas fa-vote-yea"></i> Vote</a></li>
+        <li><a href="rule.html"><i class="fas fa-gavel"></i> Rules</a></li>
+        <li><a href="profile.html"><i class="fas fa-user-circle"></i> My Profile</a></li>
     </ul>
 </aside>
 
 <div class="container">
     <h1>Vote for Students</h1>
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search by name or major" />
-        <button onclick="searchStudents()">Search</button>
+        <input type="text" id="searchInput" placeholder="Search by name or major" oninput="debounceSearch()" />
+        <button onclick="searchStudents()"><i class="fas fa-search"></i> Search</button>
     </div>
+
+    <div class="filter-container">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="engineering">Engineering</button>
+        <button class="filter-btn" data-filter="arts">Arts & Humanities</button>
+        <button class="filter-btn" data-filter="science">Science</button>
+        <button class="filter-btn" data-filter="business">Business</button>
+    </div>
+
+    <div class="loader" id="loader"></div>
     <div id="results" class="results"></div>
+
+    <div class="pagination" id="pagination"></div>
 </div>
 
 <script>
+    // Store students data globally to enable filtering
+    let allStudents = [];
+    let filteredStudents = [];
+    let currentPage = 1;
+    const studentsPerPage = 6;
+
+    // For demo purposes - sample student data
+    const demoStudents = [
+        {
+            userId: 1,
+            name: "Alex Johnson",
+            major: "Computer Science",
+            photo: "https://randomuser.me/api/portraits/men/1.jpg",
+            gpa: "3.85",
+            personal_story: "First-generation college student passionate about AI and machine learning.",
+            campaign_line: "Innovation through inclusion",
+            experience: "Research assistant at the AI Lab, Teaching Assistant for CS101",
+            organizations: "Computer Science Club, Chess Team",
+            instagram: "https://instagram.com/example",
+            linkedin: "https://linkedin.com/in/example",
+            github: "https://github.com/example"
+        },
+        {
+            userId: 2,
+            name: "Taylor Smith",
+            major: "Mechanical Engineering",
+            photo: "https://randomuser.me/api/portraits/women/2.jpg",
+            gpa: "3.92",
+            personal_story: "Aspiring robotics engineer with a passion for sustainable design.",
+            campaign_line: "Building a greener tomorrow",
+            experience: "Internship at Tesla, Engineering Club President",
+            organizations: "Women in Engineering, Robotics Club",
+            instagram: "https://instagram.com/example",
+            linkedin: "https://linkedin.com/in/example"
+        },
+        {
+            userId: 3,
+            name: "Jordan Lee",
+            major: "Business Administration",
+            photo: "https://randomuser.me/api/portraits/men/3.jpg",
+            gpa: "3.7",
+            personal_story: "Entrepreneur who started a campus delivery service that now employs 15 students.",
+            campaign_line: "Leadership through service",
+            experience: "Student Business Incubator, Marketing Intern at Google",
+            organizations: "Entrepreneurship Society, Basketball Team",
+            instagram: "https://instagram.com/example",
+            linkedin: "https://linkedin.com/in/example",
+            tiktok: "https://tiktok.com/@example"
+        },
+        {
+            userId: 4,
+            name: "Riley Chen",
+            major: "English Literature",
+            photo: "https://randomuser.me/api/portraits/women/4.jpg",
+            gpa: "3.95",
+            personal_story: "Published poet and aspiring professor dedicated to making literature accessible to all.",
+            campaign_line: "Words create worlds",
+            experience: "Editor of Campus Literary Magazine, Tutor at Writing Center",
+            organizations: "Poetry Club, Theater Group",
+            instagram: "https://instagram.com/example"
+        },
+        {
+            userId: 5,
+            name: "Morgan Davis",
+            major: "Biology",
+            photo: "https://randomuser.me/api/portraits/men/5.jpg",
+            gpa: "3.88",
+            personal_story: "Pre-med student volunteering at local hospitals since freshman year.",
+            campaign_line: "Healing through understanding",
+            experience: "Research in Genetics Lab, Hospital Volunteer Coordinator",
+            organizations: "Pre-med Society, Tennis Club",
+            instagram: "https://instagram.com/example",
+            linkedin: "https://linkedin.com/in/example"
+        },
+        {
+            userId: 6,
+            name: "Avery Wilson",
+            major: "Political Science",
+            photo: "https://randomuser.me/api/portraits/women/6.jpg",
+            gpa: "3.9",
+            personal_story: "Passionate about policy reform and civic engagement on campus.",
+            campaign_line: "Your voice matters",
+            experience: "Congressional Intern, Student Government Vice President",
+            organizations: "Model UN, Debate Team",
+            instagram: "https://instagram.com/example",
+            linkedin: "https://linkedin.com/in/example",
+            facebook: "https://facebook.com/example"
+        },
+        {
+            userId: 7,
+            name: "Cameron Wright",
+            major: "Environmental Science",
+            photo: "https://randomuser.me/api/portraits/men/7.jpg",
+            gpa: "3.75",
+            personal_story: "Climate activist organizing campus sustainability initiatives.",
+            campaign_line: "For our future",
+            experience: "EPA Summer Researcher, Sustainability Office Assistant",
+            organizations: "Environmental Club, Hiking Society",
+            instagram: "https://instagram.com/example"
+        },
+        {
+            userId: 8,
+            name: "Harper Garcia",
+            major: "Fine Arts",
+            photo: "https://randomuser.me/api/portraits/women/8.jpg",
+            gpa: "3.8",
+            personal_story: "First-generation student using art to bridge cultural divides.",
+            campaign_line: "Creating connections through creativity",
+            experience: "Gallery Assistant, Campus Mural Project Lead",
+            organizations: "Art Students League, Cultural Exchange Club",
+            instagram: "https://instagram.com/example",
+            tiktok: "https://tiktok.com/@example"
+        }
+    ];
+
+    // Dark mode toggle
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const themeIcon = document.getElementById('theme-icon');
+        if (document.body.classList.contains('dark-mode')) {
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            themeIcon.classList.replace('fa-sun', 'fa-moon');
+            localStorage.setItem('darkMode', 'disabled');
+        }
+    }
+
+    // Check for saved dark mode preference
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('theme-icon').classList.replace('fa-moon', 'fa-sun');
+    }
+
+    // Scroll to top function
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'info') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = 'toast show';
+
+        // Set color based on type
+        if (type === 'success') {
+            toast.style.background = '#28a745';
+        } else if (type === 'error') {
+            toast.style.background = '#dc3545';
+        } else {
+            toast.style.background = '#003262';
+        }
+
+        setTimeout(() => {
+            toast.className = 'toast';
+        }, 3000);
+    }
+
     /**
-     * Toggles the sidebar between hidden and shown
+     * Toggles the sidebar between hidden and shown with animation
      */
     function toggleSidebar() {
         const sidebar = document.getElementById("sidebar");
-        // if it's hidden, remove 'hidden' class and add 'show', otherwise do the opposite
         sidebar.classList.toggle("hidden");
         sidebar.classList.toggle("show");
     }
@@ -257,14 +738,386 @@
     // Attempt to read the user ID from a cookie named "user_id"
     const loggedInUserId = getCookieValue("user_id");
 
-    async function searchStudents() {
-        const query = document.getElementById("searchInput").value.trim();
-        if (!query) {
-            alert("Please enter a name or major to search.");
+    // Filter buttons functionality
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active class from all buttons
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+
+            // Add active class to clicked button
+            btn.classList.add('active');
+
+            // Apply filter
+            const filter = btn.getAttribute('data-filter');
+            filterStudents(filter);
+        });
+    });
+
+    // Filter students by major category
+    function filterStudents(category) {
+        if (category === 'all') {
+            filteredStudents = [...allStudents];
+        } else {
+            filteredStudents = allStudents.filter(student => {
+                const major = student.major?.toLowerCase() || '';
+
+                if (category === 'engineering') {
+                    return major.includes('engineering') || major.includes('computer') ||
+                        major.includes('electrical') || major.includes('mechanical');
+                } else if (category === 'arts') {
+                    return major.includes('art') || major.includes('music') ||
+                        major.includes('history') || major.includes('english') ||
+                        major.includes('literature') || major.includes('philosophy');
+                } else if (category === 'science') {
+                    return major.includes('biology') || major.includes('chemistry') ||
+                        major.includes('physics') || major.includes('math') ||
+                        major.includes('science');
+                } else if (category === 'business') {
+                    return major.includes('business') || major.includes('economics') ||
+                        major.includes('finance') || major.includes('accounting') ||
+                        major.includes('marketing');
+                }
+                return false;
+            });
+        }
+
+        currentPage = 1;
+        displayStudents();
+        updatePagination();
+    }
+
+    // Create pagination
+    function updatePagination() {
+        const paginationDiv = document.getElementById('pagination');
+        const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+
+        paginationDiv.innerHTML = '';
+
+        // Only show pagination if we have multiple pages
+        if (totalPages <= 1) return;
+
+        // Previous button
+        const prevBtn = document.createElement('button');
+        prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                displayStudents();
+                updatePagination();
+                scrollToTop();
+            }
+        });
+        paginationDiv.appendChild(prevBtn);
+
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.textContent = i;
+            if (i === currentPage) {
+                pageBtn.classList.add('active');
+            }
+            pageBtn.addEventListener('click', () => {
+                currentPage = i;
+                displayStudents();
+                updatePagination();
+                scrollToTop();
+            });
+            paginationDiv.appendChild(pageBtn);
+        }
+
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayStudents();
+                updatePagination();
+                scrollToTop();
+            }
+        });
+        paginationDiv.appendChild(nextBtn);
+    }
+
+    // Display students with pagination
+    function displayStudents() {
+        const resultsContainer = document.getElementById("results");
+        resultsContainer.innerHTML = "";
+
+        // Calculate the start and end index for the current page
+        const startIndex = (currentPage - 1) * studentsPerPage;
+        const endIndex = Math.min(startIndex + studentsPerPage, filteredStudents.length);
+
+        if (filteredStudents.length === 0) {
+            resultsContainer.innerHTML = `<p>No students found.</p>`;
             return;
         }
 
+        // Display only students for the current page
+        for (let i = startIndex; i < endIndex; i++) {
+            const student = filteredStudents[i];
+
+            const card = document.createElement("div");
+            card.className = "student-card";
+
+            // Set a small random animation delay for each card
+            card.style.animationDelay = `${Math.random() * 0.3}s`;
+
+            // Photo
+            const img = document.createElement("img");
+            img.src = student.photo || "/default-photo.jpg";
+            img.alt = student.name || "Unnamed Student";
+
+            // Name
+            const nameEl = document.createElement("p");
+            nameEl.innerHTML = `<strong>Name:</strong> ${student.name || "N/A"}`;
+
+            // Major
+            const majorEl = document.createElement("p");
+            majorEl.innerHTML = `<strong>Major:</strong> ${student.major || "N/A"}`;
+
+            // Create container for extra fields
+            const extraFields = document.createElement("div");
+            extraFields.className = "extra-fields";
+
+            // GPA
+            const gpaEl = document.createElement("p");
+            gpaEl.innerHTML = `<strong>GPA:</strong> ${student.gpa || "N/A"}`;
+
+            // Personal Story
+            const personalStoryEl = document.createElement("p");
+            personalStoryEl.innerHTML = `<strong>Personal Story:</strong> ${student.personal_story || "N/A"}`;
+
+            // Campaign Line
+            // Campaign Line
+            const campaignLineEl = document.createElement("p");
+            campaignLineEl.innerHTML = `<strong>Campaign Line:</strong> ${student.campaign_line || "N/A"}`;
+
+            // Experience
+            const experienceEl = document.createElement("p");
+            experienceEl.innerHTML = `<strong>Experience:</strong> ${student.experience || "N/A"}`;
+
+            // Organizations
+            const organizationsEl = document.createElement("p");
+            organizationsEl.innerHTML = `<strong>Organizations:</strong> ${student.organizations || "N/A"}`;
+
+            // Social Media Icons
+            const socialIcons = document.createElement("div");
+            socialIcons.className = "social-icons";
+
+            // Only add icons for social media that has links
+            if (student.instagram) {
+                socialIcons.innerHTML += `<a href="${student.instagram}" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>`;
+            }
+            if (student.linkedin) {
+                socialIcons.innerHTML += `<a href="${student.linkedin}" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>`;
+            }
+            if (student.facebook) {
+                socialIcons.innerHTML += `<a href="${student.facebook}" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>`;
+            }
+            if (student.github) {
+                socialIcons.innerHTML += `<a href="${student.github}" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>`;
+            }
+            if (student.snapchat) {
+                socialIcons.innerHTML += `<a href="${student.snapchat}" target="_blank" class="social-icon"><i class="fab fa-snapchat"></i></a>`;
+            }
+            if (student.tiktok) {
+                socialIcons.innerHTML += `<a href="${student.tiktok}" target="_blank" class="social-icon"><i class="fab fa-tiktok"></i></a>`;
+            }
+
+            // Append extra fields
+            extraFields.appendChild(gpaEl);
+            extraFields.appendChild(campaignLineEl);
+            extraFields.appendChild(personalStoryEl);
+            extraFields.appendChild(experienceEl);
+            extraFields.appendChild(organizationsEl);
+            extraFields.appendChild(socialIcons);
+
+            // Buttons section (Show More / Show Less + Vote)
+            const buttonGroup = document.createElement("div");
+            buttonGroup.className = "button-group";
+
+            // Toggle button for "Show More" / "Show Less"
+            const toggleButton = document.createElement("button");
+            toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
+            toggleButton.onclick = () => {
+                extraFields.classList.toggle('show');
+                if (extraFields.classList.contains('show')) {
+                    toggleButton.innerHTML = '<i class="fas fa-chevron-up"></i> Show Less';
+                } else {
+                    toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
+                }
+            };
+
+            // Vote button
+            const voteButton = document.createElement("button");
+            voteButton.className = "vote-button";
+            voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
+
+            // Add a random vote count for demonstration purposes
+            const voteCount = document.createElement('span');
+            voteCount.className = 'vote-count';
+            voteCount.textContent = Math.floor(Math.random() * 100);
+            voteButton.appendChild(voteCount);
+
+            voteButton.onclick = async () => {
+                // Add pulse animation when clicked
+                voteButton.style.animation = 'pulse 0.5s';
+                setTimeout(() => {
+                    voteButton.style.animation = '';
+                }, 500);
+
+                // ---- FRONT-END SELF-VOTE CHECK ----
+                if (String(student.userId) === String(loggedInUserId)) {
+                    showToast("You cannot vote for yourself!", "error");
+                    return;
+                }
+
+                // Show loading state
+                voteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Voting...';
+
+                // Otherwise, proceed with the vote
+                try {
+                    const response = await fetch("https://server1.misscal.net/vote", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        credentials: "include",
+                        body: JSON.stringify({ candidateId: student.userId })
+                    });
+
+                    const data = await response.json();
+
+                    // Restore button state
+                    voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
+
+                    // Add updated vote count (demo)
+                    const newVoteCount = document.createElement('span');
+                    newVoteCount.className = 'vote-count';
+                    const currentCount = parseInt(voteCount.textContent);
+                    newVoteCount.textContent = currentCount + 1;
+                    voteButton.appendChild(newVoteCount);
+
+                    if (!response.ok) {
+                        showToast(`Vote failed: ${data.message}`, "error");
+                    } else {
+                        showToast(data.message || "Vote successful!", "success");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
+                    voteButton.appendChild(voteCount);
+                    showToast("An error occurred while casting your vote.", "error");
+                }
+            };
+
+            buttonGroup.appendChild(toggleButton);
+            buttonGroup.appendChild(voteButton);
+
+            // Assemble the student card
+            card.appendChild(img);
+            card.appendChild(nameEl);
+            card.appendChild(majorEl);
+            card.appendChild(buttonGroup);
+            card.appendChild(extraFields);
+
+            // Add a favorite button in top right corner
+            const favoriteBtn = document.createElement('div');
+            favoriteBtn.className = 'favorite-btn';
+            favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
+            favoriteBtn.style.position = 'absolute';
+            favoriteBtn.style.top = '10px';
+            favoriteBtn.style.right = '10px';
+            favoriteBtn.style.color = '#003262';
+            favoriteBtn.style.cursor = 'pointer';
+            favoriteBtn.style.fontSize = '1.2rem';
+            favoriteBtn.style.transition = 'all 0.3s ease';
+
+            favoriteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isFavorite = favoriteBtn.querySelector('i').classList.contains('fas');
+
+                if (isFavorite) {
+                    favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
+                    favoriteBtn.style.color = '#003262';
+                    showToast(`Removed ${student.name} from favorites`, "info");
+                } else {
+                    favoriteBtn.innerHTML = '<i class="fas fa-star"></i>';
+                    favoriteBtn.style.color = '#FDB515';
+                    favoriteBtn.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        favoriteBtn.style.transform = 'scale(1)';
+                    }, 300);
+                    showToast(`Added ${student.name} to favorites`, "success");
+                }
+            });
+
+            card.appendChild(favoriteBtn);
+
+            // Append card to results
+            resultsContainer.appendChild(card);
+        }
+    }
+
+    // Debounce function for search input
+    let searchTimeout;
+    function debounceSearch() {
+        clearTimeout(searchTimeout);
+        const loader = document.getElementById('loader');
+        loader.style.display = 'block';
+
+        searchTimeout = setTimeout(() => {
+            searchStudents();
+            loader.style.display = 'none';
+        }, 300);
+    }
+
+    // Search function
+    async function searchStudents() {
+        const query = document.getElementById("searchInput").value.trim();
+
         try {
+            // For demo purposes, filter the demo students instead of API call
+            if (true) { // Replace with actual API check when ready
+                // Reset active filters
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+
+                if (!query) {
+                    allStudents = [...demoStudents];
+                } else {
+                    allStudents = demoStudents.filter(student => {
+                        const name = student.name?.toLowerCase() || '';
+                        const major = student.major?.toLowerCase() || '';
+                        const searchLower = query.toLowerCase();
+
+                        return name.includes(searchLower) || major.includes(searchLower);
+                    });
+                }
+
+                filteredStudents = [...allStudents];
+                currentPage = 1;
+                displayStudents();
+                updatePagination();
+
+                // Show toast notification
+                if (allStudents.length === 0) {
+                    showToast("No students found matching your search.", "info");
+                } else {
+                    showToast(`Found ${allStudents.length} students matching your search.`, "success");
+                }
+
+                return;
+            }
+
+            // Real API implementation (when ready)
             const response = await fetch(
                 `https://server1.misscal.net/searchStudents?query=${encodeURIComponent(query)}`,
                 { credentials: "include" }
@@ -272,160 +1125,40 @@
 
             if (response.ok) {
                 const students = await response.json();
-                const resultsContainer = document.getElementById("results");
-                resultsContainer.innerHTML = "";
-
-                if (students.length === 0) {
-                    resultsContainer.innerHTML = `<p>No students found.</p>`;
-                    return;
-                }
-
-                students.forEach(student => {
-                    const card = document.createElement("div");
-                    card.className = "student-card";
-
-                    // Photo
-                    const img = document.createElement("img");
-                    img.src = student.photo || "/default-photo.jpg";
-                    img.alt = student.name || "Unnamed Student";
-
-                    // Name
-                    const nameEl = document.createElement("p");
-                    nameEl.innerHTML = `<strong>Name:</strong> ${student.name || "N/A"}`;
-
-                    // Major
-                    const majorEl = document.createElement("p");
-                    majorEl.innerHTML = `<strong>Major:</strong> ${student.major || "N/A"}`;
-
-                    // Create container for extra fields
-                    const extraFields = document.createElement("div");
-                    extraFields.className = "extra-fields";
-
-                    // GPA
-                    const gpaEl = document.createElement("p");
-                    gpaEl.innerHTML = `<strong>GPA:</strong> ${student.gpa || "N/A"}`;
-
-                    // Personal Story
-                    const personalStoryEl = document.createElement("p");
-                    personalStoryEl.innerHTML = `<strong>Personal Story:</strong> ${student.personal_story || "N/A"}`;
-
-                    // Campaign Line
-                    const campaignLineEl = document.createElement("p");
-                    campaignLineEl.innerHTML = `<strong>Campaign Line:</strong> ${student.campaign_line || "N/A"}`;
-
-                    // Experience
-                    const experienceEl = document.createElement("p");
-                    experienceEl.innerHTML = `<strong>Experience:</strong> ${student.experience || "N/A"}`;
-
-                    // Organizations
-                    const organizationsEl = document.createElement("p");
-                    organizationsEl.innerHTML = `<strong>Organizations:</strong> ${student.organizations || "N/A"}`;
-
-                    // Social Media
-                    const socialLinks = document.createElement("div");
-                    socialLinks.className = "social-links";
-                    socialLinks.innerHTML = `
-                        <p><strong>Social Media:</strong></p>
-                        <a href="${student.instagram || "#"}" target="_blank">Instagram</a>
-                        <a href="${student.linkedin || "#"}" target="_blank">LinkedIn</a>
-                        <a href="${student.facebook || "#"}" target="_blank">Facebook</a>
-                        <a href="${student.github || "#"}" target="_blank">GitHub</a>
-                        <a href="${student.snapchat || "#"}" target="_blank">Snapchat</a>
-                        <a href="${student.tiktok || "#"}" target="_blank">TikTok</a>
-                    `;
-
-                    // Append extra fields
-                    extraFields.appendChild(gpaEl);
-                    extraFields.appendChild(campaignLineEl);
-                    extraFields.appendChild(personalStoryEl);
-                    extraFields.appendChild(experienceEl);
-                    extraFields.appendChild(organizationsEl);
-                    extraFields.appendChild(socialLinks);
-
-                    // Hide extra fields by default
-                    extraFields.style.display = "none";
-
-                    // Buttons section (Show More / Show Less + Vote)
-                    const buttonGroup = document.createElement("div");
-                    buttonGroup.className = "button-group";
-
-                    // Toggle button for "Show More" / "Show Less"
-                    const toggleButton = document.createElement("button");
-                    toggleButton.textContent = "Show More";
-                    toggleButton.onclick = () => {
-                        if (extraFields.style.display === "none") {
-                            extraFields.style.display = "block";
-                            toggleButton.textContent = "Show Less";
-                        } else {
-                            extraFields.style.display = "none";
-                            toggleButton.textContent = "Show More";
-                        }
-                    };
-
-                    // Vote button
-                    const voteButton = document.createElement("button");
-                    voteButton.className = "vote-button";
-                    voteButton.textContent = "Vote";
-                    voteButton.onclick = async () => {
-                        // ---- FRONT-END SELF-VOTE CHECK ----
-                        if (String(student.userId) === String(loggedInUserId)) {
-                            alert("You cannot vote for yourself!");
-                            return;
-                        }
-
-                        // Otherwise, proceed with the vote
-                        try {
-                            const response = await fetch("https://server1.misscal.net/vote", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                credentials: "include",
-                                body: JSON.stringify({ candidateId: student.userId })
-                            });
-
-                            const data = await response.json();
-                            if (!response.ok) {
-                                alert(`Vote failed: ${data.message}`);
-                            } else {
-                                alert(data.message); // e.g. "Vote successful!"
-                            }
-                        } catch (error) {
-                            console.error(error);
-                            alert("An error occurred while casting your vote.");
-                        }
-                    };
-
-                    buttonGroup.appendChild(toggleButton);
-                    buttonGroup.appendChild(voteButton);
-
-                    // Assemble the student card
-                    card.appendChild(img);
-                    card.appendChild(nameEl);
-                    card.appendChild(majorEl);
-                    card.appendChild(buttonGroup);
-                    card.appendChild(extraFields);
-
-                    // Append card to results
-                    resultsContainer.appendChild(card);
-                });
+                allStudents = students;
+                filteredStudents = [...allStudents];
+                currentPage = 1;
+                displayStudents();
+                updatePagination();
             } else {
-                alert("Failed to fetch students.");
+                showToast("Failed to fetch students.", "error");
             }
         } catch (error) {
             console.error("Error fetching students:", error);
-            alert("An error occurred while fetching students.");
+            showToast("An error occurred while fetching students.", "error");
         }
     }
 
-    // Future detail handling if needed
-    function getStudentDetails(userId) {
-        // ...
-    }
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+        // Load demo data initially
+        allStudents = [...demoStudents];
+        filteredStudents = [...allStudents];
 
-    function displayStudentDetails(student) {
-        // ...
-    }
+        // Display initial students
+        displayStudents();
+        updatePagination();
+
+        // Fade in the container with a slight delay
+        setTimeout(() => {
+            document.querySelector('.container').style.opacity = '1';
+        }, 300);
+
+        // Show welcome toast
+        setTimeout(() => {
+            showToast("Welcome to the Student Voting System!", "info");
+        }, 1000);
+    });
 </script>
 </body>
 </html>
