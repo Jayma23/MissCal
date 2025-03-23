@@ -764,8 +764,13 @@
 
 
     // Initialize event listeners for gallery navigation
+    document.addEventListener("DOMContentLoaded", function() {
+        // Fetch profile data
+        fetchProfileData();
 
 
+
+    });
 
     // Add visual feedback on interactive elements
     document.querySelectorAll(".tab-button, .social-link, .cta-button, .photo-nav-button").forEach(elem => {
@@ -783,9 +788,7 @@
     });
 
     // Load profile data on page load
-    document.addEventListener("DOMContentLoaded", function() {
-        fetchProfileData();
-    });
+
 
     // Setup image error handlers for all images
     function setupImageErrorHandlers() {
