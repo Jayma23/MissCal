@@ -836,7 +836,7 @@ app.get("/getProfileData", (req, res) => {
             }
         } catch (error) {
             console.error("Error parsing photos:", error);
-            photosArray = [];
+            
             mainPhoto = null;
         }
 
@@ -851,7 +851,6 @@ app.get("/getProfileData", (req, res) => {
             experience: student.experience,
             organizations: student.organizations,
             photo: mainPhoto,
-            photos: photosArray,
             instagram: student.instagram,
             linkedin: student.linkedin,
             facebook: student.facebook,
