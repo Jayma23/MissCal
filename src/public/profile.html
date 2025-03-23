@@ -735,9 +735,10 @@
     });
 
     // Fetch profile data
+    // Fetch profile data
     async function fetchProfileData() {
         try {
-            const response = await fetch("https://server1.misscal.net/getProfile", {
+            const response = await fetch("https://server1.misscal.net/getStudentDetails", {
                 method: "GET",
                 credentials: "include"
             });
@@ -774,7 +775,15 @@
                     }
                 });
 
-                // Handle profile photo
+                // Handle profile photo - using approach from first file
+                if (data.photo) {
+                    // Set profile photo if available
+                    const profileImg = document.querySelector("#profileImage img");
+                    profileImg.src = data.photo || "/default-photo.jpg";
+                    profileImg.alt = data.name || "Profile Photo";
+                }
+
+                // Handle photos for gallery
                 if (data.photos && data.photos.length > 0) {
                     let photosArray;
                     try {
@@ -788,13 +797,6 @@
                         // Set global photos array for navigation
                         photos = photosArray.filter(photo => photo); // Filter out any null values
 
-                        // Set profile image
-                        if (photos.length > 0) {
-                            const profileImg = document.querySelector("#profileImage img");
-                            const timestamp = new Date().getTime();
-                            profileImg.src = `https://server1.misscal.net/photos/${photos[0]}?t=${timestamp}`;
-                        }
-
                         // Initialize photo gallery
                         currentPhotoIndex = 0;
                         updatePhotoDisplay();
@@ -803,7 +805,6 @@
 
                 // Add animation to profile card after data is loaded
                 document.querySelector(".profile-card").classList.add("loaded");
-
             } else {
                 console.error("Failed to load profile data");
                 document.getElementById("name").innerText = "Error loading profile";
@@ -811,6 +812,35 @@
         } catch (error) {
             console.error("Error fetching profile data:", error);
         }
+    }
+
+    // Updated function to display photos in gallery
+    function updatePhotoDisplay() {
+        const imageContainer = document.getElementById("imageContainer");
+
+        if (photos.length === 0) {
+            imageContainer.innerHTML = "<p>No photos available</p>";
+            document.getElementById("photoCounter").textContent = "No photos";
+            return;
+        }
+
+        // Clear previous image
+        imageContainer.innerHTML = "";
+
+        // Create image element - using direct URL from data
+        const img = document.createElement("img");
+        img.src = photos[currentPhotoIndex] || "/default-photo.jpg";
+        img.alt = `Profile Photo ${currentPhotoIndex + 1}`;
+
+        // Add loading animation
+        img.onload = function() {
+            img.classList.add("loaded");
+        };
+
+        imageContainer.appendChild(img);
+
+        // Update counter
+        document.getElementById("photoCounter").textContent = `Photo ${currentPhotoIndex + 1} of ${photos.length}`;
     }
 
     // Add visual feedback on interactive elements
