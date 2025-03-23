@@ -719,11 +719,13 @@
                 }
             });
 
+            
+
             // Handle profile photo
             if (data.photo && data.photo !== "default-photo.jpg") {
                 const profileImg = document.querySelector("#profileImage img");
                 const timestamp = new Date().getTime(); // Add timestamp to prevent caching
-                profileImg.src = `https://server1.misscal.net/photos/${data.photo}?t=${timestamp}`;
+                profileImg.src = data.photo
                 profileImg.onerror = function() {
                     // If image fails to load, fall back to default
                     this.src = "default-profile.png";
