@@ -22,7 +22,7 @@
 <nav class="navbar">
     <ul>
         <li><a href="formPage.html">Join the Pageant</a></li>
-        <li><a href="vote.html" class="vote-button pulse-button">Vote Now</a></li>
+        <li><a href="vote.html" class="vote-button pulse-button">VOTE NOW!</a></li>
         <li><a href="leaderBoard.html" class="vote-button">Leader Board</a></li>
     </ul>
 </nav>
@@ -270,6 +270,54 @@
         100% {
             box-shadow: 0 0 0 0 rgba(253, 181, 21, 0);
         }
+    }
+
+    .vote-button.pulse-button {
+        background: #ff8c00; /* Bright orange background */
+        color: white; /* White text */
+        font-size: 1.2rem; /* Larger font */
+        font-weight: bold; /* Bold text */
+        text-transform: uppercase; /* All caps */
+        letter-spacing: 1px; /* Spaced out letters */
+        padding: 12px 25px; /* Larger padding */
+        border: 2px solid white; /* White border */
+        box-shadow: 0 0 15px rgba(255, 140, 0, 0.5); /* Orange glow */
+    }
+
+    .vote-button.pulse-button:hover {
+        background: #ff5e00; /* Darker orange on hover */
+        transform: scale(1.1) translateY(-3px); /* Grow and lift on hover */
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 140, 0, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 15px rgba(255, 140, 0, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 140, 0, 0);
+        }
+    }
+
+    /* Also update the Vote Now button in the highlight section */
+    #vote .cta-button {
+        background: #ff8c00;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 15px 35px;
+        border: 2px solid white;
+        box-shadow: 0 0 15px rgba(255, 140, 0, 0.5);
+        animation: pulse 2s infinite;
+    }
+
+    #vote .cta-button:hover {
+        background: #ff5e00;
+        transform: scale(1.1);
     }
 
     /* Sidebar */
