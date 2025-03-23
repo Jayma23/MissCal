@@ -901,6 +901,45 @@ app.get("/studentDetails", (req, res) => {
         res.json(results[0]); // Assuming userId is unique, return the first (and only) result
     });
 });
+
+app.get("/getTop20Leaderboard", (req, res) => {
+    const query = "SELECT entry_id, name, photos, votes, user_id FROM contestentries ORDER BY votes DESC LIMIT 20";
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ message: "Database error." });
+        }
+
+        if (!Array.isArray(results.rows)) {
+            console.error("Unexpected results format:", results);
+            return res.status(500).json({ message: "Unexpected database response." });
+        }
+
+        const leaderboard = results.rows.map(entry => {
+            let photoUrl = "https://via.placeholder.com/80"; // 默认头像
+            try {
+
+                let photoArray = typeof entry.photos === "string" ? JSON.parse(entry.photos) : entry.photos;
+                photoUrl = Array.isArray(photoArray) && photoArray.length > 0 ? photoArray[0] : photoUrl;
+            } catch (error) {
+                console.error("Error parsing photos:", error);
+            }
+
+            return {
+                id: entry.entry_id,
+                name: entry.name,
+                photo: photoUrl,
+                votes: entry.votes,
+                user_id: entry.user_id,
+            };
+        });
+
+        res.json(leaderboard);
+    });
+
+
+});
 app.get("/getLeaderboard", (req, res) => {
     const query = "SELECT entry_id, name, photos, votes, user_id FROM contestentries ORDER BY votes DESC LIMIT 10";
 
