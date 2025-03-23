@@ -501,10 +501,12 @@ app.get("/getProfile", (req, res) => {
 
         // Ensure photos is parsed correctly
         if (profile.photos && Array.isArray(profile.photos)) {
-            profile.photos = profile.photos.map(photo => `${photo}`);
+            //profile.photos = profile.photos.map(photo => `${photo}`);
         } else {
             profile.photos = [];
         }
+
+
 
         console.log("Final profile photos:", profile.photos);
         res.json(profile);
