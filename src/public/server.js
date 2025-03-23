@@ -812,36 +812,30 @@ app.get("/getProfileData", (req, res) => {
 
         const student = results.rows[0];
 
-
+        // Parse photos array
 
 
         try {
-            // Handle photos consistently
-            let mainPhoto = null;
-            let photosArray = [];
-
+            // Handle photos in the same way as the searchStudents endpoint
             if (student.photos) {
-                // Parse the photos if it's a string
+                // Handle both string and array formats
                 if (typeof student.photos === "string") {
-                    try {
-                        photosArray = JSON.parse(student.photos);
-                    } catch (e) {
-                        photosArray = [];
-                    }
+                    photosArray = JSON.parse(student.photos);
                 } else if (Array.isArray(student.photos)) {
                     photosArray = student.photos;
                 }
 
-                // Get the first photo as the main photo if it exists
-                mainPhoto = photosArray.length > 0 ? photosArray[0] : null;
-            }
+                // Filter out empty entries
+                photosArray = photosArray.filter(photo => photo);
 
-            // Make sure photo paths are absolute if they're relative in the database
-            if (mainPhoto && !mainPhoto.startsWith('http') && !mainPhoto.startsWith('/')) {
-                mainPhoto = '/' + mainPhoto;
+                // Set main photo to the first photo if available
+                if (photosArray.length > 0) {
+                    mainPhoto = photosArray[0];
+                }
             }
         } catch (error) {
-            console.error("Error processing photos:", error);
+            console.error("Error parsing photos:", error);
+            photosArray = [];
         }
 
         // Return the complete student data with properly formatted photos
@@ -854,6 +848,7 @@ app.get("/getProfileData", (req, res) => {
             personal_story: student.personal_story,
             experience: student.experience,
             organizations: student.organizations,
+            // Use the exact same photo format that works in the searchStudents endpoint
             photo: mainPhoto,
             photos: photosArray,
             instagram: student.instagram,
