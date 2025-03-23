@@ -645,6 +645,63 @@ app.get("/getStudentDetails", (req, res) => {
 });
 
 
+app.get("/getStudent", (req, res) => {
+    const loggedInUserId = req.cookies.user_id;
+    const requestedUserId = req.query.userId; // Get userId from the query parameter
+
+    if (!loggedInUserId) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // If no userId specified in query, default to the logged-in user
+    const userIdToLookup = requestedUserId || loggedInUserId;
+
+    const query = "SELECT name, major, gpa, campaign_line, personal_story, experience, organizations, photos, instagram, linkedin, facebook, github, tiktok, year FROM ContestEntries WHERE user_id = $1";
+
+    db.query(query, [userIdToLookup], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ message: "Database error." });
+        }
+
+        if (results.rows.length === 0) {
+            return res.status(404).json({ message: "Student not found." });
+        }
+
+        const student = results.rows[0];
+
+        // Process photos - handle both array and string formats
+        let photo = "";
+        try {
+            if (typeof student.photos === 'string') {
+                const photosArray = JSON.parse(student.photos || "[]");
+                photo = photosArray.length > 0 ? photosArray[0] : "";
+            } else if (Array.isArray(student.photos)) {
+                photo = student.photos.length > 0 ? student.photos[0] : "";
+            }
+        } catch (error) {
+            console.error("Error parsing photos:", error);
+            photo = "";
+        }
+
+        res.json({
+            name: student.name,
+            major: student.major,
+            gpa: student.gpa,
+            year: student.year,
+            campaign_line: student.campaign_line,
+            personal_story: student.personal_story,
+            experience: student.experience,
+            organizations: student.organizations,
+            photo,
+            instagram: student.instagram,
+            linkedin: student.linkedin,
+            facebook: student.facebook,
+            github: student.github,
+            tiktok: student.tiktok,
+        });
+    });
+});
 app.get("/getStudentDetails", (req, res) => {
     const userId = req.cookies.user_id;
 
