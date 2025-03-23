@@ -736,9 +736,9 @@
 
     // Fetch profile data
     // Fetch profile data with extensive logging for debugging
+    // Fetch profile data
     async function fetchProfileData() {
         try {
-            console.log("Fetching profile data...");
             const response = await fetch("https://server1.misscal.net/getStudentDetails", {
                 method: "GET",
                 credentials: "include"
@@ -746,9 +746,6 @@
 
             if (response.ok) {
                 const data = await response.json();
-                console.log("API Response Data:", data);
-                console.log("Photo value:", data.photo);
-                console.log("Photos value:", data.photos);
 
                 // Update basic info fields
                 document.getElementById("name").innerText = data.name || "Not provided";
@@ -779,55 +776,27 @@
                     }
                 });
 
-                // Handle profile photo
-                const profileImg = document.querySelector("#profileImage img");
-
-                // Try different approaches for the profile image
-                if (data.photo) {
-                    // Try the full URL if that's what the server is returning
-                    if (data.photo.startsWith('http')) {
-                        profileImg.src = data.photo;
-                    } else {
-                        // Otherwise try building the URL - without query parameters
-                        const photoPath = data.photo.split('?')[0];
-                        profileImg.src = `https://server1.misscal.net/photos/uploads/${photoPath}`;
-                        console.log("Setting profile image URL to:", profileImg.src);
-                    }
-
-                    profileImg.alt = data.name || "Profile Photo";
-
-                    // Add error handler in case the image doesn't load
-                    profileImg.onerror = function() {
-                        console.log("Profile image failed to load, using default");
-                        this.src = "default-profile.png";
-                        this.alt = "Default Profile";
-                    };
-                } else {
-                    // Use a local default image
-                    profileImg.src = "default-profile.png";
-                    profileImg.alt = "Default Profile";
-                    console.log("No photo data available, using default image");
-                }
-
-                // Process photos for gallery
+                // Parse photos array first (this is a key difference to match backend)
                 let photosArray = [];
                 try {
-                    // Try to parse photos if it's a string, or use it directly if it's already an array
-                    if (typeof data.photos === "string") {
-                        photosArray = JSON.parse(data.photos || "[]");
-                        console.log("Parsed photos from string:", photosArray);
-                    } else if (Array.isArray(data.photos)) {
-                        photosArray = data.photos;
-                        console.log("Using photos array directly:", photosArray);
-                    }
+                    photosArray = typeof data.photos === "string"
+                        ? JSON.parse(data.photos || "[]")
+                        : (Array.isArray(data.photos) ? data.photos : []);
+
+                    // Filter out empty entries
+                    photosArray = photosArray.filter(photo => photo);
                 } catch (error) {
                     console.error("Error parsing photos:", error);
                     photosArray = [];
                 }
 
-                // Filter out any empty or null values
-                photos = photosArray.filter(photo => photo);
-                console.log("Final filtered photos array:", photos);
+                // Handle profile photo - using EXACTLY the same logic as in vote.html
+                const profileImg = document.querySelector("#profileImage img");
+                profileImg.src = (photosArray.length > 0) ? photosArray[0] : "/default-photo.jpg";
+                profileImg.alt = data.name || "Profile Photo";
+
+                // Use the photos array for the gallery
+                photos = photosArray;
 
                 // Initialize the photo gallery if we have photos
                 if (photos.length > 0) {
@@ -836,13 +805,12 @@
                 } else {
                     document.getElementById("imageContainer").innerHTML = "<p>No photos available</p>";
                     document.getElementById("photoCounter").textContent = "No photos";
-                    console.log("No photos to display in gallery");
                 }
 
                 // Add animation to profile card after data is loaded
                 document.querySelector(".profile-card").classList.add("loaded");
             } else {
-                console.error("Failed to load profile data, status:", response.status);
+                console.error("Failed to load profile data");
                 document.getElementById("name").innerText = "Error loading profile";
             }
         } catch (error) {
@@ -863,142 +831,10 @@
         // Clear previous image
         imageContainer.innerHTML = "";
 
-        // Create image element
-        const img = document.createElement("img");
-
-        const currentPhoto = photos[currentPhotoIndex];
-        console.log(`Displaying photo ${currentPhotoIndex + 1}:`, currentPhoto);
-
-        // Try different approaches for gallery images
-        if (currentPhoto.startsWith('http')) {
-            // Use the URL directly if it's already a full URL
-            img.src = currentPhoto;
-        } else {
-            // Otherwise build the URL - without any query parameters
-            const photoPath = currentPhoto.split('?')[0];
-            img.src = `https://server1.misscal.net/photos/uploads/${photoPath}`;
-        }
-
-        console.log("Gallery image URL:", img.src);
-        img.alt = `Profile Photo ${currentPhotoIndex + 1}`;
-
-        // Add error handler for fallback
-        img.onerror = function() {
-            console.log(`Gallery image ${currentPhotoIndex + 1} failed to load, using default`);
-            this.src = "default-profile.png";
-            this.alt = "Default Image";
-        };
-
-        // Add loading animation
-        img.onload = function() {
-            console.log(`Gallery image ${currentPhotoIndex + 1} loaded successfully`);
-            img.classList.add("loaded");
-        };
-
-        imageContainer.appendChild(img);
-
-        // Update counter
-        document.getElementById("photoCounter").textContent = `Photo ${currentPhotoIndex + 1} of ${photos.length}`;
-    }
-
-    // Updated function to display photos in gallery
-    function updatePhotoDisplay() {
-        const imageContainer = document.getElementById("imageContainer");
-
-        if (photos.length === 0) {
-            imageContainer.innerHTML = "<p>No photos available</p>";
-            document.getElementById("photoCounter").textContent = "No photos";
-            return;
-        }
-
-        // Clear previous image
-        imageContainer.innerHTML = "";
-
-        // Create image element
-        const img = document.createElement("img");
-
-        // Construct a proper URL for the photo WITHOUT timestamp parameter
-        img.src = `https://server1.misscal.net/photos/uploads/${photos[currentPhotoIndex]}`;
-        img.alt = `Profile Photo ${currentPhotoIndex + 1}`;
-
-        // Add error handler for fallback
-        img.onerror = function() {
-            this.src = "default-profile.png";
-            this.alt = "Default Image";
-            console.log(`Error loading gallery image ${currentPhotoIndex + 1}, fallback to default`);
-        };
-
-        // Add loading animation
-        img.onload = function() {
-            img.classList.add("loaded");
-        };
-
-        imageContainer.appendChild(img);
-
-        // Update counter
-        document.getElementById("photoCounter").textContent = `Photo ${currentPhotoIndex + 1} of ${photos.length}`;
-    }
-
-    // Updated function to display photos in gallery
-    function updatePhotoDisplay() {
-        const imageContainer = document.getElementById("imageContainer");
-
-        if (photos.length === 0) {
-            imageContainer.innerHTML = "<p>No photos available</p>";
-            document.getElementById("photoCounter").textContent = "No photos";
-            return;
-        }
-
-        // Clear previous image
-        imageContainer.innerHTML = "";
-
-        // Create image element
-        const img = document.createElement("img");
-
-        // Construct a proper URL for the photo
-        img.src = `https://server1.misscal.net/photos/${photos[currentPhotoIndex]}`;
-        img.alt = `Profile Photo ${currentPhotoIndex + 1}`;
-
-        // Add error handler for fallback
-        img.onerror = function() {
-            this.src = "default-profile.png";
-            this.alt = "Default Image";
-            console.log(`Error loading gallery image ${currentPhotoIndex + 1}, fallback to default`);
-        };
-
-        // Add loading animation
-        img.onload = function() {
-            img.classList.add("loaded");
-        };
-
-        imageContainer.appendChild(img);
-
-        // Update counter
-        document.getElementById("photoCounter").textContent = `Photo ${currentPhotoIndex + 1} of ${photos.length}`;
-    }
-
-    // Updated function to display photos in gallery
-    function updatePhotoDisplay() {
-        const imageContainer = document.getElementById("imageContainer");
-
-        if (photos.length === 0) {
-            imageContainer.innerHTML = "<p>No photos available</p>";
-            document.getElementById("photoCounter").textContent = "No photos";
-            return;
-        }
-
-        // Clear previous image
-        imageContainer.innerHTML = "";
-
-        // Create image element - using direct URL from data
+        // Create image element - using EXACTLY the same approach as in vote.html
         const img = document.createElement("img");
         img.src = photos[currentPhotoIndex] || "/default-photo.jpg";
         img.alt = `Profile Photo ${currentPhotoIndex + 1}`;
-
-        // Add loading animation
-        img.onload = function() {
-            img.classList.add("loaded");
-        };
 
         imageContainer.appendChild(img);
 
