@@ -863,7 +863,7 @@ app.get("/searchStudents", (req, res) => {
 
 app.get("/getCurrentStudent", (req, res) => {
     // Get the user ID from cookies
-    const userId = req.cookies.userId;
+    const userId = req.cookies.user_id;
 
     if (!userId) {
         return res.status(401).json({ message: "Unauthorized. Please log in first." });
@@ -885,6 +885,13 @@ app.get("/getCurrentStudent", (req, res) => {
             return res.status(404).json({ message: "Student profile not found." });
         }
 
+        let photos = [];
+        try {
+            photos = JSON.parse(student.photos);
+        } catch (e) {
+            console.error("Failed to parse photos array:", e);
+        }
+
         // There should only be one result since user_id should be unique
         const student = results.rows[0];
 
@@ -903,8 +910,8 @@ app.get("/getCurrentStudent", (req, res) => {
             facebook: student.facebook,
             github: student.github,
             tiktok: student.tiktok,
-            photo: (student.photos && Array.isArray(student.photos) && student.photos.length > 0)
-                ? student.photos[0]  // Use the first image
+            photo: (photos && Array.isArray(student.photos) && student.photos.length > 0)
+                ? photos[0]  // Use the first image
                 : "default-photo.jpg" // Use a placeholder if no photo exists
         };
 
