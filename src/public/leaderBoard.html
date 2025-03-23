@@ -168,6 +168,7 @@
             border: 3px solid var(--california-gold);
             transition: all var(--transition-speed);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
         }
 
         .leaderboard-item:hover img {
@@ -178,6 +179,7 @@
             flex-grow: 1;
             text-align: left;
             padding-right: 15px;
+            cursor: pointer;
         }
 
         .participant-name {
@@ -234,6 +236,36 @@
 
         .vote-button:active {
             transform: translateY(0);
+        }
+
+        /* Profile button */
+        .profile-btn {
+            background: transparent;
+            border: none;
+            color: var(--berkeley-blue);
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+            transition: all 0.3s;
+        }
+
+        .profile-btn:hover {
+            background: #f0f0f0;
+            color: var(--california-gold);
+        }
+
+        body.dark-mode .profile-btn {
+            color: var(--california-gold);
+        }
+
+        body.dark-mode .profile-btn:hover {
+            background: #555;
+            color: white;
         }
 
         .sidebar {
@@ -530,6 +562,11 @@
                 width: 100%;
                 max-width: 300px;
             }
+
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+            }
         }
 
         /* Pulse animation */
@@ -574,6 +611,295 @@
                 opacity: 0;
             }
         }
+
+        /* Profile Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1500;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+            padding: 30px;
+            margin: 50px auto;
+            transition: all 0.3s ease;
+            animation: modal-fade-in 0.3s;
+        }
+
+        body.dark-mode .modal-content {
+            background-color: #333;
+            color: #f0f0f0;
+        }
+
+        @keyframes modal-fade-in {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: #777;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: none;
+            border: none;
+            z-index: 2;
+        }
+
+        .modal-close:hover {
+            color: var(--berkeley-blue);
+            transform: rotate(90deg);
+        }
+
+        body.dark-mode .modal-close:hover {
+            color: var(--california-gold);
+        }
+
+        /* Profile content styling */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.dark-mode .profile-header {
+            border-bottom-color: #555;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 25px;
+            border: 4px solid var(--california-gold);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-title {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            margin: 0 0 5px 0;
+            color: var(--berkeley-blue);
+        }
+
+        body.dark-mode .profile-name {
+            color: var(--california-gold);
+        }
+
+        .profile-subtitle {
+            font-size: 1.1rem;
+            color: #777;
+            margin: 0;
+        }
+
+        body.dark-mode .profile-subtitle {
+            color: #bbb;
+        }
+
+        .profile-badge {
+            display: inline-block;
+            background: var(--california-gold);
+            color: var(--berkeley-blue);
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .profile-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .profile-sections {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+
+        .profile-section {
+            background: #f9f9f9;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            text-align: left;
+        }
+
+        body.dark-mode .profile-section {
+            background: #444;
+        }
+
+        .section-title {
+            color: var(--berkeley-blue);
+            margin-top: 0;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        body.dark-mode .section-title {
+            color: var(--california-gold);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--california-gold);
+        }
+
+        .info-item {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .info-item i {
+            margin-right: 10px;
+            color: var(--berkeley-blue);
+            font-size: 1.1rem;
+            margin-top: 3px;
+        }
+
+        body.dark-mode .info-item i {
+            color: var(--california-gold);
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-label {
+            font-weight: bold;
+            margin-bottom: 3px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        body.dark-mode .info-label {
+            color: #ddd;
+        }
+
+        .info-value {
+            line-height: 1.5;
+            color: #333;
+        }
+
+        body.dark-mode .info-value {
+            color: #f0f0f0;
+        }
+
+        .profile-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .profile-action-btn {
+            background: var(--berkeley-blue);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-action-btn:hover {
+            background: var(--california-gold);
+            color: var(--berkeley-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-action-btn:active {
+            transform: translateY(0);
+        }
+
+        .social-media {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .social-linkedin { background: #0077b5; }
+        .social-facebook { background: #3b5998; }
+        .social-github { background: #333; }
+        .social-snapchat { background: #fffc00; color: black; }
+        .social-tiktok { background: #000000; }
     </style>
 </head>
 <body>
@@ -606,6 +932,16 @@
         <div class="toast-message">This is a notification</div>
     </div>
     <button class="toast-close"><i class="fas fa-times"></i></button>
+</div>
+
+<!-- Student Profile Modal -->
+<div class="modal" id="profileModal">
+    <div class="modal-content">
+        <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+        <div id="profileContent">
+            <!-- Student profile content will be loaded here -->
+        </div>
+    </div>
 </div>
 
 <div class="main-layout">
@@ -642,6 +978,9 @@
     const toastClose = document.querySelector(".toast-close");
     const toastMessage = document.querySelector(".toast-message");
     const toastIcon = document.querySelector(".toast-icon i");
+    const profileModal = document.getElementById("profileModal");
+    const modalClose = document.getElementById("modalClose");
+    const profileContent = document.getElementById("profileContent");
 
     // Cookie helper function (keeping your original function)
     function getCookieValue(name) {
@@ -734,6 +1073,168 @@
         toast.classList.remove("show");
     });
 
+    // Profile modal functions
+    function openProfileModal() {
+        profileModal.style.display = "flex";
+        document.body.style.overflow = "hidden"; // Prevent scrolling behind modal
+    }
+
+    function closeProfileModal() {
+        profileModal.style.display = "none";
+        document.body.style.overflow = ""; // Restore scrolling
+    }
+
+    // Close modal on click
+    modalClose.addEventListener("click", closeProfileModal);
+
+    // Close modal when clicking outside content
+    profileModal.addEventListener("click", (e) => {
+        if (e.target === profileModal) {
+            closeProfileModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            closeProfileModal();
+        }
+    });
+
+    // Get student details from API
+    async function getStudentDetails(userId) {
+        try {
+            // Show loader
+            loaderContainer.style.display = "flex";
+
+            const response = await fetch(`https://server1.misscal.net/getStudentDetails?userId=${userId}`, {
+                method: "GET",
+                credentials: "include"
+            });
+
+            // Hide loader
+            loaderContainer.style.display = "none";
+
+            if (!response.ok) {
+                showToast("Failed to load student details", "error");
+                return null;
+            }
+
+            const studentData = await response.json();
+            return studentData;
+
+        } catch (error) {
+            // Hide loader
+            loaderContainer.style.display = "none";
+            console.error("Error fetching student details:", error);
+            showToast("Error loading student details", "error");
+            return null;
+        }
+    }
+
+    // Display student profile in modal
+    async function showStudentProfile(userId) {
+        const studentData = await getStudentDetails(userId);
+
+        if (!studentData) {
+            return;
+        }
+
+        // Create profile content HTML
+        let profileHTML = `
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <img src="${studentData.photo || 'https://randomuser.me/api/portraits/lego/0.jpg'}"
+                     alt="${studentData.name || 'Student'}"
+                     onerror="this.src='https://randomuser.me/api/portraits/lego/0.jpg'">
+            </div>
+            <div class="profile-title">
+                <h3 class="profile-name">${studentData.name || 'Student'}</h3>
+                <p class="profile-subtitle">${studentData.major || 'N/A'}</p>
+                <div class="profile-badge">GPA: ${studentData.gpa || 'N/A'}</div>
+            </div>
+        </div>
+
+        <div class="profile-sections">
+            <div class="profile-section">
+                <h4 class="section-title">Personal Story</h4>
+                <div class="info-item">
+                    <i class="fas fa-quote-left"></i>
+                    <div class="info-content">
+                        <div class="info-value">${studentData.personal_story || 'No personal story provided'}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h4 class="section-title">Campaign</h4>
+                <div class="info-item">
+                    <i class="fas fa-bullhorn"></i>
+                    <div class="info-content">
+                        <div class="info-label">Campaign Line</div>
+                        <div class="info-value">${studentData.campaign_line || 'No campaign line provided'}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h4 class="section-title">Experience & Organizations</h4>
+            <div class="info-item">
+                <i class="fas fa-briefcase"></i>
+                <div class="info-content">
+                    <div class="info-label">Experience</div>
+                    <div class="info-value">${studentData.experience || 'No experience listed'}</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-users"></i>
+                <div class="info-content">
+                    <div class="info-label">Organizations</div>
+                    <div class="info-value">${studentData.organizations || 'No organizations listed'}</div>
+                </div>
+            </div>
+        </div>
+    `;
+
+        // Add social media if available
+        const socialLinks = [];
+
+        if (studentData.instagram) socialLinks.push(`<a href="${studentData.instagram}" target="_blank" class="social-icon social-instagram" title="Instagram"><i class="fab fa-instagram"></i></a>`);
+        if (studentData.linkedin) socialLinks.push(`<a href="${studentData.linkedin}" target="_blank" class="social-icon social-linkedin" title="LinkedIn"><i class="fab fa-linkedin"></i></a>`);
+        if (studentData.facebook) socialLinks.push(`<a href="${studentData.facebook}" target="_blank" class="social-icon social-facebook" title="Facebook"><i class="fab fa-facebook"></i></a>`);
+        if (studentData.github) socialLinks.push(`<a href="${studentData.github}" target="_blank" class="social-icon social-github" title="GitHub"><i class="fab fa-github"></i></a>`);
+        if (studentData.snapchat) socialLinks.push(`<a href="${studentData.snapchat}" target="_blank" class="social-icon social-snapchat" title="Snapchat"><i class="fab fa-snapchat"></i></a>`);
+        if (studentData.tiktok) socialLinks.push(`<a href="${studentData.tiktok}" target="_blank" class="social-icon social-tiktok" title="TikTok"><i class="fab fa-tiktok"></i></a>`);
+
+        if (socialLinks.length > 0) {
+            profileHTML += `
+            <div class="social-media">
+                ${socialLinks.join('')}
+            </div>
+        `;
+        }
+
+        // Add action buttons
+        profileHTML += `
+        <div class="profile-actions">
+            <button class="profile-action-btn" onclick="vote('${userId}')">
+                <i class="fas fa-heart"></i> Vote
+            </button>
+            <button class="profile-action-btn" onclick="closeProfileModal()">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+    `;
+
+        // Update modal content
+        profileContent.innerHTML = profileHTML;
+
+        // Show modal
+        openProfileModal();
+    }
+
     // Logout function (keeping your original implementation)
     document.getElementById("logoffButton").addEventListener("click", async () => {
         try {
@@ -821,7 +1322,7 @@
         }
     }
 
-    // Fetch leaderboard data - keeping your original implementation with enhanced UI
+    // Fetch leaderboard data - modified to include profile view option
     async function fetchLeaderboard() {
         try {
             // Show loader
@@ -853,31 +1354,38 @@
                 else if (index === 2) rankClass = "rank-3";
 
                 entry.innerHTML = `
-                    <div class="rank ${rankClass}">${index + 1}</div>
-                    <img src="${participant.photo || 'https://randomuser.me/api/portraits/lego/0.jpg'}"
-                         alt="${participant.name}"
-                         onerror="this.src='https://randomuser.me/api/portraits/lego/0.jpg'">
-                    <div class="participant-info">
-                        <div class="participant-name">${participant.name}</div>
-                    </div>
-                    <button class="vote-button" id="vote-btn-${participant.user_id}">
-                        <i class="fas fa-heart"></i> Vote
+                <div class="rank ${rankClass}">${index + 1}</div>
+                <img src="${participant.photo || 'https://randomuser.me/api/portraits/lego/0.jpg'}"
+                     alt="${participant.name}"
+                     onerror="this.src='https://randomuser.me/api/portraits/lego/0.jpg'"
+                     onclick="showStudentProfile('${participant.user_id}')">
+                <div class="participant-info" onclick="showStudentProfile('${participant.user_id}')">
+                    <div class="participant-name">${participant.name}</div>
+                    <button class="profile-btn">
+                        <i class="fas fa-id-card"></i> View Profile
                     </button>
-                `;
+                </div>
+                <button class="vote-button" id="vote-btn-${participant.user_id}">
+                    <i class="fas fa-heart"></i> Vote
+                </button>
+            `;
 
                 leaderboard.appendChild(entry);
 
-                // Attach event listener to vote button (keeping your original implementation)
+                // Attach event listener to vote button
                 const voteButton = document.getElementById(`vote-btn-${participant.user_id}`);
                 if (voteButton) {
-                    voteButton.addEventListener("click", () => {
+                    voteButton.addEventListener("click", (e) => {
+                        // Prevent opening profile when clicking vote button
+                        e.stopPropagation();
+
                         // Add vote animation
                         createVoteAnimation(voteButton);
 
                         // Add button animation
                         voteButton.style.animation = 'pulse 0.5s';
 
-                        // Call original vote function
+                        // Call vote function
                         vote(participant.user_id);
 
                         // Remove animation after it completes
@@ -905,9 +1413,7 @@
 
         // Show welcome toast
         setTimeout(() => {
-            showToast("Welcome to the Miss Cal Leaderboard!", "info");
+            showToast("Welcome to the Miss Cal Leaderboard! Click on any student to view their profile.", "info");
         }, 1000);
     });
 </script>
-</body>
-</html>
