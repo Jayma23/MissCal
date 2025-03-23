@@ -790,6 +790,77 @@ app.get("/searchStudents", (req, res) => {
         res.json(students);
     });
 });
+
+app.get("/getProfileData", (req, res) => {
+    const userId = req.cookies.user_id;
+
+    if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const query = "SELECT name, major, gpa, year, campaign_line, personal_story, experience, organizations, photos, instagram, linkedin, facebook, github, snapchat, tiktok FROM ContestEntries WHERE user_id = $1";
+
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ message: "Database error." });
+        }
+
+        if (!results.rows || results.rows.length === 0) {
+            return res.status(404).json({ message: "Student not found." });
+        }
+
+        const student = results.rows[0];
+
+        // Parse photos array
+        let photosArray = [];
+        let mainPhoto = "/default-photo.jpg";
+
+        try {
+            // Handle photos in the same way as the searchStudents endpoint
+            if (student.photos) {
+                // Handle both string and array formats
+                if (typeof student.photos === "string") {
+                    photosArray = JSON.parse(student.photos);
+                } else if (Array.isArray(student.photos)) {
+                    photosArray = student.photos;
+                }
+
+                // Filter out empty entries
+                photosArray = photosArray.filter(photo => photo);
+
+                // Set main photo to the first photo if available
+                if (photosArray.length > 0) {
+                    mainPhoto = photosArray[0];
+                }
+            }
+        } catch (error) {
+            console.error("Error parsing photos:", error);
+            photosArray = [];
+        }
+
+        // Return the complete student data with properly formatted photos
+        res.json({
+            name: student.name,
+            major: student.major,
+            gpa: student.gpa,
+            year: student.year,
+            campaign_line: student.campaign_line,
+            personal_story: student.personal_story,
+            experience: student.experience,
+            organizations: student.organizations,
+            // Use the exact same photo format that works in the searchStudents endpoint
+            photo: mainPhoto,
+            photos: photosArray,
+            instagram: student.instagram,
+            linkedin: student.linkedin,
+            facebook: student.facebook,
+            github: student.github,
+            snapchat: student.snapchat || null,
+            tiktok: student.tiktok || null
+        });
+    });
+});
 app.post("/vote", (req, res) => {
     // 1. Check that the user is logged in
     const userId = req.cookies.user_id;
