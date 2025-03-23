@@ -861,6 +861,57 @@ app.get("/searchStudents", (req, res) => {
     });
 });
 
+app.get("/getCurrentStudent", (req, res) => {
+    // Get the user ID from cookies
+    const userId = req.cookies.userId;
+
+    if (!userId) {
+        return res.status(401).json({ message: "Unauthorized. Please log in first." });
+    }
+
+    const sqlQuery = `
+        SELECT *
+        FROM ContestEntries
+        WHERE user_id = $1
+    `;
+
+    db.query(sqlQuery, [userId], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ message: "Database error." });
+        }
+
+        if (results.rows.length === 0) {
+            return res.status(404).json({ message: "Student profile not found." });
+        }
+
+        // There should only be one result since user_id should be unique
+        const student = results.rows[0];
+
+        const studentData = {
+            userId: student.user_id,
+            name: student.name,
+            major: student.major,
+            gpa: student.gpa,
+            year: student.year,
+            personal_story: student.personal_story,
+            campaign_line: student.campaign_line,
+            experience: student.experience,
+            organizations: student.organizations,
+            instagram: student.instagram,
+            linkedin: student.linkedin,
+            facebook: student.facebook,
+            github: student.github,
+            tiktok: student.tiktok,
+            photo: (student.photos && Array.isArray(student.photos) && student.photos.length > 0)
+                ? student.photos[0]  // Use the first image
+                : "default-photo.jpg" // Use a placeholder if no photo exists
+        };
+
+        res.json(studentData);
+    });
+});
+
 app.get("/getProfileData", (req, res) => {
     const userId = req.cookies.user_id;
 
