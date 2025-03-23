@@ -982,40 +982,35 @@
             document.getElementById("organizations-content").textContent = data.organizations || "No organizations listed yet.";
 
             // Process photo data - handle both single photo and photo array formats
-            if (data.photo) {
-                debug(`Single photo found: ${data.photo}`);
-                photoArray = [data.photo];
-            } else if (data.photos) {
-                debug(`Photos data found: ${typeof data.photos === 'string' ? data.photos : 'Array data'}`);
-                photoArray = parsePhotos(data.photos);
-                debug(`Parsed ${photoArray.length} photos`);
+            // In fetchProfileData function, replace the photo handling code with:
+
+// Process raw photo data on the client side
+            if (data.rawPhotos) {
+                try {
+                    if (typeof data.rawPhotos === 'string') {
+                        // If it's "undefined" or invalid JSON, handle it gracefully
+                        if (data.rawPhotos === "undefined" || data.rawPhotos.trim() === "") {
+                            photoArray = [];
+                        } else {
+                            // Try to parse it
+                            photoArray = JSON.parse(data.rawPhotos);
+                        }
+                    } else if (Array.isArray(data.rawPhotos)) {
+                        photoArray = data.rawPhotos;
+                    } else {
+                        photoArray = [];
+                    }
+
+                    // Filter out empty entries
+                    photoArray = photoArray.filter(photo => photo);
+
+                    debug(`Parsed ${photoArray.length} photos from raw data`);
+                } catch (error) {
+                    debug(`Error parsing photos on client: ${error.message}`);
+                    console.error("Error parsing photos:", error);
+                    photoArray = [];
+                }
             }
-
-            // Set profile avatar image (first photo)
-            if (photoArray.length > 0) {
-                const profileImg = document.querySelector("#profileImage img");
-                const timestamp = new Date().getTime();
-
-                // Try the /uploads path
-                profileImg.src = `/uploads/${photoArray[0]}?t=${timestamp}`;
-
-                debug(`Setting profile image to: ${profileImg.src}`);
-
-                // If fails, try direct path
-                profileImg.onerror = () => {
-                    debug("Profile image load failed, trying direct path");
-                    profileImg.src = `${photoArray[0]}?t=${timestamp}`;
-
-                    // If that fails too, keep default
-                    profileImg.onerror = () => {
-                        debug("All profile image load attempts failed");
-                    };
-                };
-            }
-
-            // Initialize photo gallery
-            currentPhotoIndex = 0;
-            updatePhotoDisplay();
 
             // Update social media links
             const socialPlatforms = ["instagram", "linkedin", "facebook", "github", "snapchat", "tiktok"];
