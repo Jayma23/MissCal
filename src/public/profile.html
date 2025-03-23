@@ -733,8 +733,20 @@
 
                 // Handle profile photo - using the same approach as the voting page
                 const profileImg = document.querySelector("#profileImage img");
-                profileImg.src = data.photo || "/default-photo.jpg";
+                if (data.photo && data.photo !== "") {
+                    // First try using the photo path directly
+                    profileImg.src = data.photo;
+                } else if (data.photos && Array.isArray(data.photos) && data.photos.length > 0) {
+                    // If no direct photo but photos array exists, use the first one
+                    profileImg.src = data.photos[0];
+                } else {
+                    // Fallback to default image
+                    profileImg.src = "default-profile.png";
+                }
                 profileImg.alt = data.name || "Profile Photo";
+
+// Add console logging for debugging
+                console.log("Profile photo source:", profileImg.src);
 
                 // Handle photos for the gallery
 
@@ -751,7 +763,7 @@
     }
 
     // Display photos in gallery
-    
+
 
     // Initialize event listeners for gallery navigation
     document.addEventListener("DOMContentLoaded", function() {
