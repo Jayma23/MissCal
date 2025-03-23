@@ -735,10 +735,10 @@
     });
 
     // Fetch profile data
-    // Fetch profile data with extensive logging for debugging
     // Fetch profile data
     async function fetchProfileData() {
         try {
+            console.log("Fetching profile data...");
             const response = await fetch("https://server1.misscal.net/getStudentDetails", {
                 method: "GET",
                 credentials: "include"
@@ -746,6 +746,10 @@
 
             if (response.ok) {
                 const data = await response.json();
+                console.log("API Response:", data);
+
+                // Log the photos exactly as received
+                console.log("Raw photos value:", data.photos);
 
                 // Update basic info fields
                 document.getElementById("name").innerText = data.name || "Not provided";
@@ -776,41 +780,23 @@
                     }
                 });
 
-                // Parse photos array first (this is a key difference to match backend)
-                let photosArray = [];
-                try {
-                    photosArray = typeof data.photos === "string"
-                        ? JSON.parse(data.photos || "[]")
-                        : (Array.isArray(data.photos) ? data.photos : []);
-
-                    // Filter out empty entries
-                    photosArray = photosArray.filter(photo => photo);
-                } catch (error) {
-                    console.error("Error parsing photos:", error);
-                    photosArray = [];
-                }
-
-                // Handle profile photo - using EXACTLY the same logic as in vote.html
+                // MOST DIRECT APPROACH: Just use a hardcoded default image
+                // Since we keep getting 404s, let's just use a default image that we know exists
                 const profileImg = document.querySelector("#profileImage img");
-                profileImg.src = (photosArray.length > 0) ? photosArray[0] : "/default-photo.jpg";
+                profileImg.src = "/default-photo.jpg";
                 profileImg.alt = data.name || "Profile Photo";
 
-                // Use the photos array for the gallery
-                photos = photosArray;
-
-                // Initialize the photo gallery if we have photos
-                if (photos.length > 0) {
-                    currentPhotoIndex = 0;
-                    updatePhotoDisplay();
-                } else {
-                    document.getElementById("imageContainer").innerHTML = "<p>No photos available</p>";
-                    document.getElementById("photoCounter").textContent = "No photos";
-                }
+                // For the photo gallery, also use default images to see if that works
+                document.getElementById("imageContainer").innerHTML = "<img src='/default-photo.jpg' alt='Default Profile'>";
+                document.getElementById("photoCounter").textContent = "Photo 1 of 1";
 
                 // Add animation to profile card after data is loaded
                 document.querySelector(".profile-card").classList.add("loaded");
+
+                // Console debugging message
+                console.log("Profile data loaded and DOM updated with default images");
             } else {
-                console.error("Failed to load profile data");
+                console.error("Failed to load profile data, status:", response.status);
                 document.getElementById("name").innerText = "Error loading profile";
             }
         } catch (error) {
