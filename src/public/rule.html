@@ -4,70 +4,1113 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rules and Privacy Policy - Miss Cal</title>
-    <link rel="stylesheet" href="rule.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
 </head>
 <body>
 <header class="main-header">
     <div class="container">
-        <h1 class="title">Rules & Privacy Policy</h1>
-        <p class="subtitle">Everything You Need to Know About the Competition</p>
+        <h1 class="title animate__animated animate__fadeInDown">Rules & Privacy Policy</h1>
+        <p class="subtitle animate__animated animate__fadeInUp">Everything You Need to Know About the Competition</p>
     </div>
 </header>
 
 <nav class="navbar">
     <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="#rules">Competition Rules</a></li>
-        <li><a href="#privacy">Data Privacy Policy</a></li>
-        <li><a id="applyNowButton" class="btn btn-primary">Apply Now</a></li>
+        <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="#rules"><i class="fas fa-gavel"></i> Competition Rules</a></li>
+        <li><a href="#privacy"><i class="fas fa-shield-alt"></i> Data Privacy Policy</a></li>
+        <li><a id="applyNowButton" class="btn btn-primary"><i class="fas fa-user-plus"></i> Apply Now</a></li>
     </ul>
 </nav>
+
+<!-- Table of Contents -->
+<div class="table-of-contents">
+    <div class="container">
+        <div class="toc-header">
+            <h3><i class="fas fa-list"></i> Quick Navigation</h3>
+            <button class="toc-toggle"><i class="fas fa-chevron-down"></i></button>
+        </div>
+        <div class="toc-content">
+            <ul>
+                <li><a href="#eligibility"><i class="fas fa-check-circle"></i> Eligibility</a></li>
+                <li><a href="#application"><i class="fas fa-file-alt"></i> Application Process</a></li>
+                <li><a href="#voting"><i class="fas fa-vote-yea"></i> Voting</a></li>
+                <li><a href="#winner"><i class="fas fa-trophy"></i> Winner Selection</a></li>
+                <li><a href="#privacy-commitment"><i class="fas fa-user-shield"></i> Privacy Commitment</a></li>
+                <li><a href="#data-ownership"><i class="fas fa-copyright"></i> Data Ownership</a></li>
+                <li><a href="#unauthorized"><i class="fas fa-exclamation-triangle"></i> Unauthorized Uploads</a></li>
+                <li><a href="#data-deletion"><i class="fas fa-trash-alt"></i> Data Deletion</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
 
 <main>
     <section id="rules" class="rules-section">
         <div class="container">
-            <h2>Competition Rules</h2>
-            <ul>
-                <li><strong>Eligibility:</strong> All UC Berkeley students are welcome to participate. A valid student ID or UC Berkeley email is required for verification.</li>
-                <li><strong>Application Process:</strong> Participants must upload:
+            <h2 class="section-header">Competition Rules</h2>
+
+            <div class="rule-card" id="eligibility">
+                <div class="rule-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="rule-content">
+                    <h3>Eligibility</h3>
+                    <p>All UC Berkeley students are welcome to participate. A valid student ID or UC Berkeley email is required for verification.</p>
+                </div>
+            </div>
+
+            <div class="rule-card" id="application">
+                <div class="rule-icon">
+                    <i class="fas fa-file-upload"></i>
+                </div>
+                <div class="rule-content">
+                    <h3>Application Process</h3>
+                    <p>Participants must upload:</p>
                     <ul>
                         <li>Preferred name</li>
                         <li>One amazing photo in JPEG or PNG format</li>
                     </ul>
-                    <p>Optional details include GPA, major, personal story, clubs joined, and jobs or internships.</p>
-                </li>
-                <li><strong>Voting:</strong> Voting is open to all UC Berkeley students. Each student is allowed one vote for their favorite participant.</li>
-                <li><strong>Winner Selection:</strong> The participant with the most votes will be crowned Miss Cal and awarded a $1000 cash prize. In case of a tie, the organizing committee will evaluate tied participants based on creativity, confidence, and impact.</li>
-            </ul>
+                    <div class="collapsible-content">
+                        <p>Optional details include GPA, major, personal story, clubs joined, and jobs or internships.</p>
+                        <div class="tips-box">
+                            <h4><i class="fas fa-lightbulb"></i> Tips for a Great Application</h4>
+                            <ul>
+                                <li>Choose a photo that showcases your personality</li>
+                                <li>Share a unique personal story that sets you apart</li>
+                                <li>Highlight your involvement in campus activities</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button class="read-more-btn">Read More <i class="fas fa-chevron-down"></i></button>
+                </div>
+            </div>
+
+            <div class="rule-card" id="voting">
+                <div class="rule-icon">
+                    <i class="fas fa-poll"></i>
+                </div>
+                <div class="rule-content">
+                    <h3>Voting</h3>
+                    <p>Voting is open to all UC Berkeley students. Each student is allowed one vote for their favorite participant.</p>
+                </div>
+            </div>
+
+            <div class="rule-card" id="winner">
+                <div class="rule-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="rule-content">
+                    <h3>Winner Selection</h3>
+                    <p>The participant with the most votes will be crowned Miss Cal and awarded a $1000 cash prize.</p>
+                    <div class="collapsible-content">
+                        <p>In case of a tie, the organizing committee will evaluate tied participants based on creativity, confidence, and impact.</p>
+                        <div class="prize-details">
+                            <h4>Prize Breakdown</h4>
+                            <div class="prize-item">
+                                <span class="prize-position">1st Place:</span>
+                                <span class="prize-amount">$1000</span>
+                                <span class="prize-extra">+ Miss Cal Crown & Sash</span>
+                            </div>
+                            <div class="prize-item">
+                                <span class="prize-position">2nd Place:</span>
+                                <span class="prize-amount">$500</span>
+                                <span class="prize-extra">+ Recognition Certificate</span>
+                            </div>
+                            <div class="prize-item">
+                                <span class="prize-position">3rd Place:</span>
+                                <span class="prize-amount">$250</span>
+                                <span class="prize-extra">+ Recognition Certificate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="read-more-btn">Read More <i class="fas fa-chevron-down"></i></button>
+                </div>
+            </div>
         </div>
     </section>
 
     <section id="privacy" class="privacy-section">
         <div class="container">
-            <h2>Data Privacy Policy</h2>
-            <ul>
-                <li><strong>Privacy Commitment:</strong> At Miss Cal, we are committed to protecting the privacy of all participants. Your data is treated with strict confidentiality.</li>
-                <li><strong>Data Ownership:</strong> Participants retain full ownership of their personal data, including photos and optional information.</li>
-                <li><strong>Unauthorized Uploads:</strong> If any participant's photo or personal information is uploaded without their permission:
+            <h2 class="section-header">Data Privacy Policy</h2>
+
+            <div class="rule-card" id="privacy-commitment">
+                <div class="rule-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="rule-content">
+                    <h3>Privacy Commitment</h3>
+                    <p>At Miss Cal, we are committed to protecting the privacy of all participants. Your data is treated with strict confidentiality.</p>
+                </div>
+            </div>
+
+            <div class="rule-card" id="data-ownership">
+                <div class="rule-icon">
+                    <i class="fas fa-user-lock"></i>
+                </div>
+                <div class="rule-content">
+                    <h3>Data Ownership</h3>
+                    <p>Participants retain full ownership of their personal data, including photos and optional information.</p>
+                </div>
+            </div>
+
+            <div class="rule-card" id="unauthorized">
+                <div class="rule-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="rule-content">
+                    <h3>Unauthorized Uploads</h3>
+                    <p>If any participant's photo or personal information is uploaded without their permission:</p>
                     <ul>
                         <li>The incident must be reported immediately to <a href="mailto:support@misscal.com">support@misscal.com</a>.</li>
                         <li>Upon verification, the unauthorized data will be permanently deleted from our servers.</li>
                     </ul>
-                </li>
-                <li><strong>Data Deletion:</strong> Participants may request the complete removal of their data at any time by contacting <a href="mailto:support@misscal.com">support@misscal.com</a>.</li>
-                <li><strong>Secure Storage:</strong> All data is encrypted and securely stored to prevent unauthorized access.</li>
-                <li><strong>Verification:</strong> Login with UC Berkeley email is required to ensure authenticity and security.</li>
-            </ul>
+                </div>
+            </div>
+
+            <div class="rule-card" id="data-deletion">
+                <div class="rule-icon">
+                    <i class="fas fa-trash"></i>
+                </div>
+                <div class="rule-content">
+                    <h3>Data Deletion</h3>
+                    <p>Participants may request the complete removal of their data at any time by contacting <a href="mailto:support@misscal.com">support@misscal.com</a>.</p>
+
+                    <div class="deletion-request-demo">
+                        <h4>Sample Data Deletion Request</h4>
+                        <div class="email-template">
+                            <div class="email-header">
+                                <div><strong>To:</strong> support@misscal.com</div>
+                                <div><strong>Subject:</strong> Data Deletion Request - [Your Name]</div>
+                            </div>
+                            <div class="email-body">
+                                <p>Hello Miss Cal Team,</p>
+                                <p>I would like to request the deletion of all my personal data from the Miss Cal database. My details are as follows:</p>
+                                <ul>
+                                    <li>Name: [Your Full Name]</li>
+                                    <li>Email: [Your Berkeley Email]</li>
+                                    <li>Student ID: [Your Student ID]</li>
+                                </ul>
+                                <p>Please confirm once the deletion is complete.</p>
+                                <p>Thank you,<br>[Your Name]</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-section">
+                <h3><i class="fas fa-question-circle"></i> Frequently Asked Questions</h3>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How secure is my data?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>All data is encrypted and securely stored using industry-standard protocols. We use SSL encryption for all data transfers and secure our databases with multiple layers of protection.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Who can see my profile information?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Only verified UC Berkeley students can view participant profiles. Your contact information is never publicly displayed.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How long is my data stored?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Your data is stored only for the duration of the competition. After the competition ends, all participant data is automatically deleted within 30 days unless you request to keep your profile active for future events.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feedback Section -->
+    <section class="feedback-section">
+        <div class="container">
+            <div class="feedback-form">
+                <h3><i class="fas fa-comment-dots"></i> Have Questions or Feedback?</h3>
+                <div class="form-group">
+                    <label for="feedback-name">Name</label>
+                    <input type="text" id="feedback-name" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label for="feedback-email">Email</label>
+                    <input type="email" id="feedback-email" placeholder="Your Berkeley email">
+                </div>
+                <div class="form-group">
+                    <label for="feedback-message">Message</label>
+                    <textarea id="feedback-message" placeholder="Your question or feedback"></textarea>
+                </div>
+                <button id="submitFeedback" class="submit-btn">Submit <i class="fas fa-paper-plane"></i></button>
+            </div>
         </div>
     </section>
 </main>
 
 <footer class="footer">
-    <p>&copy; 2024 College Life. All rights reserved. | <a href="contact.html">Contact Us</a></p>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h3>Miss Cal</h3>
+                <p>Celebrating beauty, confidence, and talent</p>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#rules">Rules</a></li>
+                    <li><a href="#privacy">Privacy</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <h4>Connect With Us</h4>
+                <div class="social-icons">
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Miss Cal. All rights reserved.</p>
+        </div>
+    </div>
 </footer>
 
-<script>
+<!-- Back to top button -->
+<div class="back-to-top" id="backToTop">
+    <i class="fas fa-arrow-up"></i>
+</div>
 
+<!-- Toast Notifications -->
+<div class="toast" id="toast">
+    <div class="toast-content">
+        <div class="toast-icon">
+            <i class="fas fa-info-circle"></i>
+        </div>
+        <div class="toast-message">This is a notification</div>
+    </div>
+    <button class="toast-close"><i class="fas fa-times"></i></button>
+</div>
+
+<style>
+    /* General Styles */
+    :root {
+        --berkeley-blue: #003262;
+        --california-gold: #FDB515;
+        --accent-pink: #ff6f61;
+        --accent-pink-hover: #ff4a3a;
+        --light-gray: #f4f4f4;
+        --white: #ffffff;
+        --dark: #333333;
+        --text-color: #444444;
+        --transition-speed: 0.3s;
+    }
+
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: var(--text-color);
+        background-color: #f9f9f9;
+        scroll-behavior: smooth;
+    }
+
+    .container {
+        width: 90%;
+        margin: auto;
+        max-width: 1200px;
+    }
+
+    /* Header */
+    .main-header {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('CalPic.jpg') no-repeat center center/cover;
+        color: white;
+        text-align: center;
+        padding: 100px 20px;
+        position: relative;
+    }
+
+    .main-header .title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3.5rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .main-header .subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Navbar */
+    .navbar {
+        background: var(--berkeley-blue);
+        color: white;
+        padding: 15px 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .navbar ul li {
+        margin: 0 5px;
+    }
+
+    .navbar ul li a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .navbar ul li a:hover {
+        background: var(--california-gold);
+        color: var(--berkeley-blue);
+        transform: translateY(-3px);
+    }
+
+    .btn-primary {
+        background: var(--accent-pink);
+        color: white;
+        font-weight: bold;
+    }
+
+    .btn-primary:hover {
+        background: var(--accent-pink-hover);
+    }
+
+    /* Table of Contents */
+    .table-of-contents {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin: 20px auto;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .toc-header {
+        padding: 15px 20px;
+        background: var(--berkeley-blue);
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .toc-header h3 {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .toc-toggle {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .toc-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .toc-content.active {
+        max-height: 500px;
+    }
+
+    .toc-content ul {
+        list-style: none;
+        padding: 20px;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+
+    .toc-content ul li a {
+        color: var(--berkeley-blue);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .toc-content ul li a:hover {
+        background: var(--light-gray);
+        transform: translateX(5px);
+    }
+
+    /* Rule Cards */
+    .section-header {
+        font-size: 2.5rem;
+        text-align: center;
+        margin-bottom: 40px;
+        color: var(--berkeley-blue);
+        position: relative;
+        padding-bottom: 15px;
+    }
+
+    .section-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: var(--california-gold);
+        border-radius: 2px;
+    }
+
+    .rules-section, .privacy-section {
+        padding: 60px 0;
+    }
+
+    .privacy-section {
+        background: var(--light-gray);
+    }
+
+    .rule-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+        overflow: hidden;
+        display: flex;
+        transition: all 0.3s ease;
+    }
+
+    .rule-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .rule-icon {
+        width: 80px;
+        background: var(--berkeley-blue);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+    }
+
+    .rule-content {
+        flex: 1;
+        padding: 25px;
+        position: relative;
+    }
+
+    .rule-content h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: var(--berkeley-blue);
+        font-size: 1.5rem;
+    }
+
+    .rule-content ul {
+        padding-left: 20px;
+    }
+
+    .rule-content ul li {
+        margin-bottom: 8px;
+    }
+
+    .collapsible-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .collapsible-content.active {
+        max-height: 1000px;
+    }
+
+    .read-more-btn {
+        background: none;
+        border: none;
+        color: var(--berkeley-blue);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 0;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    .read-more-btn i {
+        transition: transform 0.3s ease;
+    }
+
+    .read-more-btn.active i {
+        transform: rotate(180deg);
+    }
+
+    /* Tips box */
+    .tips-box {
+        background: rgba(253, 181, 21, 0.1);
+        border-left: 4px solid var(--california-gold);
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 0 5px 5px 0;
+    }
+
+    .tips-box h4 {
+        margin-top: 0;
+        color: var(--berkeley-blue);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Prize details */
+    .prize-details {
+        background: #f9f9f9;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 15px 0;
+    }
+
+    .prize-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .prize-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .prize-position {
+        font-weight: bold;
+        width: 100px;
+    }
+
+    .prize-amount {
+        color: var(--berkeley-blue);
+        font-weight: bold;
+        font-size: 1.2rem;
+        width: 100px;
+    }
+
+    .prize-extra {
+        color: #666;
+        flex: 1;
+    }
+
+    /* Email template */
+    .deletion-request-demo {
+        margin-top: 20px;
+    }
+
+    .email-template {
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        margin: 10px 0;
+    }
+
+    .email-header {
+        padding-bottom: 15px;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 15px;
+    }
+
+    .email-body {
+        font-family: monospace;
+        white-space: pre-line;
+    }
+
+    /* FAQ Section */
+    .faq-section {
+        margin-top: 60px;
+    }
+
+    .faq-section h3 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--berkeley-blue);
+    }
+
+    .faq-item {
+        margin-bottom: 15px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .faq-question {
+        padding: 15px 20px;
+        background: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .faq-question i {
+        transition: transform 0.3s ease;
+    }
+
+    .faq-question.active i {
+        transform: rotate(180deg);
+    }
+
+    .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        background: #f9f9f9;
+        transition: max-height 0.3s ease;
+    }
+
+    .faq-answer.active {
+        max-height: 500px;
+    }
+
+    .faq-answer p {
+        padding: 15px 20px;
+        margin: 0;
+    }
+
+    /* Feedback Section */
+    .feedback-section {
+        background: linear-gradient(rgba(0, 50, 98, 0.9), rgba(0, 50, 98, 0.9)), url('CalPic.jpg') center/cover;
+        color: white;
+        padding: 60px 0;
+    }
+
+    .feedback-form {
+        max-width: 600px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 30px;
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+    }
+
+    .feedback-form h3 {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: none;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        font-size: 1rem;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .form-group textarea {
+        height: 120px;
+        resize: vertical;
+    }
+
+    .submit-btn {
+        background: var(--california-gold);
+        color: var(--berkeley-blue);
+        border: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .submit-btn:hover {
+        background: white;
+        transform: translateY(-3px);
+    }
+
+    /* Footer */
+    .footer {
+        background: var(--berkeley-blue);
+        color: white;
+        padding: 60px 0 20px;
+    }
+
+    .footer-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+        margin-bottom: 40px;
+    }
+
+    .footer-logo h3 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+    }
+
+    .footer-links h4, .footer-social h4 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        color: var(--california-gold);
+    }
+
+    .footer-links ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .footer-links ul li {
+        margin-bottom: 10px;
+    }
+
+    .footer-links ul li a {
+        color: #ccc;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .footer-links ul li a:hover {
+        color: var(--california-gold);
+    }
+
+    .social-icons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .social-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .social-icon:hover {
+        background: var(--california-gold);
+        color: var(--berkeley-blue);
+        transform: translateY(-3px);
+    }
+
+    .footer-bottom {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Back to top button */
+    .back-to-top {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 50px;
+        height: 50px;
+        background: var(--berkeley-blue);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        cursor: pointer;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 99;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .back-to-top.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .back-to-top:hover {
+        background: var(--california-gold);
+        color: var(--berkeley-blue);
+        transform: translateY(-5px);
+    }
+
+    /* Toast Notifications */
+    .toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: var(--berkeley-blue);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 1000;
+        opacity: 0;
+        transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        max-width: 350px;
+    }
+
+    .toast.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+
+    .toast-content {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .toast-icon {
+        font-size: 1.5rem;
+    }
+
+    .toast-close {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        padding: 0;
+        margin-left: 15px;
+    }
+
+    .toast-close:hover {
+        transform: scale(1.2);
+    }
+
+    .toast.success {
+        background: #28a745;
+    }
+
+    .toast.error {
+        background: #dc3545;
+    }
+
+    .toast.info {
+        background: var(--berkeley-blue);
+    }
+
+    /* Animation classes */
+    .fade-in {
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .slide-in {
+        animation: slideIn 0.5s ease forwards;
+    }
+
+    @keyframes slideIn {
+        from { transform: translateY(50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .rule-card {
+            flex-direction: column;
+        }
+
+        .rule-icon {
+            width: 100%;
+            height: 60px;
+        }
+
+        .toc-content ul {
+            grid-template-columns: 1fr;
+        }
+
+        .main-header .title {
+            font-size: 2.5rem;
+        }
+
+        .navbar ul {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .navbar ul li {
+            margin: 5px 0;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .section-header {
+            font-size: 2rem;
+        }
+
+        .email-template {
+            font-size: 0.9rem;
+        }
+
+        .feedback-form {
+            padding: 20px;
+        }
+    }
+</style>
+
+<script>
+    // Table of Contents Toggle
+    document.querySelector('.toc-header').addEventListener('click', () => {
+        document.querySelector('.toc-content').classList.toggle('active');
+        const icon = document.querySelector('.toc-toggle i');
+        icon.classList.toggle('fa-chevron-down');
+        icon.classList.toggle('fa-chevron-up');
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+
+                // Show toast
+                showToast(`Navigated to ${targetElement.querySelector('h3').textContent}`, 'info');
+            }
+        });
+    });
+
+    // Read More button functionality
+    document.querySelectorAll('.read-more-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const content = button.previousElementSibling;
+            content.classList.toggle('active');
+            button.classList.toggle('active');
+
+            if (content.classList.contains('active')) {
+                button.innerHTML = 'Read Less <i class="fas fa-chevron-up"></i>';
+            } else {
+                button.innerHTML = 'Read More <i class="fas fa-chevron-down"></i>';
+            }
+        });
+    });
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-question').forEach(question => {
+        question.addEventListener('click', () => {
+            const answer = question.nextElementSibling;
+            const isActive = question.classList.contains('active');
+
+            // Close all FAQs
+            document.querySelectorAll('.faq-question').forEach(q => {
+                q.classList.remove('active');
+                q.nextElementSibling.classList.remove('active');
+            });
+
+            // Toggle clicked FAQ
+            if (!isActive) {
+                question.classList.add('active');
+                answer.classList.add('active');
+            }
+        });
+    });
+
+    // Back to top button
+    const backToTopButton = document.getElementById('backToTop');
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            backToTopButton.classList.add('active');
+        } else {
+            backToTopButton.classList.remove('active');
+        }
+    });
+
+    backToTopButton.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+
+    // Apply Now button
     document.getElementById("applyNowButton").addEventListener("click", function () {
         // Check if the `user_id` cookie exists
         const userId = document.cookie
@@ -80,9 +1123,102 @@
             window.location.href = "mainPage.html";
         } else {
             // ❌ User is NOT logged in, redirect to index.html
-            window.location.href = "index.html";
+            showToast('Please sign in to apply', 'info');
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 1500);
         }
     });
+
+    // Feedback form submission
+    document.getElementById('submitFeedback').addEventListener('click', () => {
+        const name = document.getElementById('feedback-name').value.trim();
+        const email = document.getElementById('feedback-email').value.trim();
+        const message = document.getElementById('feedback-message').value.trim();
+
+        if (!name || !email || !message) {
+            showToast('Please fill out all fields', 'error');
+            return;
+        }
+
+        if (!email.endsWith('@berkeley.edu')) {
+            showToast('Please use a valid Berkeley email address', 'error');
+            return;
+        }
+
+        // In a real app, you would send this data to your server
+        // For demo, just show a success message
+        showToast('Your feedback has been submitted!', 'success');
+
+        // Clear form
+        document.getElementById('feedback-name').value = '';
+        document.getElementById('feedback-email').value = '';
+        document.getElementById('feedback-message').value = '';
+    });
+
+    // Toast notification function
+    function showToast(message, type = "info") {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.querySelector('.toast-message');
+        const toastIcon = document.querySelector('.toast-icon i');
+
+        toastMessage.textContent = message;
+        toast.className = "toast";
+        toast.classList.add(type);
+
+        // Update icon based on type
+        if (type === "success") {
+            toastIcon.className = "fas fa-check-circle";
+        } else if (type === "error") {
+            toastIcon.className = "fas fa-exclamation-circle";
+        } else {
+            toastIcon.className = "fas fa-info-circle";
+        }
+
+        toast.classList.add("show");
+
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 5000);
+    }
+
+    // Close toast manually
+    document.querySelector('.toast-close').addEventListener('click', () => {
+        document.getElementById('toast').classList.remove('show');
+    });
+
+    // Intersection Observer for scroll animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    // Apply animations to rule cards
+    document.querySelectorAll('.rule-card').forEach((card, index) => {
+        card.style.opacity = "0";
+        card.style.animationDelay = `${index * 0.1}s`;
+        observer.observe(card);
+    });
+
+    // Apply the same for FAQ items
+    document.querySelectorAll('.faq-item').forEach((item, index) => {
+        item.style.opacity = "0";
+        item.style.animationDelay = `${index * 0.1}s`;
+        observer.observe(item);
+    });
+
+    // Show welcome toast on page load
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            showToast('Welcome to the Miss Cal Rules & Privacy page!', 'info');
+        }, 1000);
+
+        // Open Table of Contents by default
+        document.querySelector('.toc-content').classList.add('active');
+    });
 </script>
-</body>
-</html>
