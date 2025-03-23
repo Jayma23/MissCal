@@ -4,11 +4,607 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Miss Cal - Profile</title>
-    <link rel="stylesheet" type="text/css" href='styles.css'/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #FDB515; /* California Gold */
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            width: 90%;
+            margin: auto;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        /* Header */
+        .main-header {
+            background: #003262; /* Berkeley Blue */
+            color: white;
+            text-align: center;
+            padding: 50px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-header .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            animation: fadeIn 1s ease;
+        }
+
+        .main-header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #003262;
+            color: white;
+            padding: 10px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .navbar ul li {
+            margin: 0 10px;
+        }
+
+        .navbar ul li a {
+            color: #003262;
+            background: #FDB515;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .navbar ul li a:hover {
+            background: #e0a814;
+            transform: translateY(-2px);
+        }
+
+        /* Profile Container */
+        .profile-container {
+            padding: 30px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 800px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-container h2 {
+            color: #003262; /* Berkeley Blue */
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-container h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #FDB515;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-container h2:hover::after {
+            transform: scaleX(1);
+        }
+
+        /* Tabs */
+        .profile-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 5px;
+        }
+
+        .tab-button {
+            background: #f0f0f0;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: #003262;
+        }
+
+        .tab-button:hover {
+            background: #e0e0e0;
+        }
+
+        .tab-button.active {
+            background: #003262;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 20px;
+            border: 3px solid #FDB515;
+            position: relative;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-avatar .loading-spinner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.1);
+        }
+
+        .profile-avatar .loading-spinner::after {
+            content: '';
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #003262;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-details h3 {
+            margin: 0 0 5px 0;
+            color: #003262;
+        }
+
+        .badge {
+            background: #FDB515;
+            color: #003262;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .profile-body {
+            padding: 20px;
+        }
+
+        .profile-body p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .profile-body i {
+            color: #003262;
+            margin-right: 8px;
+        }
+
+        /* Story Container */
+        .story-container {
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            line-height: 1.8;
+            border-left: 5px solid #FDB515;
+        }
+
+        /* Experience Container */
+        .experience-container {
+            padding: 0 10px;
+        }
+
+        .experience-container h3 {
+            color: #003262;
+            margin: 20px 0 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .experience-container h3 i {
+            margin-right: 10px;
+        }
+
+        .content-block {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        /* Social Links */
+        .social-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-link i {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
+        .social-link.disabled-link {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .linkedin { background: #0077b5; }
+        .facebook { background: #3b5998; }
+        .github { background: #333; }
+        .snapchat { background: #fffc00; color: black; }
+        .tiktok { background: #000000; }
+
+        /* Photo Gallery */
+        .photo-gallery {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            height: 300px;
+            position: relative;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .photo-gallery img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .photo-gallery img:hover {
+            transform: scale(1.02);
+        }
+
+        .photo-gallery .empty-message {
+            color: #666;
+        }
+
+        .photo-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .photo-nav-button {
+            background: #003262;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 15px;
+        }
+
+        .photo-nav-button:hover {
+            background: #FDB515;
+            color: #003262;
+        }
+
+        .photo-nav-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #photoCounter {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Edit Button */
+        .edit-button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #003262; /* Berkeley Blue */
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .cta-button:hover {
+            background: #00254a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .cta-button i {
+            margin-right: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            background: #003262; /* Berkeley Blue */
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #003262; /* Berkeley Blue */
+            color: white;
+            padding: 40px 25px;
+            width: 250px;
+            height: 100vh;
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 40px;
+            font-size: 1.5rem;
+            color: #FDB515; /* California Gold */
+            text-align: center;
+            position: relative;
+        }
+
+        .sidebar h3::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: #FDB515;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            display: block;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul li a:hover, .sidebar ul li a.active {
+            background: #FDB515; /* California Gold */
+            color: #003262; /* Berkeley Blue */
+            transform: translateX(5px);
+        }
+
+        .sidebar ul li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+
+        /* Toggle Button */
+        .sidebar-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #FDB515;
+            color: #003262;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1001;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-toggle:hover {
+            background: #e0a814;
+            transform: scale(1.05);
+        }
+
+        /* Debug Info Panel */
+        #debugInfo {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            max-width: 300px;
+            z-index: 1000;
+            display: none;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #003262;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .profile-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .tab-button {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .social-links-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
 </head>
 <body>
+<!-- Sidebar Toggle Button -->
 <button id="sidebarToggle" class="sidebar-toggle">☰ </button>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<!-- Debug Info Panel -->
+<div id="debugInfo"></div>
+
+<!-- The Sidebar -->
 <aside class="sidebar hidden" id="sidebar">
     <h3>Dashboard</h3>
     <ul>
@@ -21,6 +617,7 @@
         <li><a id="logoffButton" class="btn btn-danger w-100"><i class="fas fa-sign-out-alt"></i> Log Off</a></li>
     </ul>
 </aside>
+
 <header class="main-header">
     <div class="container">
         <h1 class="title">My Profile</h1>
@@ -38,10 +635,10 @@
 <main class="profile-container">
     <div class="profile-tabs">
         <button class="tab-button active" data-tab="basicInfo">Basic Info</button>
+        <button class="tab-button" data-tab="photos">Photos</button>
         <button class="tab-button" data-tab="story">My Story</button>
         <button class="tab-button" data-tab="experience">Experience</button>
         <button class="tab-button" data-tab="social">Social Media</button>
-
     </div>
 
     <div id="basicInfo" class="tab-content active">
@@ -50,6 +647,7 @@
             <div class="profile-header">
                 <div id="profileImage" class="profile-avatar">
                     <img src="default-profile.png" alt="Profile Photo">
+                    <div class="loading-spinner"></div>
                 </div>
                 <div class="profile-details">
                     <h3 id="name">Loading...</h3>
@@ -61,6 +659,18 @@
                 <p><i class="fas fa-award"></i> <strong>GPA:</strong> <span id="gpa">Loading...</span></p>
                 <p><i class="fas fa-quote-left"></i> <strong>Campaign Line:</strong> <span id="campaign_line">Loading...</span></p>
             </div>
+        </div>
+    </div>
+
+    <div id="photos" class="tab-content">
+        <h2 class="section-title">My Photos</h2>
+        <div id="imageContainer" class="photo-gallery">
+            <div class="empty-message">No photos available</div>
+        </div>
+        <div class="photo-controls">
+            <button id="prevPhoto" class="photo-nav-button" disabled><i class="fas fa-chevron-left"></i></button>
+            <span id="photoCounter">No photos</span>
+            <button id="nextPhoto" class="photo-nav-button" disabled><i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
 
@@ -106,524 +716,64 @@
         </div>
     </div>
 
-
-
     <div class="edit-button-container">
         <a href="editProfile.html" class="cta-button"><i class="fas fa-edit"></i> Edit Profile</a>
     </div>
 </main>
 
 <footer class="footer">
-    <p>&copy; 2024 College Life. All rights reserved.</p>
+    <p>&copy; 2024 Miss Cal. All rights reserved.</p>
 </footer>
 
-<style>
-    /* General Styles */
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #FDB515; /* California Gold */
-        color: #333;
-        transition: all 0.3s ease;
-    }
-
-    .container {
-        width: 90%;
-        margin: auto;
-        max-width: 1200px;
-        text-align: center;
-    }
-
-    /* Header */
-    .main-header {
-        background: #003262; /* Berkeley Blue */
-        color: white;
-        text-align: center;
-        padding: 50px 20px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .main-header .title {
-        font-family: 'Playfair Display', serif;
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-        animation: fadeIn 1s ease;
-    }
-
-    .main-header .subtitle {
-        font-size: 1.2rem;
-        opacity: 0.9;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Navbar */
-    .navbar {
-        background: #003262;
-        color: white;
-        padding: 10px 0;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .navbar ul {
-        list-style: none;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        margin: 0;
-    }
-
-    .navbar ul li {
-        margin: 0 10px;
-    }
-
-    .navbar ul li a {
-        color: #003262;
-        background: #FDB515;
-        text-decoration: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-
-    .navbar ul li a:hover {
-        background: #e0a814;
-        transform: translateY(-2px);
-    }
-
-    /* Profile Container */
-    .profile-container {
-        padding: 30px 20px;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        margin: 20px auto;
-        max-width: 800px;
-        animation: slideUp 0.5s ease;
-    }
-
-    @keyframes slideUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .profile-container h2 {
-        color: #003262; /* Berkeley Blue */
-        margin-bottom: 20px;
-        position: relative;
-        display: inline-block;
-    }
-
-    .profile-container h2::after {
-        content: '';
-        position: absolute;
-        bottom: -5px;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: #FDB515;
-        transform: scaleX(0);
-        transform-origin: left;
-        transition: transform 0.3s ease;
-    }
-
-    .profile-container h2:hover::after {
-        transform: scaleX(1);
-    }
-
-    /* Tabs */
-    .profile-tabs {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-bottom: 20px;
-        gap: 5px;
-    }
-
-    .tab-button {
-        background: #f0f0f0;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: bold;
-        color: #003262;
-    }
-
-    .tab-button:hover {
-        background: #e0e0e0;
-    }
-
-    .tab-button.active {
-        background: #003262;
-        color: white;
-    }
-
-    .tab-content {
-        display: none;
-        animation: fadeIn 0.5s ease;
-    }
-
-    .tab-content.active {
-        display: block;
-    }
-
-    /* Profile Card */
-    .profile-card {
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        overflow: hidden;
-        border: 1px solid #eee;
-    }
-
-    .profile-header {
-        display: flex;
-        align-items: center;
-        padding: 20px;
-        background: #f9f9f9;
-    }
-
-    .profile-avatar {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        overflow: hidden;
-        margin-right: 20px;
-        border: 3px solid #FDB515;
-    }
-
-    .profile-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .profile-details {
-        flex: 1;
-    }
-
-    .profile-details h3 {
-        margin: 0 0 5px 0;
-        color: #003262;
-    }
-
-    .badge {
-        background: #FDB515;
-        color: #003262;
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: bold;
-    }
-
-    .profile-body {
-        padding: 20px;
-    }
-
-    .profile-body p {
-        margin-bottom: 15px;
-        line-height: 1.6;
-    }
-
-    .profile-body i {
-        color: #003262;
-        margin-right: 8px;
-    }
-
-    /* Story Container */
-    .story-container {
-        padding: 20px;
-        background: #f9f9f9;
-        border-radius: 10px;
-        line-height: 1.8;
-        border-left: 5px solid #FDB515;
-    }
-
-    /* Experience Container */
-    .experience-container {
-        padding: 0 10px;
-    }
-
-    .experience-container h3 {
-        color: #003262;
-        margin: 20px 0 10px;
-        display: flex;
-        align-items: center;
-    }
-
-    .experience-container h3 i {
-        margin-right: 10px;
-    }
-
-    .content-block {
-        background: #f9f9f9;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        line-height: 1.6;
-    }
-
-    /* Social Links */
-    .social-links-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 15px;
-        margin-top: 20px;
-    }
-
-    .social-link {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 15px;
-        border-radius: 8px;
-        color: white;
-        text-decoration: none;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-
-    .social-link:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .social-link i {
-        margin-right: 8px;
-        font-size: 1.2rem;
-    }
-
-    .instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
-    .linkedin { background: #0077b5; }
-    .facebook { background: #3b5998; }
-    .github { background: #333; }
-    .snapchat { background: #fffc00; color: black; }
-    .tiktok { background: #000000; }
-
-    /* Photo Gallery */
-    .photo-gallery {
-        display: flex;
-        justify-content: center;
-        margin: 20px 0;
-        min-height: 300px;
-    }
-
-    .photo-gallery img {
-        max-width: 100%;
-        max-height: 300px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
-    }
-
-    .photo-gallery img:hover {
-        transform: scale(1.02);
-    }
-
-    .photo-controls {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 20px;
-    }
-
-    .photo-nav-button {
-        background: #003262;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin: 0 15px;
-    }
-
-    .photo-nav-button:hover {
-        background: #FDB515;
-        color: #003262;
-    }
-
-    #photoCounter {
-        font-size: 0.9rem;
-        color: #666;
-    }
-
-    /* Edit Button */
-    .edit-button-container {
-        text-align: center;
-        margin-top: 30px;
-    }
-
-    .cta-button {
-        display: inline-block;
-        background: #003262; /* Berkeley Blue */
-        color: white;
-        text-decoration: none;
-        padding: 12px 25px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: bold;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .cta-button:hover {
-        background: #00254a;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .cta-button i {
-        margin-right: 8px;
-    }
-
-    /* Footer */
-    .footer {
-        background: #003262; /* Berkeley Blue */
-        color: white;
-        text-align: center;
-        padding: 15px 0;
-        position: relative;
-        bottom: 0;
-        width: 100%;
-        margin-top: 30px;
-    }
-
-    /* Sidebar */
-    .sidebar {
-        background: #003262; /* Berkeley Blue */
-        color: white;
-        padding: 40px 25px;
-        width: 250px;
-        height: 100vh;
-        box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
-        position: fixed;
-        top: 0;
-        left: 0;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        z-index: 1000;
-        overflow-y: auto;
-    }
-
-    .sidebar h3 {
-        margin-bottom: 40px;
-        font-size: 1.5rem;
-        color: #FDB515; /* California Gold */
-        text-align: center;
-        position: relative;
-    }
-
-    .sidebar h3::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 50px;
-        height: 3px;
-        background: #FDB515;
-    }
-
-    .sidebar ul {
-        list-style: none;
-        padding: 0;
-    }
-
-    .sidebar ul li {
-        margin: 15px 0;
-    }
-
-    .sidebar ul li a {
-        color: white;
-        text-decoration: none;
-        padding: 12px;
-        display: block;
-        border-radius: 5px;
-        transition: all 0.3s ease;
-    }
-
-    .sidebar ul li a:hover, .sidebar ul li a.active {
-        background: #FDB515; /* California Gold */
-        color: #003262; /* Berkeley Blue */
-        transform: translateX(5px);
-    }
-
-    .sidebar ul li a i {
-        margin-right: 10px;
-        width: 20px;
-        text-align: center;
-    }
-
-    .sidebar.hidden {
-        transform: translateX(-100%);
-    }
-
-    .sidebar.show {
-        transform: translateX(0);
-    }
-
-    /* Toggle Button */
-    .sidebar-toggle {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        background: #FDB515;
-        color: #003262;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        z-index: 1001;
-        font-size: 1.2rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .sidebar-toggle:hover {
-        background: #e0a814;
-        transform: scale(1.05);
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .profile-tabs {
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .tab-button {
-            width: 100%;
-            margin-bottom: 5px;
-        }
-
-        .profile-header {
-            flex-direction: column;
-            text-align: center;
-        }
-
-        .profile-avatar {
-            margin-right: 0;
-            margin-bottom: 15px;
-        }
-
-        .social-links-grid {
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        }
-    }
-</style>
-
 <script>
+    // Debug mode - set to true to show debug panel
+    const DEBUG_MODE = false;
+
+    // Debug helper function
+    function debug(message) {
+        if (!DEBUG_MODE) return;
+
+        const debugPanel = document.getElementById('debugInfo');
+        debugPanel.style.display = 'block';
+
+        const currentContent = debugPanel.innerHTML;
+        debugPanel.innerHTML = `${message}<br>${currentContent}`.substring(0, 1000); // Keep the panel from getting too large
+
+        console.log(message);
+    }
+
+    // Helper function to get a cookie by name
+    function getCookie(name) {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                return cookie.substring(name.length + 1);
+            }
+        }
+        return null;
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'info') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = 'toast show';
+
+        // Set color based on type
+        if (type === 'success') {
+            toast.style.background = '#28a745';
+        } else if (type === 'error') {
+            toast.style.background = '#dc3545';
+        } else {
+            toast.style.background = '#003262';
+        }
+
+        setTimeout(() => {
+            toast.className = 'toast';
+        }, 3000);
+    }
+
     // Sidebar Toggle
     const sidebar = document.getElementById("sidebar");
     const sidebarToggle = document.getElementById("sidebarToggle");
@@ -667,163 +817,247 @@
             if (response.ok) {
                 // Remove user_id cookie manually (for frontend visibility)
                 document.cookie = "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                showToast("You have been logged out successfully!", "success");
 
-                alert("You have been logged out.");
-                window.location.href = "sign-in.html";  // Redirect to login page
+                setTimeout(() => {
+                    window.location.href = "sign-in.html";  // Redirect to login page
+                }, 1000);
             } else {
-                alert("Logoff failed. Please try again.");
+                showToast("Logoff failed. Please try again.", "error");
             }
         } catch (error) {
             console.error("Error logging out:", error);
-            alert("An error occurred while logging out.");
+            showToast("An error occurred while logging out.", "error");
         }
     });
 
-    // Photo gallery navigation
+    // Photo gallery variables
     let currentPhotoIndex = 0;
-    let photos = [];
+    let photoArray = [];
 
+    // Function to update photo display
     function updatePhotoDisplay() {
         const imageContainer = document.getElementById("imageContainer");
+        const prevButton = document.getElementById("prevPhoto");
+        const nextButton = document.getElementById("nextPhoto");
+        const photoCounter = document.getElementById("photoCounter");
 
-        if (photos.length === 0) {
-            imageContainer.innerHTML = "<p>No photos available</p>";
-            document.getElementById("photoCounter").textContent = "No photos";
+        // Clear container
+        imageContainer.innerHTML = "";
+
+        if (!photoArray || photoArray.length === 0) {
+            // No photos
+            imageContainer.innerHTML = "<div class='empty-message'>No photos available</div>";
+            photoCounter.textContent = "No photos";
+
+            // Disable navigation buttons
+            prevButton.disabled = true;
+            nextButton.disabled = true;
             return;
         }
 
-        // Clear previous image
-        imageContainer.innerHTML = "";
+        // Enable/disable navigation buttons based on current index
+        prevButton.disabled = photoArray.length <= 1 || currentPhotoIndex === 0;
+        nextButton.disabled = photoArray.length <= 1 || currentPhotoIndex === photoArray.length - 1;
 
-        // Create image element
+        // Create and add image
         const img = document.createElement("img");
-        const timestamp = new Date().getTime(); // Unique timestamp
-        img.src = `https://server1.misscal.net/${photos[currentPhotoIndex]}?t=${timestamp}`;
-        img.alt = `Profile Photo ${currentPhotoIndex + 1}`;
+        // Add a cache-busting timestamp
+        const timestamp = new Date().getTime();
+        const photoPath = photoArray[currentPhotoIndex];
 
-        // Add loading animation
-        img.onload = function() {
-            img.classList.add("loaded");
+        debug(`Loading photo: ${photoPath}`);
+
+        // The server is configured to serve from /uploads path
+        img.src = `/uploads/${photoPath}?t=${timestamp}`;
+        img.alt = `Photo ${currentPhotoIndex + 1}`;
+
+        // Add loading indicator
+        const loadingSpinner = document.createElement("div");
+        loadingSpinner.className = "loading-spinner";
+        imageContainer.appendChild(loadingSpinner);
+
+        // When image loads, remove spinner and add the image
+        img.onload = () => {
+            debug(`Photo loaded successfully: ${photoPath}`);
+            imageContainer.innerHTML = "";
+            imageContainer.appendChild(img);
         };
 
+        // If image fails to load, try alternative URL format
+        img.onerror = () => {
+            debug(`Photo load failed with path: ${photoPath}, trying alternative URL`);
+
+            // Try the direct path
+            img.src = `${photoPath}?t=${timestamp}`;
+
+            // If that fails too, show a placeholder
+            img.onerror = () => {
+                debug(`All photo load attempts failed for: ${photoPath}`);
+                imageContainer.innerHTML = "<div class='empty-message'>Could not load photo</div>";
+            };
+        };
+
+        // Add image to container
         imageContainer.appendChild(img);
 
         // Update counter
-        document.getElementById("photoCounter").textContent = `Photo ${currentPhotoIndex + 1} of ${photos.length}`;
+        photoCounter.textContent = `Photo ${currentPhotoIndex + 1} of ${photoArray.length}`;
     }
 
+    // Photo navigation buttons
     document.getElementById("prevPhoto").addEventListener("click", () => {
-        if (photos.length === 0) return;
+        if (photoArray.length === 0 || currentPhotoIndex === 0) return;
 
-        currentPhotoIndex = (currentPhotoIndex - 1 + photos.length) % photos.length;
+        currentPhotoIndex--;
         updatePhotoDisplay();
     });
 
     document.getElementById("nextPhoto").addEventListener("click", () => {
-        if (photos.length === 0) return;
+        if (photoArray.length === 0 || currentPhotoIndex === photoArray.length - 1) return;
 
-        currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
+        currentPhotoIndex++;
         updatePhotoDisplay();
     });
 
-    // Fetch profile data
+    // Function to safely parse photos
+    function parsePhotos(photosData) {
+        try {
+            // Try to determine if photosData is already an array or needs parsing
+            if (Array.isArray(photosData)) {
+                return photosData.filter(photo => photo);
+            }
+
+            // If it's a string, try to parse it as JSON
+            if (typeof photosData === 'string') {
+                const parsed = JSON.parse(photosData);
+                if (Array.isArray(parsed)) {
+                    return parsed.filter(photo => photo);
+                }
+            }
+
+            // If it's a single photo string, wrap it in an array
+            if (typeof photosData === 'string' && photosData.trim() !== '') {
+                return [photosData];
+            }
+
+            // Default to empty array
+            return [];
+        } catch (error) {
+            debug(`Error parsing photos: ${error.message}`);
+            console.error("Error parsing photos:", error);
+            return [];
+        }
+    }
+
+    // Fetch profile data from server
     async function fetchProfileData() {
         try {
+            debug("Fetching profile data...");
+
+            // Show loading animations
+            document.querySelector(".profile-avatar .loading-spinner").style.display = "flex";
+
             const response = await fetch("https://server1.misscal.net/getStudentDetails", {
                 method: "GET",
                 credentials: "include"
             });
 
-            if (response.ok) {
-                const data = await response.json();
-
-                // Update basic info fields
-                document.getElementById("name").innerText = data.name || "Not provided";
-                document.getElementById("major").innerText = data.major || "Not provided";
-                document.getElementById("gpa").innerText = data.gpa || "Not provided";
-                document.getElementById("year").innerText = data.year || "Not provided";
-                document.getElementById("campaign_line").innerText = data.campaign_line || "Not provided";
-
-                // Story tab
-                document.getElementById("personal_story").innerText = data.personal_story || "No personal story provided yet.";
-
-                // Experience tab
-                document.getElementById("experience-content").innerText = data.experience || "No professional experience listed yet.";
-                document.getElementById("organizations-content").innerText = data.organizations || "No organizations listed yet.";
-
-                // Update social links
-                ["instagram", "linkedin", "facebook", "github", "snapchat", "tiktok"].forEach((platform) => {
-                    const linkElement = document.getElementById(platform);
-                    const url = data[platform] || "#";
-
-                    // Only show "Not provided" text for non-clickable links
-                    if (url === "#") {
-                        linkElement.innerHTML = `<i class="fab fa-${platform}"></i> Not provided`;
-                        linkElement.classList.add("disabled-link");
-                    } else {
-                        linkElement.innerHTML = `<i class="fab fa-${platform}"></i> ${platform.charAt(0).toUpperCase() + platform.slice(1)}`;
-                        linkElement.href = url;
-                    }
-                });
-
-                // Handle profile photo
-                if (data.photos && data.photos.length > 0) {
-                    let photosArray;
-                    try {
-                        photosArray = typeof data.photos === "string" ? JSON.parse(data.photos) : data.photos;
-                    } catch (error) {
-                        console.error("Error parsing photos:", error);
-                        photosArray = [];
-                    }
-
-                    if (Array.isArray(photosArray) && photosArray.length > 0) {
-                        // Set global photos array for navigation
-                        photos = photosArray.filter(photo => photo); // Filter out any null values
-
-                        // Set profile image
-                        if (photos.length > 0) {
-                            const profileImg = document.querySelector("#profileImage img");
-                            const timestamp = new Date().getTime();
-                            profileImg.src = `https://server1.misscal.net/photos/${photos[0]}?t=${timestamp}`;
-                        }
-
-                        // Initialize photo gallery
-                        currentPhotoIndex = 0;
-                        updatePhotoDisplay();
-                    }
-                }
-
-                // Add animation to profile card after data is loaded
-                document.querySelector(".profile-card").classList.add("loaded");
-
-            } else {
-                console.error("Failed to load profile data");
-                document.getElementById("name").innerText = "Error loading profile";
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Server returned ${response.status}: ${errorText}`);
             }
+
+            const data = await response.json();
+            debug(`Profile data received: ${JSON.stringify(data).substring(0, 100)}...`);
+
+            // Update basic info
+            document.getElementById("name").textContent = data.name || "Not provided";
+            document.getElementById("major").textContent = data.major || "Not provided";
+            document.getElementById("gpa").textContent = data.gpa || "Not provided";
+            document.getElementById("year").textContent = data.year || "Not provided";
+            document.getElementById("campaign_line").textContent = data.campaign_line || "Not provided";
+            document.getElementById("personal_story").textContent = data.personal_story || "No personal story provided yet.";
+            document.getElementById("experience-content").textContent = data.experience || "No professional experience listed yet.";
+            document.getElementById("organizations-content").textContent = data.organizations || "No organizations listed yet.";
+
+            // Process photo data - handle both single photo and photo array formats
+            if (data.photo) {
+                debug(`Single photo found: ${data.photo}`);
+                photoArray = [data.photo];
+            } else if (data.photos) {
+                debug(`Photos data found: ${typeof data.photos === 'string' ? data.photos : 'Array data'}`);
+                photoArray = parsePhotos(data.photos);
+                debug(`Parsed ${photoArray.length} photos`);
+            }
+
+            // Set profile avatar image (first photo)
+            if (photoArray.length > 0) {
+                const profileImg = document.querySelector("#profileImage img");
+                const timestamp = new Date().getTime();
+
+                // Try the /uploads path
+                profileImg.src = `/uploads/${photoArray[0]}?t=${timestamp}`;
+
+                debug(`Setting profile image to: ${profileImg.src}`);
+
+                // If fails, try direct path
+                profileImg.onerror = () => {
+                    debug("Profile image load failed, trying direct path");
+                    profileImg.src = `${photoArray[0]}?t=${timestamp}`;
+
+                    // If that fails too, keep default
+                    profileImg.onerror = () => {
+                        debug("All profile image load attempts failed");
+                    };
+                };
+            }
+
+            // Initialize photo gallery
+            currentPhotoIndex = 0;
+            updatePhotoDisplay();
+
+            // Update social media links
+            const socialPlatforms = ["instagram", "linkedin", "facebook", "github", "snapchat", "tiktok"];
+            socialPlatforms.forEach(platform => {
+                const linkElement = document.getElementById(platform);
+                const url = data[platform];
+
+                if (!url || url === "#" || url === "") {
+                    linkElement.innerHTML = `<i class="fab fa-${platform}"></i> Not provided`;
+                    linkElement.href = "#";
+                    linkElement.classList.add("disabled-link");
+                } else {
+                    linkElement.innerHTML = `<i class="fab fa-${platform}"></i> ${platform.charAt(0).toUpperCase() + platform.slice(1)}`;
+                    linkElement.href = url.startsWith("http") ? url : `https://${url}`;
+                    linkElement.classList.remove("disabled-link");
+                }
+            });
+
+            // Hide loading spinners
+            document.querySelector(".profile-avatar .loading-spinner").style.display = "none";
+
+            // Show success message
+            showToast("Profile loaded successfully", "success");
+
         } catch (error) {
+            debug(`Error fetching profile: ${error.message}`);
             console.error("Error fetching profile data:", error);
+
+            // Hide loading spinners
+            document.querySelector(".profile-avatar .loading-spinner").style.display = "none";
+
+            // Show error message
+            showToast("Failed to load profile data. Please try again.", "error");
+
+            // Set error state on fields
+            document.getElementById("name").textContent = "Error loading profile";
         }
     }
 
-    // Add visual feedback on interactive elements
-    document.querySelectorAll(".tab-button, .social-link, .cta-button, .photo-nav-button").forEach(elem => {
-        elem.addEventListener("mousedown", function() {
-            this.style.transform = "scale(0.95)";
-        });
-
-        elem.addEventListener("mouseup", function() {
-            this.style.transform = "";
-        });
-
-        elem.addEventListener("mouseleave", function() {
-            this.style.transform = "";
-        });
-    });
-
-    // Load profile data on page load
-    document.addEventListener("DOMContentLoaded", function() {
+    // Load profile data when page loads
+    document.addEventListener("DOMContentLoaded", () => {
+        debug("Page loaded, fetching profile data...");
         fetchProfileData();
     });
-</script>
-</body>
-</html>
+    </script>
