@@ -793,19 +793,15 @@
 
         // Create image element
         const img = document.createElement("img");
-        const photoUrl = photos[currentPhotoIndex];
-
-        // Check if the URL is already complete or needs the domain added
-        img.src = photoUrl.includes('://')
-            ? photoUrl
-            : `https://server1.misscal.net/photos/${photoUrl}`;
-
+        img.src = photos[currentPhotoIndex];
         img.alt = `Profile Photo ${currentPhotoIndex + 1}`;
 
-        // Add error handler for missing images
+        // Add robust error handling
         img.onerror = function() {
-            this.src = "/default-photo.jpg";
-            this.alt = "Default Photo";
+            // Use a relative path from your website root
+            this.src = '/assets/default-photo.jpg'; // Update this path to your default image
+            this.alt = 'Default Profile Photo';
+            console.log('Using default photo due to loading error');
         };
 
         imageContainer.appendChild(img);
@@ -855,6 +851,27 @@
     document.addEventListener("DOMContentLoaded", function() {
         fetchProfileData();
     });
+
+    // Add this function to your JavaScript
+    function setupImageErrorHandlers() {
+        // Find all images on the page
+        const allImages = document.querySelectorAll('img');
+
+        // Add error handler to each image
+        allImages.forEach(img => {
+            img.onerror = function() {
+                // Check if this is already the default photo to avoid infinite loops
+                if (!this.src.includes('default-photo.jpg')) {
+                    // Use an absolute path to your default image
+                    this.src = '/assets/default-photo.jpg'; // Update this path as needed
+                    this.alt = 'Default Profile Photo';
+                }
+            };
+        });
+    }
+
+    // Call this function when the DOM is loaded
+    document.addEventListener('DOMContentLoaded', setupImageErrorHandlers);
 </script>
 </body>
 </html>
