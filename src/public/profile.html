@@ -41,7 +41,7 @@
         <button class="tab-button" data-tab="story">My Story</button>
         <button class="tab-button" data-tab="experience">Experience</button>
         <button class="tab-button" data-tab="social">Social Media</button>
-
+        
     </div>
 
     <div id="basicInfo" class="tab-content active">
@@ -681,7 +681,7 @@
     });
 
     // Global variable to store photos array for the gallery
-
+    let photos = [];
     let currentPhotoIndex = 0;
 
     // Create a data URI for a placeholder avatar to use instead of file references
@@ -747,7 +747,14 @@
                 }
 
                 // Handle photos for the gallery
-
+                if (data.photos && data.photos.length > 0) {
+                    photos = data.photos;
+                    currentPhotoIndex = 0;
+                    updatePhotoDisplay();
+                } else {
+                    document.getElementById("imageContainer").innerHTML = "<p>No photos available</p>";
+                    document.getElementById("photoCounter").textContent = "No photos";
+                }
 
                 // Add animation to profile card after data is loaded
                 document.querySelector(".profile-card").classList.add("loaded");
@@ -761,15 +768,61 @@
     }
 
     // Display photos in gallery
+    function updatePhotoDisplay() {
+        const imageContainer = document.getElementById("imageContainer");
 
+        if (photos.length === 0) {
+            imageContainer.innerHTML = "<p>No photos available</p>";
+            document.getElementById("photoCounter").textContent = "No photos";
+            return;
+        }
+
+        // Clear previous image
+        imageContainer.innerHTML = "";
+
+        // Create image element
+        const img = document.createElement("img");
+        const photoUrl = photos[currentPhotoIndex];
+
+        // Check if the URL is already complete or needs the domain added
+        img.src = photoUrl.includes('://')
+            ? photoUrl
+            : `https://server1.misscal.net/photos/${photoUrl}`;
+
+        img.alt = `Profile Photo ${currentPhotoIndex + 1}`;
+
+        // Add error handler for missing images
+        img.onerror = function() {
+            this.src = placeholderAvatar;
+            this.alt = "Default Photo";
+        };
+
+        imageContainer.appendChild(img);
+
+        // Update counter
+        document.getElementById("photoCounter").textContent = `Photo ${currentPhotoIndex + 1} of ${photos.length}`;
+    }
 
     // Initialize event listeners for gallery navigation
     document.addEventListener("DOMContentLoaded", function() {
         // Fetch profile data
         fetchProfileData();
 
+        // Set up previous photo button
+        document.getElementById("prevPhoto").addEventListener("click", () => {
+            if (photos.length === 0) return;
 
+            currentPhotoIndex = (currentPhotoIndex - 1 + photos.length) % photos.length;
+            updatePhotoDisplay();
+        });
 
+        // Set up next photo button
+        document.getElementById("nextPhoto").addEventListener("click", () => {
+            if (photos.length === 0) return;
+
+            currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
+            updatePhotoDisplay();
+        });
     });
 
     // Add visual feedback on interactive elements
@@ -788,7 +841,9 @@
     });
 
     // Load profile data on page load
-
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchProfileData();
+    });
 
     // Setup image error handlers for all images
     function setupImageErrorHandlers() {
