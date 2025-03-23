@@ -27,7 +27,6 @@ app.use((req, res, next) => {
 });
 
 app.use("/photos", express.static(path.join(__dirname, "uploads")));
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
 // Middleware
 app.use(bodyParser.json());
 app.use((req, res, next) => {
@@ -817,7 +816,6 @@ app.get("/getProfileData", (req, res) => {
         let photosArray = [];
         let mainPhoto = "/default-photo.jpg";
 
-        // In your getProfileData endpoint
         try {
             // Handle photos in the same way as the searchStudents endpoint
             if (student.photos) {
@@ -828,30 +826,17 @@ app.get("/getProfileData", (req, res) => {
                     photosArray = student.photos;
                 }
 
-                // Filter out empty entries and add proper error handling
-                photosArray = photosArray.filter(photo => photo).map(photo => {
-                    // Check if the photo path exists on the server
-                    const photoPath = photo.startsWith('http') ? photo : path.join(__dirname, photo);
-
-                    if (fs.existsSync(photoPath)) {
-                        return photo;
-                    } else {
-                        // Return the path to your default photo instead
-                        return '/assets/default-photo.jpg'; // Update this path
-                    }
-                });
+                // Filter out empty entries
+                photosArray = photosArray.filter(photo => photo);
 
                 // Set main photo to the first photo if available
                 if (photosArray.length > 0) {
                     mainPhoto = photosArray[0];
-                } else {
-                    mainPhoto = '/assets/default-photo.jpg'; // Update this path
                 }
             }
         } catch (error) {
             console.error("Error parsing photos:", error);
             photosArray = [];
-            mainPhoto = '/assets/default-photo.jpg'; // Update this path
         }
 
         // Return the complete student data with properly formatted photos
