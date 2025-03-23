@@ -652,7 +652,7 @@ app.get("/getStudentDetails", (req, res) => {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const query = "SELECT name, major, gpa, campaign_line, personal_story, experience, organizations, photos, instagram, linkedin, facebook, github, tiktok FROM ContestEntries WHERE user_id = $1";
+    const query = "SELECT name, major, gpa, campaign_line, personal_story, experience, organizations, photos, instagram, linkedin, facebook, github, tiktok, year FROM ContestEntries WHERE user_id = $1";
     db.query(query, [userId], (err, results) => {
         if (err) {
             console.error("Database error:", err);
@@ -670,6 +670,7 @@ app.get("/getStudentDetails", (req, res) => {
             name: student.name,
             major: student.major,
             gpa: student.gpa,
+            year: student.year,
             campaign_line: student.campaign_line,
             personal_story: student.personal_story,
             experience: student.experience,
@@ -712,6 +713,7 @@ app.get("/searchStudents", (req, res) => {
             name: student.name,
             major: student.major,
             gpa: student.gpa,
+            year: student.year,
             personal_story: student.personal_story,
             campaign_line: student.campaign_line,
             experience: student.experience,
