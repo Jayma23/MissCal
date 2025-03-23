@@ -41,7 +41,6 @@
         <button class="tab-button" data-tab="story">My Story</button>
         <button class="tab-button" data-tab="experience">Experience</button>
         <button class="tab-button" data-tab="social">Social Media</button>
-        <button class="tab-button" data-tab="photos">Photos</button>
     </div>
 
     <div id="basicInfo" class="tab-content active">
@@ -106,15 +105,7 @@
         </div>
     </div>
 
-    <div id="photos" class="tab-content">
-        <h2 class="section-title">My Photos</h2>
-        <div id="imageContainer" class="photo-gallery"></div>
-        <div class="photo-controls">
-            <button id="prevPhoto" class="photo-nav-button"><i class="fas fa-chevron-left"></i></button>
-            <span id="photoCounter">Photo 0 of 0</span>
-            <button id="nextPhoto" class="photo-nav-button"><i class="fas fa-chevron-right"></i></button>
-        </div>
-    </div>
+
 
     <div class="edit-button-container">
         <a href="editProfile.html" class="cta-button"><i class="fas fa-edit"></i> Edit Profile</a>
@@ -691,19 +682,7 @@
 
 
 
-    document.getElementById("prevPhoto").addEventListener("click", () => {
-        if (photos.length === 0) return;
 
-        currentPhotoIndex = (currentPhotoIndex - 1 + photos.length) % photos.length;
-        updatePhotoDisplay();
-    });
-
-    document.getElementById("nextPhoto").addEventListener("click", () => {
-        if (photos.length === 0) return;
-
-        currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
-        updatePhotoDisplay();
-    });
 
     // Fetch profile data
     // Fetch profile data
@@ -758,14 +737,7 @@
                 profileImg.alt = data.name || "Profile Photo";
 
                 // Handle photos for the gallery
-                if (data.photos && data.photos.length > 0) {
-                    photos = data.photos;
-                    currentPhotoIndex = 0;
-                    updatePhotoDisplay();
-                } else {
-                    document.getElementById("imageContainer").innerHTML = "<p>No photos available</p>";
-                    document.getElementById("photoCounter").textContent = "No photos";
-                }
+
 
                 // Add animation to profile card after data is loaded
                 document.querySelector(".profile-card").classList.add("loaded");
@@ -779,40 +751,7 @@
     }
 
     // Display photos in gallery
-    function updatePhotoDisplay() {
-        const imageContainer = document.getElementById("imageContainer");
-
-        if (photos.length === 0) {
-            imageContainer.innerHTML = "<p>No photos available</p>";
-            document.getElementById("photoCounter").textContent = "No photos";
-            return;
-        }
-
-        // Clear previous image
-        imageContainer.innerHTML = "";
-
-        // Create image element
-        const img = document.createElement("img");
-        const photoUrl = photos[currentPhotoIndex];
-
-        // Check if the URL is already complete or needs the domain added
-        img.src = photoUrl.includes('://')
-            ? photoUrl
-            : `https://server1.misscal.net/photos/${photoUrl}`;
-
-        img.alt = `Profile Photo ${currentPhotoIndex + 1}`;
-
-        // Add error handler for missing images
-        img.onerror = function() {
-            this.src = "/default-photo.jpg";
-            this.alt = "Default Photo";
-        };
-
-        imageContainer.appendChild(img);
-
-        // Update counter
-        document.getElementById("photoCounter").textContent = `Photo ${currentPhotoIndex + 1} of ${photos.length}`;
-    }
+    
 
     // Initialize event listeners for gallery navigation
     document.addEventListener("DOMContentLoaded", function() {
