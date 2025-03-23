@@ -142,13 +142,6 @@
         <h2 class="section-title">Current Leaders</h2>
         <p class="section-subtitle">Top 20 contestants with the most votes. Sign in to vote for your favorite!</p>
 
-        <div class="leaderboard-filter">
-            <button class="filter-button active" data-filter="all">All Categories</button>
-            <button class="filter-button" data-filter="stem">STEM</button>
-            <button class="filter-button" data-filter="humanities">Humanities</button>
-            <button class="filter-button" data-filter="business">Business</button>
-        </div>
-
         <div class="leaderboard-container">
             <div class="leaderboard-header">
                 <span class="rank-header">Rank</span>
@@ -1558,19 +1551,14 @@
     });
 
     // Load leaderboard data from API
-    async function loadLeaderboard(filter = 'all') {
+    async function loadLeaderboard() {
         // Show loader
         leaderboardList.innerHTML = '<div class="loader"></div>';
 
         try {
-            // In a real app, you would fetch data from your API
-            // const response = await fetch('https://server1.misscal.net/getLeaderboard');
-            // const data = await response.json();
-
-            // For demo, we'll use mock data
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-
-            const data = getMockLeaderboardData(filter);
+            // Fetch data from the real API endpoint
+            const response = await fetch('/getLeaderboard');
+            const data = await response.json();
 
             // Clear loader
             leaderboardList.innerHTML = '';
@@ -1581,10 +1569,8 @@
                 return;
             }
 
-            // Show top 20 contestants
-            const displayCount = Math.min(data.length, 20);
-
-            for (let i = 0; i < displayCount; i++) {
+            // Show top contestants (API already limits to 10)
+            for (let i = 0; i < data.length; i++) {
                 const contestant = data[i];
                 const item = document.createElement('div');
                 item.className = 'leaderboard-item';
@@ -1601,14 +1587,13 @@
                     <img src="${contestant.photo}" alt="${contestant.name}" class="contestant-img">
                     <div class="contestant-info">
                         <div class="contestant-name">${contestant.name}</div>
-                        <div class="contestant-major">${contestant.major}</div>
                     </div>
                 </div>
                 <div class="votes">${contestant.votes}</div>
                 <button class="vote-btn" onclick="voteForContestant('${contestant.id}')">
                     <i class="fas fa-heart"></i> Vote
                 </button>
-            `;
+                `;
 
                 leaderboardList.appendChild(item);
             }
