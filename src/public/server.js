@@ -812,8 +812,9 @@ app.get("/getProfileData", (req, res) => {
 
         const student = results.rows[0];
 
-        // Parse photos array
-
+        // Initialize variables to avoid undefined errors
+        let photosArray = [];
+        let mainPhoto = null;
 
         try {
             // Handle photos in the same way as the searchStudents endpoint
@@ -836,6 +837,7 @@ app.get("/getProfileData", (req, res) => {
         } catch (error) {
             console.error("Error parsing photos:", error);
             photosArray = [];
+            mainPhoto = null;
         }
 
         // Return the complete student data with properly formatted photos
@@ -848,7 +850,6 @@ app.get("/getProfileData", (req, res) => {
             personal_story: student.personal_story,
             experience: student.experience,
             organizations: student.organizations,
-            // Use the exact same photo format that works in the searchStudents endpoint
             photo: mainPhoto,
             photos: photosArray,
             instagram: student.instagram,
