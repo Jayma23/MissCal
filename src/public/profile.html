@@ -736,6 +736,7 @@
 
     // Fetch profile data
     // Fetch profile data
+    // Fetch profile data
     async function fetchProfileData() {
         try {
             const response = await fetch("https://server1.misscal.net/getStudentDetails", {
@@ -775,32 +776,51 @@
                     }
                 });
 
-                // Handle profile photo - using approach from first file
+                // Handle profile photo
+                const profileImg = document.querySelector("#profileImage img");
+
+                // For profile image, construct proper URL
                 if (data.photo) {
-                    // Set profile photo if available
-                    const profileImg = document.querySelector("#profileImage img");
-                    profileImg.src = data.photo || "/default-photo.jpg";
+                    // Construct a proper URL for the photo
+                    profileImg.src = `https://server1.misscal.net/photos/${data.photo}`;
                     profileImg.alt = data.name || "Profile Photo";
+
+                    // Add error handler in case the image doesn't load
+                    profileImg.onerror = function() {
+                        this.src = "default-profile.png";
+                        this.alt = "Default Profile";
+                        console.log("Error loading profile image, fallback to default");
+                    };
+                } else {
+                    // Use a local default image
+                    profileImg.src = "default-profile.png";
+                    profileImg.alt = "Default Profile";
                 }
 
-                // Handle photos for gallery
-                if (data.photos && data.photos.length > 0) {
-                    let photosArray;
-                    try {
-                        photosArray = typeof data.photos === "string" ? JSON.parse(data.photos) : data.photos;
-                    } catch (error) {
-                        console.error("Error parsing photos:", error);
-                        photosArray = [];
+                // Process photos for gallery
+                let photosArray = [];
+                try {
+                    // Try to parse photos if it's a string, or use it directly if it's already an array
+                    if (typeof data.photos === "string") {
+                        photosArray = JSON.parse(data.photos || "[]");
+                    } else if (Array.isArray(data.photo)) {
+                        photosArray = data.photos;
                     }
+                } catch (error) {
+                    console.error("Error parsing photos:", error);
+                    photosArray = [];
+                }
 
-                    if (Array.isArray(photosArray) && photosArray.length > 0) {
-                        // Set global photos array for navigation
-                        photos = photosArray.filter(photo => photo); // Filter out any null values
+                // Filter out any empty or null values
+                photos = photosArray.filter(photo => photo);
 
-                        // Initialize photo gallery
-                        currentPhotoIndex = 0;
-                        updatePhotoDisplay();
-                    }
+                // Initialize the photo gallery if we have photos
+                if (photos.length > 0) {
+                    currentPhotoIndex = 0;
+                    updatePhotoDisplay();
+                } else {
+                    document.getElementById("imageContainer").innerHTML = "<p>No photos available</p>";
+                    document.getElementById("photoCounter").textContent = "No photos";
                 }
 
                 // Add animation to profile card after data is loaded
@@ -812,6 +832,44 @@
         } catch (error) {
             console.error("Error fetching profile data:", error);
         }
+    }
+
+    // Updated function to display photos in gallery
+    function updatePhotoDisplay() {
+        const imageContainer = document.getElementById("imageContainer");
+
+        if (photos.length === 0) {
+            imageContainer.innerHTML = "<p>No photos available</p>";
+            document.getElementById("photoCounter").textContent = "No photos";
+            return;
+        }
+
+        // Clear previous image
+        imageContainer.innerHTML = "";
+
+        // Create image element
+        const img = document.createElement("img");
+
+        // Construct a proper URL for the photo
+        img.src = `https://server1.misscal.net/photos/${photos[currentPhotoIndex]}`;
+        img.alt = `Profile Photo ${currentPhotoIndex + 1}`;
+
+        // Add error handler for fallback
+        img.onerror = function() {
+            this.src = "default-profile.png";
+            this.alt = "Default Image";
+            console.log(`Error loading gallery image ${currentPhotoIndex + 1}, fallback to default`);
+        };
+
+        // Add loading animation
+        img.onload = function() {
+            img.classList.add("loaded");
+        };
+
+        imageContainer.appendChild(img);
+
+        // Update counter
+        document.getElementById("photoCounter").textContent = `Photo ${currentPhotoIndex + 1} of ${photos.length}`;
     }
 
     // Updated function to display photos in gallery
