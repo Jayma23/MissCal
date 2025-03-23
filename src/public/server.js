@@ -744,6 +744,76 @@ app.get("/getStudentDetails", (req, res) => {
     });
 });
 
+app.get("/getDetails", (req, res) => {
+    const userId = req.cookies.user_id;
+
+    if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const query = "SELECT name, major, gpa, campaign_line, personal_story, experience, organizations, photos, instagram, linkedin, facebook, github, tiktok, year FROM ContestEntries WHERE user_id = $1";
+
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ message: "Database error." });
+        }
+
+        // For PostgreSQL using Pool, results are in rows property
+        if (!results.rows || results.rows.length === 0) {
+            return res.status(404).json({ message: "Student not found." });
+        }
+
+        const student = results.rows[0];
+
+        // Safely handle photos data
+        let photoArray = [];
+        let mainPhoto = "";
+
+        try {
+            if (student.photos) {
+                // Handle both string and array formats
+                if (typeof student.photos === "string") {
+                    photoArray = JSON.parse(student.photos);
+                } else if (Array.isArray(student.photos)) {
+                    photoArray = student.photos;
+                }
+
+                // Filter out null/undefined/empty values
+                photoArray = photoArray.filter(photo => photo);
+
+                // Get first photo as main photo
+                if (photoArray.length > 0) {
+                    mainPhoto = photoArray[0];
+                }
+            }
+        } catch (error) {
+            console.error("Error parsing photos:", error);
+            photoArray = [];
+            mainPhoto = "";
+        }
+
+        // Respond with the data
+        res.json({
+            name: student.name || "",
+            major: student.major || "",
+            gpa: student.gpa || "",
+            year: student.year || "",
+            campaign_line: student.campaign_line || "",
+            personal_story: student.personal_story || "",
+            experience: student.experience || "",
+            organizations: student.organizations || "",
+            photos: photoArray, // Send the full array of photos
+            photo: mainPhoto,   // Send the main photo separately
+            instagram: student.instagram || "",
+            linkedin: student.linkedin || "",
+            facebook: student.facebook || "",
+            github: student.github || "",
+            tiktok: student.tiktok || ""
+        });
+    });
+});
+
 app.get("/searchStudents", (req, res) => {
     const query = req.query.query; // Get the search query from the client
 
