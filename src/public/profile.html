@@ -49,7 +49,8 @@
         <div class="profile-card">
             <div class="profile-header">
                 <div id="profileImage" class="profile-avatar">
-                    <img src="default-profile.png" alt="Profile Photo">
+                    <!-- Changed the default image path -->
+                    <img src="placeholder-avatar.png" alt="Profile Photo">
                 </div>
                 <div class="profile-details">
                     <h3 id="name">Loading...</h3>
@@ -687,29 +688,12 @@
         }
     });
 
-    // Photo gallery navigation
-
-
-
-    document.getElementById("prevPhoto").addEventListener("click", () => {
-        if (photos.length === 0) return;
-
-        currentPhotoIndex = (currentPhotoIndex - 1 + photos.length) % photos.length;
-        updatePhotoDisplay();
-    });
-
-    document.getElementById("nextPhoto").addEventListener("click", () => {
-        if (photos.length === 0) return;
-
-        currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
-        updatePhotoDisplay();
-    });
-
-    // Fetch profile data
-    // Fetch profile data
     // Global variable to store photos array for the gallery
     let photos = [];
     let currentPhotoIndex = 0;
+
+    // Create a data URI for a placeholder avatar to use instead of file references
+    const placeholderAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='35' r='20' fill='%23ccc'/%3E%3Cpath d='M20 90 Q50 65 80 90' fill='%23ccc'/%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='%23ccc' stroke-width='6'/%3E%3C/svg%3E";
 
     // Fetch profile data using the new endpoint
     async function fetchProfileData() {
@@ -752,10 +736,23 @@
                     }
                 });
 
-                // Handle profile photo - using the same approach as the voting page
+                // Handle profile photo - using inline SVG as fallback
                 const profileImg = document.querySelector("#profileImage img");
-                profileImg.src = data.photo || "/default-photo.jpg";
-                profileImg.alt = data.name || "Profile Photo";
+                if (data.photo) {
+                    profileImg.src = data.photo.includes('://')
+                        ? data.photo
+                        : `https://server1.misscal.net/photos/${data.photo}`;
+                    profileImg.alt = data.name || "Profile Photo";
+
+                    // Add error handler
+                    profileImg.onerror = function() {
+                        this.src = placeholderAvatar;
+                        this.alt = "Default Profile Avatar";
+                    };
+                } else {
+                    profileImg.src = placeholderAvatar;
+                    profileImg.alt = "Default Profile Avatar";
+                }
 
                 // Handle photos for the gallery
                 if (data.photos && data.photos.length > 0) {
@@ -804,7 +801,7 @@
 
         // Add error handler for missing images
         img.onerror = function() {
-            this.src = "/default-photo.jpg";
+            this.src = placeholderAvatar;
             this.alt = "Default Photo";
         };
 
@@ -856,7 +853,7 @@
         fetchProfileData();
     });
 
-    // Add this function to your JavaScript
+    // Setup image error handlers for all images
     function setupImageErrorHandlers() {
         // Find all images on the page
         const allImages = document.querySelectorAll('img');
@@ -864,11 +861,10 @@
         // Add error handler to each image
         allImages.forEach(img => {
             img.onerror = function() {
-                // Check if this is already the default photo to avoid infinite loops
-                if (!this.src.includes('default-photo.jpg')) {
-                    // Use an absolute path to your default image
-                    this.src = '/assets/default-photo.jpg'; // Update this path as needed
-                    this.alt = 'Default Profile Photo';
+                // Only replace if this isn't already showing the placeholder
+                if (!this.src.includes('data:image/svg')) {
+                    this.src = placeholderAvatar;
+                    this.alt = 'Default Profile Avatar';
                 }
             };
         });

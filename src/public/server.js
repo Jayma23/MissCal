@@ -813,8 +813,7 @@ app.get("/getProfileData", (req, res) => {
         const student = results.rows[0];
 
         // Parse photos array
-        let photosArray = [];
-        let mainPhoto = "/default-photo.jpg";
+
 
         try {
             // Handle photos in the same way as the searchStudents endpoint
