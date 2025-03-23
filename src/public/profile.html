@@ -733,20 +733,8 @@
 
                 // Handle profile photo - using the same approach as the voting page
                 const profileImg = document.querySelector("#profileImage img");
-                if (data.photo && data.photo !== "") {
-                    // First try using the photo path directly
-                    profileImg.src = data.photo;
-                } else if (data.photos && Array.isArray(data.photos) && data.photos.length > 0) {
-                    // If no direct photo but photos array exists, use the first one
-                    profileImg.src = data.photos[0];
-                } else {
-                    // Fallback to default image
-                    profileImg.src = "default-profile.png";
-                }
+                profileImg.src = data.photo || "/default-photo.jpg";
                 profileImg.alt = data.name || "Profile Photo";
-
-// Add console logging for debugging
-                console.log("Profile photo source:", profileImg.src);
 
                 // Handle photos for the gallery
 
@@ -763,7 +751,40 @@
     }
 
     // Display photos in gallery
+    function updatePhotoDisplay() {
+        const imageContainer = document.getElementById("imageContainer");
 
+        if (photos.length === 0) {
+            imageContainer.innerHTML = "<p>No photos available</p>";
+            document.getElementById("photoCounter").textContent = "No photos";
+            return;
+        }
+
+        // Clear previous image
+        imageContainer.innerHTML = "";
+
+        // Create image element
+        const img = document.createElement("img");
+        const photoUrl = photos[currentPhotoIndex];
+
+        // Check if the URL is already complete or needs the domain added
+        img.src = photoUrl.includes('://')
+            ? photoUrl
+            : `https://server1.misscal.net/photos/${photoUrl}`;
+
+        img.alt = `Profile Photo ${currentPhotoIndex + 1}`;
+
+        // Add error handler for missing images
+        img.onerror = function() {
+            this.src = "/default-photo.jpg";
+            this.alt = "Default Photo";
+        };
+
+        imageContainer.appendChild(img);
+
+        // Update counter
+        document.getElementById("photoCounter").textContent = `Photo ${currentPhotoIndex + 1} of ${photos.length}`;
+    }
 
     // Initialize event listeners for gallery navigation
     document.addEventListener("DOMContentLoaded", function() {
@@ -824,21 +845,6 @@
             };
         });
     }
-
-    window.addEventListener('load', function() {
-        const profileImg = document.querySelector("#profileImage img");
-
-        // Force error handler to run if image is empty or undefined
-        if (!profileImg.src || profileImg.src === window.location.href) {
-            profileImg.src = "default-profile.png";
-        }
-
-        // Double-check that the image loads
-        profileImg.onerror = function() {
-            this.src = "default-profile.png";
-            this.alt = "Default Profile Photo";
-        };
-    });
 
     // Call this function when the DOM is loaded
     document.addEventListener('DOMContentLoaded', setupImageErrorHandlers);
