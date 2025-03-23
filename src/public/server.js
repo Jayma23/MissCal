@@ -812,32 +812,36 @@ app.get("/getProfileData", (req, res) => {
 
         const student = results.rows[0];
 
-        // Initialize variables to avoid undefined errors
-        let photosArray = [];
-        let mainPhoto = null;
+
+
 
         try {
-            // Handle photos in the same way as the searchStudents endpoint
+            // Handle photos consistently
+            let mainPhoto = null;
+            let photosArray = [];
+
             if (student.photos) {
-                // Handle both string and array formats
+                // Parse the photos if it's a string
                 if (typeof student.photos === "string") {
-                    photosArray = JSON.parse(student.photos);
+                    try {
+                        photosArray = JSON.parse(student.photos);
+                    } catch (e) {
+                        photosArray = [];
+                    }
                 } else if (Array.isArray(student.photos)) {
                     photosArray = student.photos;
                 }
 
-                // Filter out empty entries
-                photosArray = photosArray.filter(photo => photo);
+                // Get the first photo as the main photo if it exists
+                mainPhoto = photosArray.length > 0 ? photosArray[0] : null;
+            }
 
-                // Set main photo to the first photo if available
-                if (photosArray.length > 0) {
-                    mainPhoto = photosArray[0];
-                }
+            // Make sure photo paths are absolute if they're relative in the database
+            if (mainPhoto && !mainPhoto.startsWith('http') && !mainPhoto.startsWith('/')) {
+                mainPhoto = '/' + mainPhoto;
             }
         } catch (error) {
-            console.error("Error parsing photos:", error);
-            photosArray = [];
-            mainPhoto = null;
+            console.error("Error processing photos:", error);
         }
 
         // Return the complete student data with properly formatted photos
@@ -949,7 +953,138 @@ app.post("/vote", (req, res) => {
         });
     });
 });
+// New comprehensive profile data endpoint
+app.get("/api/profile", (req, res) => {
+    const userId = req.cookies.user_id || req.query.userId;
 
+    if (!userId) {
+        return res.status(401).json({
+            success: false,
+            message: "No user ID provided"
+        });
+    }
+
+    // Query to get all profile data in one go
+    const query = `
+        SELECT 
+            c.user_id,
+            c.name,
+            c.major,
+            c.gpa,
+            c.year,
+            c.campaign_line,
+            c.personal_story,
+            c.experience,
+            c.organizations,
+            c.photos,
+            c.instagram,
+            c.linkedin,
+            c.facebook,
+            c.github,
+            c.snapchat,
+            c.tiktok,
+            c.votes,
+            c.form_submitted,
+            c.phase1_vote_done,
+            u.full_name,
+            u.email
+        FROM 
+            ContestEntries c
+        LEFT JOIN 
+            Users u ON c.user_id = u.user_id
+        WHERE 
+            c.user_id = $1
+    `;
+
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({
+                success: false,
+                message: "Database error",
+                error: err.message
+            });
+        }
+
+        if (!results.rows || results.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Profile not found"
+            });
+        }
+
+        const profileData = results.rows[0];
+
+        // Process photos properly
+        let photoUrl = null;
+        let photosArray = [];
+
+        try {
+            // Handle various photo storage formats
+            if (profileData.photos) {
+                if (typeof profileData.photos === 'string') {
+                    photosArray = JSON.parse(profileData.photos);
+                } else if (Array.isArray(profileData.photos)) {
+                    photosArray = profileData.photos;
+                }
+
+                // Clean up the photos array
+                photosArray = photosArray.filter(p => p && p.trim() !== '');
+
+                // Get the main photo
+                if (photosArray.length > 0) {
+                    // Create full URLs for photos if they're relative paths
+                    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+                    photoUrl = photosArray[0].startsWith('http')
+                        ? photosArray[0]
+                        : `${baseUrl}/${photosArray[0].replace(/^\/+/, '')}`;
+
+                    // Update all photo URLs in the array
+                    photosArray = photosArray.map(photo =>
+                        photo.startsWith('http')
+                            ? photo
+                            : `${baseUrl}/${photo.replace(/^\/+/, '')}`
+                    );
+                }
+            }
+        } catch (error) {
+            console.error("Error processing photos:", error);
+        }
+
+        // Prepare the response with all data and properly formatted photos
+        const response = {
+            success: true,
+            profile: {
+                userId: profileData.user_id,
+                name: profileData.name || profileData.full_name || "Not provided",
+                major: profileData.major || "Not provided",
+                gpa: profileData.gpa || "Not provided",
+                year: profileData.year || "Not provided",
+                campaignLine: profileData.campaign_line || "Not provided",
+                personalStory: profileData.personal_story || "Not provided",
+                experience: profileData.experience || "Not provided",
+                organizations: profileData.organizations || "Not provided",
+                photo: photoUrl || `${req.protocol}://${req.get('host')}/default-profile.png`,
+                photos: photosArray,
+                socialMedia: {
+                    instagram: profileData.instagram || null,
+                    linkedin: profileData.linkedin || null,
+                    facebook: profileData.facebook || null,
+                    github: profileData.github || null,
+                    snapchat: profileData.snapchat || null,
+                    tiktok: profileData.tiktok || null
+                },
+                votes: profileData.votes || 0,
+                formSubmitted: profileData.form_submitted || false,
+                hasVoted: profileData.phase1_vote_done || false,
+                email: profileData.email
+            }
+        };
+
+        res.json(response);
+    });
+});
 app.get("/studentDetails", (req, res) => {
     const userId = req.query.userId;
     if (!userId) {
