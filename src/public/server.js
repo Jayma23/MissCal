@@ -25,7 +25,8 @@ app.use((req, res, next) => {
     }
     next();
 });
-
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use("/photos", express.static(path.join(__dirname, "uploads")));
 // Middleware
 app.use(bodyParser.json());
@@ -323,133 +324,7 @@ app.post("/submitForm", upload.array("photos", 10), (req, res) => {
 //const { generateVerificationToken } = require("../generateVerificationToken");
 
 // POST /submitForm
-app.post("/submitForm2", upload.fields([
-    { name: "photos", maxCount: 1 },
-    { name: "photos1", maxCount: 1 }
-]), (req, res) => {
-    res.header("Access-Control-Allow-Origin", "https://www.misscal.net");
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.header("Access-Control-Allow-Methods", "POST");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-    const {
-        user_id,
-        name,
-        major,
-        gpa,
-        campaign_line,
-        personal_story,
-        experience,
-        organizations,
-        instagram,
-        year,
-        linkedin,
-        facebook,
-        github,
-        snapchat,
-        tiktok
-    } = req.body;
-
-    const photoMain = req.files["photos"]?.[0]?.path || null;
-    const photoExtra = req.files["photos1"]?.[0]?.path || null;
-
-    if (!user_id) {
-        return res.status(400).json({ message: "User ID is required." });
-    }
-
-    const queryCheckUser = "SELECT form_submitted FROM Users WHERE user_id = $1";
-    db.query(queryCheckUser, [user_id], (err, userResults) => {
-        if (err) return res.status(500).json({ message: "Database error." });
-        if (userResults.rows.length === 0) return res.status(400).json({ message: "User not found." });
-        if (userResults.rows[0].form_submitted) {
-            return res.status(400).json({ message: "You have already submitted your participation form." });
-        }
-
-        const queryCheck = "SELECT * FROM ContestEntries WHERE user_id = $1";
-        db.query(queryCheck, [user_id], (err, results) => {
-            if (err) return res.status(500).json({ message: "Database error." });
-
-            if (results.rows.length > 0) {
-                const existing = results.rows[0];
-                const fieldsToUpdate = {};
-                const valuesToUpdate = [];
-
-                const compareAndUpdate = (field, value) => {
-                    if (value && value !== existing[field]) {
-                        fieldsToUpdate[field] = "$" + (valuesToUpdate.length + 1);
-                        valuesToUpdate.push(value);
-                    }
-                };
-
-                compareAndUpdate("name", name);
-                compareAndUpdate("major", major);
-                compareAndUpdate("gpa", gpa);
-                compareAndUpdate("year", year);
-                compareAndUpdate("campaign_line", campaign_line);
-                compareAndUpdate("personal_story", personal_story);
-                compareAndUpdate("experience", experience);
-                compareAndUpdate("organizations", organizations);
-                compareAndUpdate("instagram", instagram);
-                compareAndUpdate("linkedin", linkedin);
-                compareAndUpdate("facebook", facebook);
-                compareAndUpdate("github", github);
-                compareAndUpdate("snapchat", snapchat);
-                compareAndUpdate("tiktok", tiktok);
-                compareAndUpdate("photos", photoMain);
-                compareAndUpdate("photos1", photoExtra);
-
-                if (Object.keys(fieldsToUpdate).length === 0) {
-                    return res.status(200).json({ message: "No changes detected." });
-                }
-
-                fieldsToUpdate.form_submitted = "$" + (valuesToUpdate.length + 1);
-                valuesToUpdate.push(true);
-
-                const setClause = Object.keys(fieldsToUpdate)
-                    .map((key) => `${key} = ${fieldsToUpdate[key]}`)
-                    .join(", ");
-
-                const queryUpdate = `UPDATE ContestEntries SET ${setClause} WHERE user_id = $${valuesToUpdate.length + 1}`;
-                valuesToUpdate.push(user_id);
-
-                db.query(queryUpdate, valuesToUpdate, (err) => {
-                    if (err) return res.status(500).json({ message: "Database error." });
-                    return res.status(200).json({ message: "Contest entry updated successfully!" });
-                });
-
-            } else {
-                const queryInsert = `
-                    INSERT INTO ContestEntries (
-                        user_id, major, gpa, name, campaign_line, personal_story, experience, organizations,
-                        instagram, linkedin, facebook, github, snapchat, tiktok,
-                        photos, photos1, form_submitted, year
-                    )
-                    VALUES (
-                               $1, $2, $3, $4, $5, $6, $7, $8,
-                               $9, $10, $11, $12, $13, $14,
-                               $15, $16, $17, $18
-                           )
-                `;
-
-                const values = [
-                    user_id, major, gpa || null, name, campaign_line, personal_story, experience, organizations,
-                    instagram, linkedin, facebook, github, snapchat, tiktok,
-                    photoMain, photoExtra, true, year || null
-                ];
-
-                db.query(queryInsert, values, (err) => {
-                    if (err) return res.status(500).json({ message: "Database error." });
-
-                    const queryUpdateUser = "UPDATE Users SET form_submitted = true WHERE user_id = $1";
-                    db.query(queryUpdateUser, [user_id], (err) => {
-                        if (err) return res.status(500).json({ message: "Database error." });
-                        return res.status(201).json({ message: "Contest entry created successfully!" });
-                    });
-                });
-            }
-        });
-    });
-});
 
 // For demonstration, assume you have a 'Users' table with fields:
 //    full_name, email, password, is_verified (TINYINT), email_verification_token (VARCHAR)
