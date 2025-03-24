@@ -323,7 +323,10 @@ app.post("/submitForm", upload.array("photos", 10), (req, res) => {
 //const { generateVerificationToken } = require("../generateVerificationToken");
 
 // POST /submitForm
-app.post("/submitForm2", upload.array("photos", 5), (req, res) => {
+app.post("/submitForm2", upload.fields([
+    { name: "photos", maxCount: 1 },
+    { name: "photos1", maxCount: 1 }
+]), (req, res) => {
     res.header("Access-Control-Allow-Origin", "https://www.misscal.net");
     res.header("Access-Control-Allow-Credentials", "true");
     res.header("Access-Control-Allow-Methods", "POST");
@@ -344,17 +347,11 @@ app.post("/submitForm2", upload.array("photos", 5), (req, res) => {
         facebook,
         github,
         snapchat,
-        tiktok,
+        tiktok
     } = req.body;
 
-    const uploadedPhotos = req.files.map(file => file.path);
-    const photoFields = [
-        uploadedPhotos[0] ? JSON.stringify([uploadedPhotos[0]]) : null,
-        uploadedPhotos[1] ? JSON.stringify([uploadedPhotos[1]]) : null,
-        uploadedPhotos[2] ? JSON.stringify([uploadedPhotos[2]]) : null,
-        uploadedPhotos[3] ? JSON.stringify([uploadedPhotos[3]]) : null,
-        uploadedPhotos[4] ? JSON.stringify([uploadedPhotos[4]]) : null,
-    ];
+    const photoMain = req.files["photos"]?.[0]?.path || null;
+    const photoExtra = req.files["photos1"]?.[0]?.path || null;
 
     if (!user_id) {
         return res.status(400).json({ message: "User ID is required." });
@@ -364,20 +361,21 @@ app.post("/submitForm2", upload.array("photos", 5), (req, res) => {
     db.query(queryCheckUser, [user_id], (err, userResults) => {
         if (err) return res.status(500).json({ message: "Database error." });
         if (userResults.rows.length === 0) return res.status(400).json({ message: "User not found." });
-        if (userResults.rows[0].form_submitted) return res.status(400).json({ message: "You have already submitted your participation form." });
+        if (userResults.rows[0].form_submitted) {
+            return res.status(400).json({ message: "You have already submitted your participation form." });
+        }
 
         const queryCheck = "SELECT * FROM ContestEntries WHERE user_id = $1";
         db.query(queryCheck, [user_id], (err, results) => {
             if (err) return res.status(500).json({ message: "Database error." });
 
             if (results.rows.length > 0) {
-                // Update existing
-                const existingData = results.rows[0];
+                const existing = results.rows[0];
                 const fieldsToUpdate = {};
                 const valuesToUpdate = [];
 
                 const compareAndUpdate = (field, value) => {
-                    if (value && value !== existingData[field]) {
+                    if (value && value !== existing[field]) {
                         fieldsToUpdate[field] = "$" + (valuesToUpdate.length + 1);
                         valuesToUpdate.push(value);
                     }
@@ -397,12 +395,8 @@ app.post("/submitForm2", upload.array("photos", 5), (req, res) => {
                 compareAndUpdate("github", github);
                 compareAndUpdate("snapchat", snapchat);
                 compareAndUpdate("tiktok", tiktok);
-
-                compareAndUpdate("photos", photoFields[0]);
-                compareAndUpdate("photos1", photoFields[1]);
-                compareAndUpdate("photos2", photoFields[2]);
-                compareAndUpdate("photos3", photoFields[3]);
-                compareAndUpdate("photos4", photoFields[4]);
+                compareAndUpdate("photos", photoMain);
+                compareAndUpdate("photos1", photoExtra);
 
                 if (Object.keys(fieldsToUpdate).length === 0) {
                     return res.status(200).json({ message: "No changes detected." });
@@ -422,34 +416,31 @@ app.post("/submitForm2", upload.array("photos", 5), (req, res) => {
                     if (err) return res.status(500).json({ message: "Database error." });
                     return res.status(200).json({ message: "Contest entry updated successfully!" });
                 });
+
             } else {
-                // Insert new entry
                 const queryInsert = `
                     INSERT INTO ContestEntries (
                         user_id, major, gpa, name, campaign_line, personal_story, experience, organizations,
                         instagram, linkedin, facebook, github, snapchat, tiktok,
-                        photos, photos1, photos2, photos3, photos4,
-                        form_submitted, year
+                        photos, photos1, form_submitted, year
                     )
                     VALUES (
-                        $1, $2, $3, $4, $5, $6, $7, $8,
-                        $9, $10, $11, $12, $13, $14,
-                        $15, $16, $17, $18, $19,
-                        $20, $21
-                    )
+                               $1, $2, $3, $4, $5, $6, $7, $8,
+                               $9, $10, $11, $12, $13, $14,
+                               $15, $16, $17, $18
+                           )
                 `;
 
                 const values = [
                     user_id, major, gpa || null, name, campaign_line, personal_story, experience, organizations,
                     instagram, linkedin, facebook, github, snapchat, tiktok,
-                    photoFields[0], photoFields[1], photoFields[2], photoFields[3], photoFields[4],
-                    true, year || null
+                    photoMain, photoExtra, true, year || null
                 ];
 
                 db.query(queryInsert, values, (err) => {
                     if (err) return res.status(500).json({ message: "Database error." });
 
-                    const queryUpdateUser = `UPDATE Users SET form_submitted = true WHERE user_id = $1`;
+                    const queryUpdateUser = "UPDATE Users SET form_submitted = true WHERE user_id = $1";
                     db.query(queryUpdateUser, [user_id], (err) => {
                         if (err) return res.status(500).json({ message: "Database error." });
                         return res.status(201).json({ message: "Contest entry created successfully!" });
@@ -459,6 +450,7 @@ app.post("/submitForm2", upload.array("photos", 5), (req, res) => {
         });
     });
 });
+
 // For demonstration, assume you have a 'Users' table with fields:
 //    full_name, email, password, is_verified (TINYINT), email_verification_token (VARCHAR)
 app.post("/signup", async (req, res) => {
