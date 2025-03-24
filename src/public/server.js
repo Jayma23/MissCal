@@ -901,20 +901,17 @@ app.get("/getCurrentStudent", (req, res) => {
             return res.status(404).json({ message: "Student profile not found." });
         }
 
-        // ✅ Student is now defined
         const student = results.rows[0];
 
-        // ✅ Safely parse photos
+        // ✅ No need to parse, treat as string
         let photoUrl = "default-photo.jpg";
-        try {
-            if (student.photos && typeof student.photos === "string" && student.photos.trim().startsWith("[")) {
-                const parsedPhotos = JSON.parse(student.photos);
-                if (Array.isArray(parsedPhotos) && parsedPhotos.length > 0) {
-                    photoUrl = `https://server1.misscal.net/${parsedPhotos[0]}`;
-                }
-            }
-        } catch (e) {
-            console.error("Error parsing photos:", e);
+
+        if (
+            student.photos &&
+            typeof student.photos === "string" &&
+            student.photos.trim() !== ""
+        ) {
+            photoUrl = `https://server1.misscal.net/${student.photos}`;
         }
 
         const studentData = {

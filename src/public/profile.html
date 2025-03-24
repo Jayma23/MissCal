@@ -722,15 +722,19 @@
 
 
             // Handle profile photo
-            if (data.photo && data.photo !== "default-photo.jpg") {
-                const profileImg = document.querySelector("#profileImage img");
-                const timestamp = new Date().getTime(); // Add timestamp to prevent caching
+            const profileImg = document.querySelector("#profileImage img");
 
-                profileImg.src = data.photo.startsWith("https")
-                    ? data.photo
-                    : `${data.photo}`;
-                
+            if (data.photo && data.photo !== "default-photo.jpg") {
+                const timestamp = new Date().getTime(); // Prevent caching
+                profileImg.src = `${data.photo}?t=${timestamp}`;
+            } else {
+                profileImg.src = "default-profile.png";
             }
+
+// Optional: fallback if image fails to load
+            profileImg.onerror = function () {
+                this.src = "default-profile.png";
+            };
 
             // Add animation to profile card after data is loaded
             document.querySelector(".profile-card").classList.add("loaded");
