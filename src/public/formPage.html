@@ -116,7 +116,13 @@
             align-items: center;
             justify-content: center;
         }
-        /* Caption removed as requested */
+        .photo-caption {
+            width: 100%;
+            margin-top: 5px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
         .add-photo-btn {
             display: flex;
             align-items: center;
@@ -447,13 +453,15 @@
             // Store the photo data
             uploadedPhotos.set(photoId, {
                 file: file,
-                dataUrl: e.target.result
+                dataUrl: e.target.result,
+                caption: ""
             });
 
             // Update the UI
             photoItem.innerHTML = `
                 <img src="${e.target.result}" class="photo-preview">
                 <button type="button" class="photo-remove">×</button>
+                <input type="text" class="photo-caption" placeholder="Add a caption..." data-id="${photoId}">
             `;
             photosContainer.insertBefore(photoItem, addPhotoButton);
 
@@ -469,7 +477,14 @@
                 }
             });
 
-            // Caption functionality removed
+            // Add caption functionality
+            photoItem.querySelector('.photo-caption').addEventListener('input', function() {
+                const photoData = uploadedPhotos.get(photoId);
+                if (photoData) {
+                    photoData.caption = this.value;
+                    uploadedPhotos.set(photoId, photoData);
+                }
+            });
 
             updatePhotoCount();
 
@@ -561,6 +576,7 @@
         // Add photos to formData
         uploadedPhotos.forEach((photoData, photoId) => {
             formData.append('photos[]', photoData.file);
+            formData.append(`caption_${photoId}`, photoData.caption);
         });
 
         // Retrieve user_id from the cookie
