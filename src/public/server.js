@@ -604,7 +604,13 @@ app.get("/getStudentDetails", (req, res) => {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const query = "SELECT name, major, gpa, campaign_line, personal_story, experience, organizations, photos, instagram, linkedin, facebook, github, tiktok FROM ContestEntries WHERE user_id = $1";
+    const query = `
+        SELECT name, major, gpa, campaign_line, personal_story,
+               experience, organizations, photos,
+               instagram, linkedin, facebook, github, tiktok
+        FROM ContestEntries
+        WHERE user_id = $1
+    `;
 
     db.query(query, [userId], (err, results) => {
         if (err) {
@@ -618,11 +624,20 @@ app.get("/getStudentDetails", (req, res) => {
 
         const student = results.rows[0];
 
-        // Handle Photos Safely
         let photo = "";
+        let photosArray = [];
+
         try {
-            const photosArray = JSON.parse(student.photos || "[]");
-            photo = photosArray.length > 0 ? photosArray[0] : "";
+            if (
+                student.photos &&
+                typeof student.photos === "string" &&
+                student.photos.trim().startsWith("[")
+            ) {
+                photosArray = JSON.parse(student.photos);
+            }
+            photo = photosArray.length > 0
+                ? `https://server1.misscal.net/${photosArray[0]}`
+                : "";
         } catch (error) {
             console.error("Error parsing photos:", error);
             photo = "";
@@ -645,6 +660,8 @@ app.get("/getStudentDetails", (req, res) => {
         });
     });
 });
+
+
 
 
 app.get("/getStudent", (req, res) => {
@@ -862,7 +879,6 @@ app.get("/searchStudents", (req, res) => {
 });
 
 app.get("/getCurrentStudent", (req, res) => {
-    // Get the user ID from cookies
     const userId = req.cookies.user_id;
 
     if (!userId) {
@@ -885,15 +901,21 @@ app.get("/getCurrentStudent", (req, res) => {
             return res.status(404).json({ message: "Student profile not found." });
         }
 
-        let photos = [];
-        try {
-            photos = JSON.parse(student.photos);
-        } catch (e) {
-            console.error("Failed to parse photos array:", e);
-        }
-
-        // There should only be one result since user_id should be unique
+        // ✅ Student is now defined
         const student = results.rows[0];
+
+        // ✅ Safely parse photos
+        let photoUrl = "default-photo.jpg";
+        try {
+            if (student.photos && typeof student.photos === "string" && student.photos.trim().startsWith("[")) {
+                const parsedPhotos = JSON.parse(student.photos);
+                if (Array.isArray(parsedPhotos) && parsedPhotos.length > 0) {
+                    photoUrl = `https://server1.misscal.net/${parsedPhotos[0]}`;
+                }
+            }
+        } catch (e) {
+            console.error("Error parsing photos:", e);
+        }
 
         const studentData = {
             userId: student.user_id,
@@ -910,14 +932,14 @@ app.get("/getCurrentStudent", (req, res) => {
             facebook: student.facebook,
             github: student.github,
             tiktok: student.tiktok,
-            photo: (photos && Array.isArray(student.photos) && student.photos.length > 0)
-                ? photos[0]  // Use the first image
-                : "default-photo.jpg" // Use a placeholder if no photo exists
+            photo: photoUrl
         };
 
         res.json(studentData);
     });
 });
+
+
 
 app.get("/getProfileData", (req, res) => {
     const userId = req.cookies.user_id;
