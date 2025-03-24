@@ -81,73 +81,6 @@
             visibility: visible;
             opacity: 1;
         }
-
-        /* Styles for multiple photos */
-        .photos-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .photo-item {
-            position: relative;
-            width: 200px;
-            margin-bottom: 15px;
-        }
-        .photo-preview {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        .photo-remove {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(255, 0, 0, 0.7);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .add-photo-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 200px;
-            height: 200px;
-            background-color: #f0f0f0;
-            border: 2px dashed #ccc;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 24px;
-            color: #666;
-        }
-        .add-photo-btn:hover {
-            background-color: #e8e8e8;
-        }
-        .photo-counter {
-            margin-top: 5px;
-            color: #666;
-            font-size: 0.9em;
-        }
-        .photo-label {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 12px;
-        }
     </style>
 </head>
 
@@ -181,7 +114,7 @@
         <p id="progressText">Step 1 of 4: Basic Information</p>
     </div>
 
-    <form id="joinForm" action="/submitForm2" method="POST" enctype="multipart/form-data">
+    <form id="joinForm" action="/submitForm" method="POST" enctype="multipart/form-data">
         <!-- Step 1: Basic Information -->
         <div class="form-step active" id="step1">
             <h2>Basic Information</h2>
@@ -193,6 +126,7 @@
 
             <label for="year">Year: <span class="field-tooltip">ⓘ<span class="tooltip-text">Year of Graduation</span></span></label>
             <input type="number" id="year" name="year" placeholder="Enter your Year of Graduation">
+
 
             <label for="gpa">GPA: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your current cumulative GPA on a 4.0 scale</span></span></label>
             <input type="number" id="gpa" name="gpa" step="0.01" placeholder="Enter your GPA" min="0" max="4.0">
@@ -206,16 +140,12 @@
         <!-- Step 2: Photo Upload -->
         <div class="form-step" id="step2">
             <h2>Photo Upload</h2>
-            <span>Upload Photos (Up to 5): <span class="field-tooltip">ⓘ<span class="tooltip-text">Choose up to 5 high-quality photos that best represent you</span></span></span>
+            <label for="photos">Upload Photos (Only One please pick the best one): <span class="field-tooltip">ⓘ<span class="tooltip-text">Choose a high-quality photo that best represents you</span></span></label>
+            <input type="file" id="photos" name="photos" accept="image/*" required>
 
-            <!-- Hidden file input that will be triggered by our custom UI -->
-            <input type="file" id="photoInput" name="photoInput" accept="image/*" style="display: none">
-
-            <div class="photo-counter">Selected: <span id="photoCount">0</span>/5 photos</div>
-
-            <!-- Container for photo previews -->
-            <div class="photos-container" id="photosContainer">
-                <div id="addPhotoButton" class="add-photo-btn">+</div>
+            <div class="preview-container">
+                <h3>Photo Preview</h3>
+                <img id="imagePreview" class="image-preview" src="#" alt="Your image preview">
             </div>
 
             <div class="nav-buttons">
@@ -356,9 +286,8 @@
     });
 
     document.getElementById("nextToStep3").addEventListener("click", () => {
-        const photoCount = document.querySelectorAll('.photo-item').length;
-        if (photoCount === 0) {
-            alert("Please upload at least one photo before proceeding.");
+        if (!document.getElementById("photos").files.length) {
+            alert("Please upload a photo before proceeding.");
             return;
         }
         showStep(2);
@@ -410,137 +339,17 @@
         }
     });
 
-    // Multiple photo upload handler
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize variables
-        const MAX_PHOTOS = 5;
-        const uploadedPhotos = new Map();
-        let photoCounter = 0;
-
-        // Elements
-        const photosContainer = document.getElementById('photosContainer');
-        const photoInput = document.getElementById('photoInput');
-        const addPhotoButton = document.getElementById('addPhotoButton');
-        const photoCountDisplay = document.getElementById('photoCount');
-
-        // Click on the add photo button to trigger file input
-        addPhotoButton.addEventListener('click', () => {
-            if (uploadedPhotos.size >= MAX_PHOTOS) {
-                alert(`You can upload a maximum of ${MAX_PHOTOS} photos.`);
-                return;
-            }
-            photoInput.click();
-        });
-
-        // Handle file selection
-        photoInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (!file) return;
-
-            if (uploadedPhotos.size >= MAX_PHOTOS) {
-                alert(`You can upload a maximum of ${MAX_PHOTOS} photos.`);
-                return;
-            }
-
-            // Check file type
-            if (!file.type.match('image.*')) {
-                alert('Please upload an image file.');
-                return;
-            }
-
-            // Generate a unique ID for this photo
-            const photoId = `photo_${photoCounter++}`;
-            const photoIndex = uploadedPhotos.size; // This will be 0, 1, 2, 3, or 4
-
-            // Create photo preview element
-            const photoItem = document.createElement('div');
-            photoItem.className = 'photo-item';
-            photoItem.dataset.id = photoId;
-            photoItem.dataset.index = photoIndex;
-
+    // Image preview
+    document.getElementById("photos").addEventListener("change", function() {
+        const file = this.files[0];
+        if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Store the photo data with its index
-                uploadedPhotos.set(photoId, {
-                    file: file,
-                    dataUrl: e.target.result,
-                    index: photoIndex
-                });
-
-                // Update the UI
-                photoItem.innerHTML = `
-                    <img src="${e.target.result}" class="photo-preview">
-                    <button type="button" class="photo-remove">×</button>
-                    <div class="photo-label">Photo ${photoIndex + 1}</div>
-                `;
-
-                photosContainer.insertBefore(photoItem, addPhotoButton);
-
-                // Add remove button functionality
-                photoItem.querySelector('.photo-remove').addEventListener('click', function() {
-                    // Get the index of the photo being removed
-                    const removedIndex = parseInt(photoItem.dataset.index);
-
-                    // Remove from the map
-                    uploadedPhotos.delete(photoId);
-                    photoItem.remove();
-
-                    // Update indices for remaining photos
-                    updatePhotoIndices();
-
-                    // Show add button if it was hidden
-                    if (addPhotoButton.style.display === 'none') {
-                        addPhotoButton.style.display = 'flex';
-                    }
-                });
-
-                updatePhotoCount();
-
-                // Hide add button if max photos reached
-                if (uploadedPhotos.size >= MAX_PHOTOS) {
-                    addPhotoButton.style.display = 'none';
-                }
-            };
-
+                const preview = document.getElementById("imagePreview");
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            }
             reader.readAsDataURL(file);
-        });
-
-        function updatePhotoCount() {
-            const count = uploadedPhotos.size;
-            photoCountDisplay.textContent = count;
-
-            // Update visibility of add button
-            addPhotoButton.style.display = count >= MAX_PHOTOS ? 'none' : 'flex';
-        }
-
-        function updatePhotoIndices() {
-            // Get all photo items
-            const photoItems = document.querySelectorAll('.photo-item');
-
-            // Sort by DOM order
-            const sorted = Array.from(photoItems).sort((a, b) => {
-                return Array.from(a.parentNode.children).indexOf(a) -
-                    Array.from(b.parentNode.children).indexOf(b);
-            });
-
-            // Update indices and labels
-            sorted.forEach((item, index) => {
-                const photoId = item.dataset.id;
-                item.dataset.index = index;
-
-                // Update the label
-                const label = item.querySelector('.photo-label');
-                if (label) {
-                    label.textContent = `Photo ${index + 1}`;
-                }
-
-                // Update the stored index
-                if (uploadedPhotos.has(photoId)) {
-                    const photoData = uploadedPhotos.get(photoId);
-                    photoData.index = index;
-                    uploadedPhotos.set(photoId, photoData);
-                }
-            });
         }
     });
 
@@ -564,9 +373,8 @@
             previewHTML += `<p><strong>Campaign Line:</strong> ${campaignLine}</p>`;
         }
 
-        const photoCount = document.querySelectorAll('.photo-item').length;
-        if (photoCount > 0) {
-            previewHTML += `<p><strong>Photos:</strong> ${photoCount} uploaded ✓</p>`;
+        if (document.getElementById("photos").files.length) {
+            previewHTML += `<p><strong>Photo:</strong> Uploaded ✓</p>`;
         }
 
         if (previewHTML === "") {
@@ -582,6 +390,7 @@
 
         // Validate form
         const name = document.getElementById("name").value;
+        const photos = document.getElementById("photos").files;
 
         if (!name) {
             alert("Please enter your name.");
@@ -589,9 +398,8 @@
             return;
         }
 
-        const photoCount = document.querySelectorAll('.photo-item').length;
-        if (photoCount === 0) {
-            alert("Please upload at least one photo.");
+        if (!photos.length) {
+            alert("Please upload a photo.");
             showStep(1);
             return;
         }
@@ -612,41 +420,7 @@
             return;
         }
 
-        // Show submission status
-        const statusDiv = document.createElement("div");
-        statusDiv.id = "submission-status";
-        statusDiv.className = "preview-container";
-        statusDiv.innerHTML = "<p>Submitting your application...</p>";
-        document.querySelector('.form-step.active .nav-buttons').before(statusDiv);
-
-        // Create the form data object
         const formData = new FormData(event.target);
-
-        // Get all photos in order
-        const photoItems = document.querySelectorAll('.photo-item');
-        const photosSorted = Array.from(photoItems)
-            .sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index));
-
-        // Clear any existing photos in the formData
-        for (const key of Array.from(formData.keys())) {
-            if (key === 'photos' || key === 'photos[]') {
-                formData.delete(key);
-            }
-        }
-
-        // Add photos to formData
-        photosSorted.forEach((item) => {
-            const fileInput = item.querySelector('img');
-            if (fileInput && fileInput.src) {
-                // Create a file object from the data URL
-                fetch(fileInput.src)
-                    .then(res => res.blob())
-                    .then(blob => {
-                        const file = new File([blob], `photo_${item.dataset.index}.jpg`, { type: 'image/jpeg' });
-                        formData.append('photos', file);
-                    });
-            }
-        });
 
         // Retrieve user_id from the cookie
         const getCookie = (name) => {
@@ -658,7 +432,6 @@
         const userId = getCookie("user_id");
         if (!userId) {
             alert("You need to log in first!");
-            if (statusDiv) statusDiv.remove();
             return;
         }
 
@@ -666,34 +439,22 @@
         formData.append("user_id", userId);
 
         try {
-            statusDiv.innerHTML = "<p>Uploading photos and information...</p>";
+            const response = await fetch("https://server1.misscal.net/submitForm", {
+                method: "POST",
+                body: formData,
+                credentials: "include",
+            });
 
-            // Need to wait a bit for the fetch and file appending to complete
-            setTimeout(async () => {
-                try {
-                    const response = await fetch("https://server1.misscal.net/submitForm2", {
-                        method: "POST",
-                        body: formData,
-                        credentials: "include",
-                    });
-
-                    if (response.ok) {
-                        statusDiv.innerHTML = "<p>Form submitted successfully! Redirecting...</p>";
-                        setTimeout(() => {
-                            window.location.href = "mainPage.html";
-                        }, 2000);
-                    } else {
-                        const error = await response.json();
-                        statusDiv.innerHTML = `<p style="color: red;">Error: ${error.message || "Form submission failed. Please try again."}</p>`;
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                    statusDiv.innerHTML = `<p style="color: red;">An error occurred while submitting the form. Please try again later.</p>`;
-                }
-            }, 1000);
+            if (response.ok) {
+                alert("Form submitted successfully!");
+                window.location.href = "mainPage.html";
+            } else {
+                const error = await response.json();
+                alert(error.message || "Form submission failed. Please try again.");
+            }
         } catch (error) {
             console.error("Error:", error);
-            statusDiv.innerHTML = `<p style="color: red;">An error occurred while submitting the form. Please try again later.</p>`;
+            alert("An error occurred while submitting the form. Please try again later.");
         }
     });
 
