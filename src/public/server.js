@@ -117,229 +117,207 @@ db.connect()
     });
 
 module.exports = db;
-app.post("/submitMultiPhotos", upload.array("photos", 10), (req, res) => {
-    // Import statements (assuming these are at the top of your file)
-// const multer = require('multer');
-// const db = require('./db'); // Your database connection
+app.post("/submitForm", upload.array("photos", 10), (req, res) => {
+    res.header("Access-Control-Allow-Origin", "https://www.misscal.net");  // Set only your frontend domain
+    res.header("Access-Control-Allow-Credentials", "true");  // Allow credentials (cookies, auth headers)
+    res.header("Access-Control-Allow-Methods", "POST");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-// Configure multer storage for multiple photo uploads
-    const storage = multer.diskStorage({
-        destination: function(req, file, cb) {
-            cb(null, 'uploads/');
-        },
-        filename: function(req, file, cb) {
-            // Create unique filenames with timestamp and original extension
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-            const ext = file.originalname.split('.').pop();
-            cb(null, file.fieldname + '-' + uniqueSuffix + '.' + ext);
+    const {
+        user_id,
+        name,
+        major,
+        gpa,
+        campaign_line,
+        personal_story,
+        experience,
+        organizations,
+        instagram,
+        year,
+        linkedin,
+        facebook,
+        github,
+        snapchat,
+        tiktok,
+        form_submitted,
+    } = req.body;
+
+    const photos = req.files.map((file) => file.path);
+
+    if (!user_id) {
+        return res.status(400).json({ message: "User ID is required." });
+    }
+
+    const queryCheckUser = "SELECT form_submitted FROM Users WHERE user_id = $1";
+    db.query(queryCheckUser, [user_id], (err, userResults) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({message: "Database error."});
         }
-    });
 
-// Create multer upload middleware for multiple files
-    const multiUpload = multer({
-        storage: storage,
-        limits: {
-            fileSize: 5 * 1024 * 1024, // 5MB limit per file
-            files: 5 // Max 5 files
-        },
-        fileFilter: function(req, file, cb) {
-            // Accept only image files
-            if (!file.mimetype.startsWith('image/')) {
-                return cb(new Error('Only image files are allowed!'), false);
-            }
-            cb(null, true);
+        if (userResults.rows.length === 0) {
+            return res.status(400).json({message: "User not found."});
         }
-    }).array('photos[]', 5); // Field name matches our frontend
 
-// New endpoint for multi-photo uploads
-    app.post("/submitMultiPhotos", (req, res) => {
-        // Set CORS headers
-        res.header("Access-Control-Allow-Origin", "https://www.misscal.net");
-        res.header("Access-Control-Allow-Credentials", "true");
-        res.header("Access-Control-Allow-Methods", "POST");
-        res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        if (userResults.rows[0].form_submitted) {
+            return res.status(400).json({message: "You have already submitted your participation form. One person can only upload information once."});
+        }
 
-        // Use multer middleware with error handling
-        multiUpload(req, res, function(err) {
+        // Check if the user already exists in the database
+        const queryCheck = "SELECT * FROM ContestEntries WHERE user_id = $1";
+        db.query(queryCheck, [user_id], (err, results) => {
             if (err) {
-                if (err.code === 'LIMIT_FILE_SIZE') {
-                    return res.status(400).json({ message: "One or more files exceed the 5MB size limit." });
-                }
-                if (err.code === 'LIMIT_FILE_COUNT') {
-                    return res.status(400).json({ message: "Maximum of 5 photos allowed." });
-                }
-                console.error("Upload error:", err);
-                return res.status(400).json({ message: "Error uploading files: " + err.message });
+                console.error("Database error:", err);
+                return res.status(500).json({message: "Database error."});
             }
 
-            // No files uploaded
-            if (!req.files || req.files.length === 0) {
-                return res.status(400).json({ message: "Please upload at least one photo." });
-            }
 
-            const {
-                user_id,
-                name,
-                major,
-                gpa,
-                campaign_line,
-                personal_story,
-                experience,
-                organizations,
-                instagram,
-                year,
-                linkedin,
-                facebook,
-                github,
-                snapchat,
-                tiktok
-            } = req.body;
+            if (results.length > 0) {
+                // User exists, selectively update their data
+                const existingData = results[0];
 
-            // Get file paths from uploaded files
-            const photos = req.files.map((file) => file.path);
 
-            if (!user_id) {
-                return res.status(400).json({ message: "User ID is required." });
-            }
+                const fieldsToUpdate = {};
+                const valuesToUpdate = [];
 
-            // Check if user exists and hasn't submitted a form yet
-            const queryCheckUser = "SELECT form_submitted FROM Users WHERE user_id = $1";
-            db.query(queryCheckUser, [user_id], (err, userResults) => {
-                if (err) {
-                    console.error("Database error:", err);
-                    return res.status(500).json({ message: "Database error." });
+                // Compare each field and only add changed values to the update query
+                if (major && major !== existingData.major) {
+                    fieldsToUpdate.major = "?";
+                    valuesToUpdate.push(major);
+                }
+                if (name && name !== existingData.name) {
+                    fieldsToUpdate.name = "?";
+                    valuesToUpdate.push(name);
+                }
+                if (gpa && gpa !== existingData.gpa) {
+                    fieldsToUpdate.gpa = "?";
+                    valuesToUpdate.push(gpa);
+                }
+                if (gpa && gpa !== existingData.year) {
+                    fieldsToUpdate.year = "?";
+                    valuesToUpdate.push(year);
+                }
+                if (campaign_line && campaign_line !== existingData.campaign_line) {
+                    fieldsToUpdate.campaign_line = "?";
+                    valuesToUpdate.push(campaign_line);
+                }
+                if (personal_story && personal_story !== existingData.personal_story) {
+                    fieldsToUpdate.personal_story = "?";
+                    valuesToUpdate.push(personal_story);
+                }
+                if (experience && experience !== existingData.experience) {
+                    fieldsToUpdate.experience = "?";
+                    valuesToUpdate.push(experience);
+                }
+                if (organizations && organizations !== existingData.organizations) {
+                    fieldsToUpdate.organizations = "?";
+                    valuesToUpdate.push(organizations);
+                }
+                if (instagram && instagram !== existingData.instagram) {
+                    fieldsToUpdate.instagram = "?";
+                    valuesToUpdate.push(instagram);
+                }
+                if (linkedin && linkedin !== existingData.linkedin) {
+                    fieldsToUpdate.linkedin = "?";
+                    valuesToUpdate.push(linkedin);
+                }
+                if (facebook && facebook !== existingData.facebook) {
+                    fieldsToUpdate.facebook = "?";
+                    valuesToUpdate.push(facebook);
+                }
+                if (github && github !== existingData.github) {
+                    fieldsToUpdate.github = "?";
+                    valuesToUpdate.push(github);
+                }
+                if (snapchat && snapchat !== existingData.snapchat) {
+                    fieldsToUpdate.snapchat = "?";
+                    valuesToUpdate.push(snapchat);
+                }
+                if (tiktok && tiktok !== existingData.tiktok) {
+                    fieldsToUpdate.tiktok = "?";
+                    valuesToUpdate.push(tiktok);
+                }
+                if (photos.length > 0 && JSON.stringify(photos) !== existingData.photos) {
+                    fieldsToUpdate.photos = "?";
+                    valuesToUpdate.push(JSON.stringify(photos));
                 }
 
-                if (userResults.rows.length === 0) {
-                    return res.status(400).json({ message: "User not found." });
+                // If no fields to update, return success immediately
+                if (Object.keys(fieldsToUpdate).length === 0) {
+                    return res.status(200).json({message: "No changes detected. Nothing to update."});
                 }
 
-                if (userResults.rows[0].form_submitted) {
-                    return res.status(400).json({ message: "You have already submitted your participation form. One person can only upload information once." });
-                }
+                // Construct the dynamic update query
+                const setClause = Object.keys(fieldsToUpdate)
+                    .map((key) => `${key} = ${fieldsToUpdate[key]}`)
+                    .join(", ");
 
-                // Check if the user already has a contest entry
-                const queryCheck = "SELECT * FROM ContestEntries WHERE user_id = $1";
-                db.query(queryCheck, [user_id], (err, results) => {
+                fieldsToUpdate.form_submitted = "$" + (valuesToUpdate.length + 1);
+                valuesToUpdate.push(true);
+
+                const queryUpdate = `UPDATE ContestEntries
+                                     SET ${setClause}
+                                     WHERE user_id = $1`;
+                valuesToUpdate.push(user_id); // Add user_id to the end of the query values
+
+                db.query(queryUpdate, valuesToUpdate, (err, results) => {
                     if (err) {
                         console.error("Database error:", err);
-                        return res.status(500).json({ message: "Database error." });
+                        return res.status(500).json({message: "Database error."});
                     }
-
-                    if (results.rows && results.rows.length > 0) {
-                        // User exists, update their data
-                        const existingData = results.rows[0];
-
-                        // Build update query dynamically
-                        let updateQuery = "UPDATE ContestEntries SET ";
-                        const updateValues = [];
-                        let paramCount = 1;
-
-                        // Add each field to update query if it exists
-                        const fieldsToCheck = {
-                            name, major, gpa, year, campaign_line, personal_story,
-                            experience, organizations, instagram, linkedin,
-                            facebook, github, snapchat, tiktok
-                        };
-
-                        const updateFields = [];
-
-                        for (const [field, value] of Object.entries(fieldsToCheck)) {
-                            if (value !== undefined) {
-                                updateFields.push(`${field} = $${paramCount}`);
-                                updateValues.push(value);
-                                paramCount++;
-                            }
+                    res.status(200).json({message: "Contest entry updated successfully!"});
+                });
+            } else {
+                // User does not exist, insert new data
+                const queryInsert = `
+                    INSERT INTO ContestEntries (user_id, major, gpa, name, campaign_line, personal_story, experience,
+                                                organizations,
+                                                instagram, linkedin, facebook, github, snapchat, tiktok, photos,
+                                                form_submitted, year)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+                `;
+                db.query(
+                    queryInsert,
+                    [
+                        user_id,
+                        major,
+                        gpa || null,
+                        name,
+                        campaign_line,
+                        personal_story,
+                        experience,
+                        organizations,
+                        instagram,
+                        linkedin,
+                        facebook,
+                        github,
+                        snapchat,
+                        tiktok,
+                        JSON.stringify(photos),
+                        true,
+                        year || null,
+                    ],
+                    (err, results) => {
+                        if (err) {
+                            console.error("Database error:", err);
+                            return res.status(500).json({message: "Database error."});
                         }
-
-                        // Always update photos field
-                        updateFields.push(`photos = $${paramCount}`);
-                        updateValues.push(JSON.stringify(photos));
-                        paramCount++;
-
-                        // Always set form_submitted to true
-                        updateFields.push(`form_submitted = $${paramCount}`);
-                        updateValues.push(true);
-                        paramCount++;
-
-                        // Complete the query
-                        updateQuery += updateFields.join(", ");
-                        updateQuery += ` WHERE user_id = $${paramCount}`;
-                        updateValues.push(user_id);
-
-                        // Execute update query
-                        db.query(updateQuery, updateValues, (err) => {
+                        const queryUpdateUser = `UPDATE Users
+                                                 SET form_submitted = true
+                                                 WHERE user_id = $1`;
+                        db.query(queryUpdateUser, [user_id], (err) => {
                             if (err) {
                                 console.error("Database error:", err);
-                                return res.status(500).json({ message: "Database error." });
+                                return res.status(500).json({message: "Database error."});
                             }
-
-                            // Update user's form_submitted status
-                            const queryUpdateUser = "UPDATE Users SET form_submitted = true WHERE user_id = $1";
-                            db.query(queryUpdateUser, [user_id], (err) => {
-                                if (err) {
-                                    console.error("Database error:", err);
-                                    return res.status(500).json({ message: "Database error." });
-                                }
-
-                                res.status(200).json({ message: "Contest entry updated successfully!" });
-                            });
+                            res.status(201).json({message: "Contest entry created successfully!"});
                         });
-                    } else {
-                        // User doesn't exist, create new entry
-                        const queryInsert = `
-            INSERT INTO ContestEntries (
-              user_id, name, major, gpa, year, campaign_line, personal_story, 
-              experience, organizations, instagram, linkedin, facebook, 
-              github, snapchat, tiktok, photos, form_submitted
-            )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
-          `;
-
-                        db.query(
-                            queryInsert,
-                            [
-                                user_id,
-                                name,
-                                major || null,
-                                gpa || null,
-                                year || null,
-                                campaign_line || null,
-                                personal_story || null,
-                                experience || null,
-                                organizations || null,
-                                instagram || null,
-                                linkedin || null,
-                                facebook || null,
-                                github || null,
-                                snapchat || null,
-                                tiktok || null,
-                                JSON.stringify(photos),
-                                true
-                            ],
-                            (err) => {
-                                if (err) {
-                                    console.error("Database error:", err);
-                                    return res.status(500).json({ message: "Database error." });
-                                }
-
-                                // Update user's form_submitted status
-                                const queryUpdateUser = "UPDATE Users SET form_submitted = true WHERE user_id = $1";
-                                db.query(queryUpdateUser, [user_id], (err) => {
-                                    if (err) {
-                                        console.error("Database error:", err);
-                                        return res.status(500).json({ message: "Database error." });
-                                    }
-
-                                    res.status(201).json({ message: "Contest entry created successfully!" });
-                                });
-                            }
-                        );
                     }
-                });
-            });
+                );
+            }
         });
     });
+});
 // Signup Endpoint
 //const { sendVerificationEmail } = require("../sendVerificationEmail");
 //const { generateVerificationToken } = require("../generateVerificationToken");
