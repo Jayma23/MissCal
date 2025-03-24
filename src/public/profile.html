@@ -724,12 +724,9 @@
             // Handle profile photo
             const profileImg = document.querySelector("#profileImage img");
 
-            if (data.photo && data.photo !== "default-photo.jpg") {
-                const timestamp = new Date().getTime(); // Prevent caching
-                profileImg.src = `${data.photo}?t=${timestamp}`;
-            } else {
-                profileImg.src = "default-profile.png";
-            }
+
+            profileImg.src = `${data.photo}`;
+
 
 // Optional: fallback if image fails to load
             profileImg.onerror = function () {

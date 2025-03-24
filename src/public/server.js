@@ -904,15 +904,9 @@ app.get("/getCurrentStudent", (req, res) => {
         const student = results.rows[0];
 
         // ✅ No need to parse, treat as string
-        let photoUrl = "default-photo.jpg";
+        let photoUrl = `https://server1.misscal.net/${student.photos}`;
 
-        if (
-            student.photos &&
-            typeof student.photos === "string" &&
-            student.photos.trim() !== ""
-        ) {
-            photoUrl = `https://server1.misscal.net/${student.photos}`;
-        }
+
 
         const studentData = {
             userId: student.user_id,
