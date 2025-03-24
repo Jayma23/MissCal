@@ -729,10 +729,7 @@
                 profileImg.src = data.photo.startsWith("https")
                     ? data.photo
                     : `${data.photo}`;
-                profileImg.onerror = function() {
-                    // If image fails to load, fall back to default
-                    this.src = "default-profile.png";
-                };
+                
             }
 
             // Add animation to profile card after data is loaded
