@@ -89,6 +89,7 @@
             transition: 0.3s;
             font-weight: 600;
             border-radius: 50px;
+            margin-top: 20px;
         }
         .btn-custom:hover {
             background: #001F3F;
@@ -105,12 +106,12 @@
             color: blue;
             font-weight: 600;
             text-decoration: underline;
-
         }
 
         .signup-prompt a:hover {
             text-decoration: underline;
         }
+
         .forgot-password {
             text-align: right;
             margin-top: 8px;
@@ -118,12 +119,21 @@
         }
 
         .forgot-password a {
-            color: #4CAF50;
+            color: #003262;
             text-decoration: none;
+            transition: color 0.2s;
         }
 
         .forgot-password a:hover {
+            color: #FDB515;
             text-decoration: underline;
+        }
+
+        .help-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            margin-bottom: 20px;
         }
 
         .footer {
@@ -151,7 +161,6 @@
 <header class="main-header">
     <div class="container">
         <h1 class="title">Welcome to Miss Cal</h1>
-
     </div>
 </header>
 
@@ -171,15 +180,19 @@
                 <div class="input-group">
                     <span class="input-group-text bg-light"><i class="bi bi-lock-fill text-secondary"></i></span>
                     <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required />
-                    <div class="forgot-password">
-                        <a href="forgot-password.html">Forgot your password?</a>
                 </div>
+            </div>
 
+            <div class="help-links">
+                <div></div> <!-- Empty div for spacing -->
+                <div class="forgot-password">
+                    <a href="forgot-password.html">Forgot your password?</a>
+                </div>
             </div>
 
             <button type="submit" class="btn btn-custom w-100" id="signInBtn">Sign In</button>
         </form>
-        <p class="signup-prompt">Don’t have an account? <a href="signup.html">Sign Up</a></p>
+        <p class="signup-prompt">Don't have an account? <a href="signup.html">Sign Up</a></p>
     </div>
 </main>
 
