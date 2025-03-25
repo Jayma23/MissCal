@@ -17,6 +17,17 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],  // ✅ Allow necessary headers
 }));
 const cookieParser = require('cookie-parser');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+    host: "smtp.your-email-provider.com", // e.g., smtp.gmail.com
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+        user: "mzyjamesma23248@gmail.com", // your email address
+        pass: "mzy20020212", // your email password or app-specific password
+    },
+});
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(cookieParser());
 app.use((req, res, next) => {
@@ -1192,7 +1203,145 @@ app.get("/getLeaderboard", (req, res) => {
         res.json(leaderboard);
     });
 });
+app.post("/forgot-password", async (req, res) => {
+    try {
+        const { email } = req.body;
 
+        if (!email) {
+            return res.status(400).json({ message: "Email is required." });
+        }
+
+        // Check if the email exists in your database
+        const userQuery = "SELECT user_id, name FROM Users WHERE email = $1";
+        const userResult = await db.query(userQuery, [email]);
+
+        if (userResult.rows.length === 0) {
+            // For security reasons, still return success even if email doesn't exist
+            // This prevents email enumeration attacks
+            return res.status(200).json({
+                message: "If your email is registered, you will receive a password reset link shortly."
+            });
+        }
+
+        const user = userResult.rows[0];
+        const userId = user.user_id;
+        const userName = user.name;
+
+        // Generate a secure random token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+
+        // Token expires in 1 hour
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 1);
+
+        // Delete any existing tokens for this user
+        await db.query("DELETE FROM password_reset_tokens WHERE user_id = $1", [userId]);
+
+        // Store the new token in the database
+        await db.query(
+            "INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)",
+            [userId, resetToken, expiresAt]
+        );
+
+        // Create the reset link
+        const resetLink = `https://www.misscal.net/reset-password.html?token=${resetToken}`;
+
+        // Send the email with the reset link
+        const mailOptions = {
+            from: '"Miss Cal" <noreply@misscal.net>',
+            to: email,
+            subject: "Password Reset for Miss Cal",
+            text: `Hello ${userName},\n\nYou have requested to reset your password for Miss Cal. Please click the link below to reset your password. This link will expire in 1 hour.\n\n${resetLink}\n\nIf you did not request a password reset, please ignore this email.\n\nBest regards,\nMiss Cal Team`,
+            html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #333;">Password Reset Request</h2>
+          <p>Hello ${userName},</p>
+          <p>You have requested to reset your password for Miss Cal. Please click the button below to reset your password. This link will expire in 1 hour.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetLink}" style="background-color: #4CAF50; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+          </div>
+          <p>If the button above doesn't work, you can copy and paste the following link into your browser:</p>
+          <p>${resetLink}</p>
+          <p>If you did not request a password reset, please ignore this email.</p>
+          <p>Best regards,<br>Miss Cal Team</p>
+        </div>
+      `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        return res.status(200).json({
+            message: "If your email is registered, you will receive a password reset link shortly."
+        });
+    } catch (error) {
+        console.error("Forgot password error:", error);
+        return res.status(500).json({ message: "An error occurred. Please try again later." });
+    }
+});
+
+// Endpoint to verify token and reset password
+app.post("/reset-password", async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+
+        if (!token || !newPassword) {
+            return res.status(400).json({ message: "Token and new password are required." });
+        }
+
+        // Verify password complexity
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+        if (!passwordRegex.test(newPassword)) {
+            return res.status(400).json({
+                message: "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number."
+            });
+        }
+
+        // Find the token in the database
+        const tokenQuery = `
+      SELECT t.token_id, t.user_id, t.expires_at, t.used 
+      FROM password_reset_tokens t
+      WHERE t.token = $1
+    `;
+        const tokenResult = await db.query(tokenQuery, [token]);
+
+        if (tokenResult.rows.length === 0) {
+            return res.status(400).json({ message: "Invalid or expired token." });
+        }
+
+        const tokenData = tokenResult.rows[0];
+
+        // Check if token is expired
+        if (new Date() > new Date(tokenData.expires_at)) {
+            return res.status(400).json({ message: "This reset link has expired. Please request a new one." });
+        }
+
+        // Check if token has already been used
+        if (tokenData.used) {
+            return res.status(400).json({ message: "This reset link has already been used." });
+        }
+
+        // Hash the new password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+        // Update the user's password
+        await db.query(
+            "UPDATE Users SET password = $1 WHERE user_id = $2",
+            [hashedPassword, tokenData.user_id]
+        );
+
+        // Mark the token as used
+        await db.query(
+            "UPDATE password_reset_tokens SET used = TRUE WHERE token_id = $1",
+            [tokenData.token_id]
+        );
+
+        return res.status(200).json({ message: "Password has been successfully reset." });
+    } catch (error) {
+        console.error("Reset password error:", error);
+        return res.status(500).json({ message: "An error occurred. Please try again later." });
+    }
+});
 
 
 

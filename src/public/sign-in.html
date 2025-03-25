@@ -111,6 +111,20 @@
         .signup-prompt a:hover {
             text-decoration: underline;
         }
+        .forgot-password {
+            text-align: right;
+            margin-top: 8px;
+            font-size: 0.9em;
+        }
+
+        .forgot-password a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
 
         .footer {
             background: #003262;
@@ -157,8 +171,12 @@
                 <div class="input-group">
                     <span class="input-group-text bg-light"><i class="bi bi-lock-fill text-secondary"></i></span>
                     <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required />
+                    <div class="forgot-password">
+                        <a href="forgot-password.html">Forgot your password?</a>
                 </div>
+
             </div>
+
             <button type="submit" class="btn btn-custom w-100" id="signInBtn">Sign In</button>
         </form>
         <p class="signup-prompt">Don’t have an account? <a href="signup.html">Sign Up</a></p>
