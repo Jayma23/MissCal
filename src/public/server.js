@@ -319,7 +319,7 @@ app.post("/signup", async (req, res) => {
         return res.status(400).json({ message: "All fields are required." });
     }
 
-    // e.g., if you require a certain domain
+    // Verify it's a Berkeley email
     if (!email.endsWith("@berkeley.edu")) {
         return res.status(400).json({ message: "Email must be a UC Berkeley email." });
     }
@@ -336,8 +336,8 @@ app.post("/signup", async (req, res) => {
             return res.status(409).json({ message: "Email already exists." });
         }
 
-        // 2) Generate token & hashed password (in memory)
-        //const verificationToken = generateVerificationToken();
+        // 2) Generate verification token & hash password
+        const verificationToken = crypto.randomBytes(32).toString('hex');
         let hashedPassword;
         try {
             hashedPassword = await bcrypt.hash(password, 10);
@@ -346,68 +346,61 @@ app.post("/signup", async (req, res) => {
             return res.status(500).json({ message: "Internal server error." });
         }
 
-        // 3) Attempt to send the email *before* inserting user into DB
-        //try {
-         //   await sendVerificationEmail(email, verificationToken);
-        ///} catch (mailErr) {
-        //    console.error("Error sending verification email:", mailErr);
-            // If we fail here, we do *not* insert the user
-        //    return res.status(500).json({ message: "Failed to send verification email." });
-       // }
-
-        // 4) If email sent successfully, now insert user with is_verified=0
+        // 3) Create user with is_verified=false and store verification token
         const queryInsert = `
-      INSERT INTO Users (full_name, email, password, is_verified)
-      VALUES ($1, $2, $3, $4)
-      
-    `;
+            INSERT INTO Users (full_name, email, password, is_verified, email_verification_token)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING user_id
+        `;
 
-        //db.query(queryInsert, [full_name, email, hashedPassword, verificationToken, false], (err, insertResults) => {
-        db.query(queryInsert, [full_name, email, hashedPassword, false], (err, insertResults) => {
+        db.query(queryInsert, [full_name, email, hashedPassword, false, verificationToken], async (err, insertResults) => {
             if (err) {
                 console.error("Database insertion error:", err);
                 return res.status(500).json({ message: "Database error." });
             }
 
-            // 5) Respond success; user is in DB with is_verified=0
-            res.status(201).json({
-                message: "Signup successful! Please check your email to verify."
-            });
-        });
-    });
-});
-app.get("/verify-email", (req, res) => {
-    const { token } = req.query;
-    if (!token) {
-        return res.status(400).send("Missing token.");
-    }
+            // 4) Send verification email
+            try {
+                // Create verification link
+                const verificationLink = `https://www.misscal.net/verify-email?token=${verificationToken}`;
 
-    const selectQuery = "SELECT user_id FROM Users WHERE email_verification_token = ?";
-    db.query(selectQuery, [token], (err, results) => {
-        if (err) {
-            console.error("DB error:", err);
-            return res.status(500).send("Database error.");
-        }
-        if (results.length === 0) {
-            return res.status(400).send("Invalid or expired token.");
-        }
+                // Prepare email
+                const mailOptions = {
+                    from: '"Miss Cal" <mikejamesma23248@gmail.com>',
+                    to: email,
+                    subject: "Verify Your Email for Miss Cal",
+                    text: `Hello ${full_name},\n\nThank you for signing up for Miss Cal! Please verify your email by clicking the link below:\n\n${verificationLink}\n\nThis link will expire in 24 hours.\n\nBest regards,\nMiss Cal Team`,
+                    html: `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                            <h2 style="color: #333;">Verify Your Email</h2>
+                            <p>Hello ${full_name},</p>
+                            <p>Thank you for signing up for Miss Cal! Please verify your email by clicking the button below:</p>
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="${verificationLink}" style="background-color: #003262; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify My Email</a>
+                            </div>
+                            <p>If the button above doesn't work, you can copy and paste the following link into your browser:</p>
+                            <p>${verificationLink}</p>
+                            <p>Best regards,<br>Miss Cal Team</p>
+                        </div>
+                    `
+                };
 
-        const userId = results[0].user_id;
-        const updateQuery = `
-      UPDATE Users
-      SET is_verified = false, email_verification_token = NULL
-      WHERE user_id = ?
-    `;
-        db.query(updateQuery, [userId], (err) => {
-            if (err) {
-                console.error("DB error (update):", err);
-                return res.status(500).send("Error verifying user in DB.");
+                await transporter.sendMail(mailOptions);
+
+                res.status(201).json({
+                    message: "Signup successful! Please check your email to verify your account."
+                });
+            } catch (emailErr) {
+                console.error("Error sending verification email:", emailErr);
+
+                // If email fails, delete the user and return error
+                db.query("DELETE FROM Users WHERE user_id = $1", [insertResults.rows[0].user_id]);
+                return res.status(500).json({ message: "Failed to send verification email. Please try again." });
             }
-            // Optionally redirect or show success page
-            res.send("Email verified! You can now log in.");
         });
     });
 });
+
 
 
 app.post("/logout", (req, res) => {
@@ -441,15 +434,20 @@ app.post("/login", (req, res) => {
                 return res.status(401).json({ message: "Incorrect password." });
             }
 
-            // ✅ Explicitly set the HTTP-only, Secure cookie for HTTPS
+            // Check if email is verified
+            if (!user.is_verified) {
+                return res.status(403).json({
+                    message: "Please verify your email before logging in. Check your inbox for a verification link."
+                });
+            }
+
+            // Continue with login (set cookie, etc)
             res.cookie("user_id", user.user_id, {
                 httpOnly: true,
-                secure: true,  // ✅ Required for HTTPS
-                sameSite: "None", // ✅ Must be None for cross-origin requests
+                secure: true,
+                sameSite: "None",
                 path: "/",
             });
-
-            console.log("✅ Cookie Set: user_id =", user.user_id);
 
             res.status(200).json({
                 message: "Login successful!",
@@ -842,46 +840,23 @@ app.get("/searchStudents", (req, res) => {
         }
 
         const students = results.rows.map(student => {
-            // Debug all possible photo fields in the database
-            console.log(`Student ${student.name} photo data:`, {
-                photo: student.photo,
-                photos: student.photos,
-                uploads: student.uploads
+            // Initialize with default photo
+
+
+
+            // Handle JSONB 'photos' field, which is the primary photo field
+
+
+
+            // Ensure URL is properly formatted
+
+            let photoUrl = `https://server1.misscal.net/${student.photos}`;
+
+            // For debug logging
+            console.log(`Photo for ${student.name}:`, {
+                originalPhotos: student.photos,
+                processedPhotoUrl: photoUrl
             });
-
-            // Try to find the photo in various possible fields
-            let photoUrl = "/default-photo.jpg"; // Default fallback
-
-            // Check each possible field where the photo URL might be stored
-            if (student.uploads && Array.isArray(student.uploads) && student.uploads.length > 0) {
-                // If it's stored in an 'uploads' field as an array
-                photoUrl = `/uploads/${student.uploads[0]}`;
-            } else if (student.uploads && typeof student.uploads === 'string') {
-                // If 'uploads' is a string
-                try {
-                    // Try parsing it as JSON
-                    const parsedUploads = JSON.parse(student.uploads);
-                    if (Array.isArray(parsedUploads) && parsedUploads.length > 0) {
-                        photoUrl = `/uploads/${parsedUploads[0]}`;
-                    } else {
-                        photoUrl = `/uploads/${student.uploads}`;
-                    }
-                } catch (e) {
-                    // If it's not JSON, use it directly
-                    photoUrl = `/uploads/${student.uploads}`;
-                }
-            } else if (student.photo_url) {
-                // If there's a direct photo_url field
-                photoUrl = student.photo_url;
-            } else if (student.photo) {
-                // If there's a photo field
-                photoUrl = student.photo;
-            }
-
-            // Ensure the URL is properly formatted
-            if (photoUrl && !photoUrl.startsWith('http') && !photoUrl.startsWith('/')) {
-                photoUrl = '/' + photoUrl;
-            }
 
             return {
                 userId: student.user_id,
@@ -1160,12 +1135,17 @@ app.get("/getTop20Leaderboard", (req, res) => {
 
         const leaderboard = results.rows.map(entry => {
             let photoUrl = "https://via.placeholder.com/80"; // 默认头像
-            try {
+            /*try {
 
                 let photoArray = typeof entry.photos === "string" ? JSON.parse(entry.photos) : entry.photos;
                 photoUrl = Array.isArray(photoArray) && photoArray.length > 0 ? photoArray[0] : photoUrl;
             } catch (error) {
                 console.error("Error parsing photos:", error);
+            }*/
+            if (entry.photos) {
+                photoUrl = `https://server1.misscal.net/${entry.photos}`;
+            } else {
+                photoUrl = "https://via.placeholder.com/80";
             }
 
             return {
@@ -1205,6 +1185,7 @@ app.get("/getLeaderboard", (req, res) => {
             } catch (error) {
                 console.error("Error parsing photos:", error);
             }
+            photoUrl = `https://server1.misscal.net/${entry.photos}`;
 
             return {
                 id: entry.entry_id,
@@ -1643,7 +1624,128 @@ app.post("/create-password", async (req, res) => {
         return res.status(500).json({ message: "An error occurred. Please try again later." });
     }
 });
+app.get("/verify-email", async (req, res) => {
+    const { token } = req.query;
 
+    if (!token) {
+        return res.status(400).send("Missing verification token.");
+    }
+
+    try {
+        // Find user with this token
+        const tokenQuery = "SELECT user_id, email FROM Users WHERE email_verification_token = $1";
+        const tokenResult = await db.query(tokenQuery, [token]);
+
+        if (tokenResult.rows.length === 0) {
+            return res.status(400).send(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Invalid Token - Miss Cal</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 40px;
+                            background: linear-gradient(to bottom right, #FDB515, #FDB515);
+                            color: #333;
+                            text-align: center;
+                        }
+                        .container {
+                            max-width: 600px;
+                            margin: 0 auto;
+                            background: white;
+                            padding: 40px;
+                            border-radius: 10px;
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                        }
+                        h1 {
+                            color: #003262;
+                        }
+                        .btn {
+                            display: inline-block;
+                            background: #003262;
+                            color: white;
+                            padding: 12px 25px;
+                            text-decoration: none;
+                            border-radius: 5px;
+                            font-weight: bold;
+                            margin-top: 20px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1>Invalid or Expired Token</h1>
+                        <p>The verification link is invalid or has expired.</p>
+                        <a href="https://www.misscal.net/signup.html" class="btn">Return to Sign Up</a>
+                    </div>
+                </body>
+                </html>
+            `);
+        }
+
+        const userId = tokenResult.rows[0].user_id;
+
+        // Update user as verified and clear token
+        await db.query(
+            "UPDATE Users SET is_verified = true, email_verification_token = NULL WHERE user_id = $1",
+            [userId]
+        );
+
+        // Return success page
+        res.send(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Email Verified - Miss Cal</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 40px;
+                        background: linear-gradient(to bottom right, #FDB515, #FDB515);
+                        color: #333;
+                        text-align: center;
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background: white;
+                        padding: 40px;
+                        border-radius: 10px;
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                    }
+                    h1 {
+                        color: #003262;
+                    }
+                    .btn {
+                        display: inline-block;
+                        background: #003262;
+                        color: white;
+                        padding: 12px 25px;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        font-weight: bold;
+                        margin-top: 20px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>Email Verified!</h1>
+                    <p>Your email has been successfully verified.</p>
+                    <p>You can now log in to your Miss Cal account.</p>
+                    <a href="https://www.misscal.net/sign-in.html" class="btn">Sign In</a>
+                </div>
+            </body>
+            </html>
+        `);
+    } catch (error) {
+        console.error("Email verification error:", error);
+        res.status(500).send("An error occurred. Please try again later.");
+    }
+});
 
 
 app.listen(PORT, '0.0.0.0', () => {
