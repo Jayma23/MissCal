@@ -634,12 +634,9 @@
 
                     // Photo
                     const img = document.createElement("img");
-                    img.src = student.photo || "/default-photo.jpg";
-                    img.alt = student.name || "Unnamed Student";
-                    img.onerror = function() {
-                        this.src = "/default-photo.jpg";
-                        this.onerror = null; // Prevent infinite loop
-                    };
+                    img.src = student.photo
+                    img.alt = student.name
+                    
 
                     // Name
                     const nameEl = document.createElement("p");
