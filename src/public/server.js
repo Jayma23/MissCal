@@ -842,17 +842,43 @@ app.get("/searchStudents", (req, res) => {
         }
 
         const students = results.rows.map(student => {
-            // Debug the photo value
-            console.log(`Photo for ${student.name}:`, student.photo);
+            // Debug all possible photo fields in the database
+            console.log(`Student ${student.name} photo data:`, {
+                photo: student.photo,
+                photos: student.photos,
+                uploads: student.uploads
+            });
 
-            // Handle the single photo field
+            // Try to find the photo in various possible fields
             let photoUrl = "/default-photo.jpg"; // Default fallback
 
-            if (student.photo) {
+            // Check each possible field where the photo URL might be stored
+            if (student.uploads && Array.isArray(student.uploads) && student.uploads.length > 0) {
+                // If it's stored in an 'uploads' field as an array
+                photoUrl = `/uploads/${student.uploads[0]}`;
+            } else if (student.uploads && typeof student.uploads === 'string') {
+                // If 'uploads' is a string
+                try {
+                    // Try parsing it as JSON
+                    const parsedUploads = JSON.parse(student.uploads);
+                    if (Array.isArray(parsedUploads) && parsedUploads.length > 0) {
+                        photoUrl = `/uploads/${parsedUploads[0]}`;
+                    } else {
+                        photoUrl = `/uploads/${student.uploads}`;
+                    }
+                } catch (e) {
+                    // If it's not JSON, use it directly
+                    photoUrl = `/uploads/${student.uploads}`;
+                }
+            } else if (student.photo_url) {
+                // If there's a direct photo_url field
+                photoUrl = student.photo_url;
+            } else if (student.photo) {
+                // If there's a photo field
                 photoUrl = student.photo;
             }
 
-            // Check if the photo is a relative path or full URL
+            // Ensure the URL is properly formatted
             if (photoUrl && !photoUrl.startsWith('http') && !photoUrl.startsWith('/')) {
                 photoUrl = '/' + photoUrl;
             }
