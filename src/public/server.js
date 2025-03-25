@@ -35,7 +35,8 @@ const PUBLIC_PATHS = [
     "/login",
     "/signup",
     "/forgot-password",
-    "/reset-password"
+    "/reset-password",
+    "/verify-email"
 ];
 
 // Serve static files (should come before auth middleware)
@@ -320,7 +321,7 @@ app.post("/signup", async (req, res) => {
     }
 
     // Verify it's a Berkeley email
-    if (!email.endsWith("@gmail")) {
+    if (!email.endsWith("@gmail.com")) {
         return res.status(400).json({ message: "Email must be a UC Berkeley email." });
     }
 
@@ -362,7 +363,7 @@ app.post("/signup", async (req, res) => {
             // 4) Send verification email
             try {
                 // Create verification link
-                const verificationLink = `https://www.misscal.net/verify-email?token=${verificationToken}`;
+                const verificationLink = `https://server1.misscal.net/verify-email?token=${verificationToken}`;
 
                 // Prepare email
                 const mailOptions = {
