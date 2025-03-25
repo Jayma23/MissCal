@@ -4,123 +4,92 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 const path = require("path");
-
 const multer = require('multer'); // Used for handling file uploads
 const fs = require('fs');
-
-const app = express(); // Initialize 'app'
-const PORT = process.env.PORT || 3000;
-app.use(cors({
-    origin: ["https://misscal.net", "https://www.misscal.net"],  // ✅ Allow your front-end origins
-    credentials: true,  // ✅ Required for cookies and authentication
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],  // ✅ Allow these methods
-    allowedHeaders: ["Content-Type", "Authorization"],  // ✅ Allow necessary headers
-}));
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const transporter = nodemailer.createTransport({
-    host: "smtp.your-email-provider.com", // e.g., smtp.gmail.com
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-        user: "mzyjamesma23248@gmail.com", // your email address
-        pass: "mzy20020212", // your email password or app-specific password
-    },
-});
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+const { Pool } = require("pg");
+require("dotenv").config(); // Load environment variables
+
+// Initialize Express app
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Set up basic middleware in correct order
 app.use(cookieParser());
-app.use((req, res, next) => {
-    if (!req.cookies.user_id && req.path !== "/login" && req.path !== "/signup") {
-        return res.status(401).json({ message: "Unauthorized: Please log in." });
-    }
-    next();
-});
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use("/photos", express.static(path.join(__dirname, "uploads")));
-// Middleware
 app.use(bodyParser.json());
+
+// CORS setup
+app.use(cors({
+    origin: ["https://misscal.net", "https://www.misscal.net"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+// Define public paths that don't need authentication
+const PUBLIC_PATHS = [
+    "/login",
+    "/signup",
+    "/forgot-password",
+    "/reset-password"
+];
+
+// Serve static files (should come before auth middleware)
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/photos", express.static(path.join(__dirname, "uploads")));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Handle OPTIONS requests for CORS
 app.use((req, res, next) => {
     if (req.method === "OPTIONS") {
         return res.sendStatus(200);
     }
-
-    if (!req.cookies.user_id && req.path !== "/login" && req.path !== "/signup") {
-        return res.status(401).json({ message: "Unauthorized: Please log in." });
-    }
     next();
 });
 
-
-
-
-
-
-
-// ❌ Remove this duplicate CORS setup in the error handler (causing conflicts)
-// app.use((err, req, res, next) => {
-//     res.header("Access-Control-Allow-Origin", "https://misscal.net");
-//     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-//     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//     res.header("Access-Control-Allow-Credentials", "true");
-//     next(err);
-// });
-
-// ✅ Handle preflight OPTIONS request properly
-
-
-
-// Now define routes
-app.get('/test', (req, res) => {
-    res.json({ message: 'CORS working!' });
-});
-// Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
-
-const upload = multer({
-    dest: 'uploads/', // Temporary storage folder
-    limits: { files: 10 } // Limit to a maximum of 10 files
-});
-
-
-
-const { Pool } = require("pg");
-require("dotenv").config(); // Load environment variables
-
-// MySQL Database Connection
-/*const db = mysql.createConnection({
-    //host: "127.0.0.1",
-    host: "ep-little-cell-a6siaqa3-pooler.us-west-2.aws.neon.tech",
-    //user: "root",
-    user: "neondb_owner",
-    //password: "Mzy20020212",
-    password: "npg_N3jhmKgHalk6",
-    //database: "accountForStudent",
-    database: "neondb",
-
-    connectionString: process.env.DATABASE_URL, // Use .env variable
-    ssl: {
-        rejectUnauthorized: false, // Required for Neon SSL connections
-    },
-
-});
-
-db.connect((err) => {
-    if (err) {
-        console.error("Database connection error:", err);
-        process.exit(1);
+// SINGLE authentication middleware - REMOVE ALL OTHER auth checks
+app.use((req, res, next) => {
+    // Check if the path should be publicly accessible
+    if (PUBLIC_PATHS.includes(req.path)) {
+        return next();
     }
-    console.log("Connected to MySQL database.");
+
+    // Skip auth for static file paths
+    if (req.path.startsWith('/uploads/') || req.path.startsWith('/photos/')) {
+        return next();
+    }
+
+    // If we get here, authentication is required
+    if (!req.cookies || !req.cookies.user_id) {
+        return res.status(401).json({ message: "Unauthorized: Please log in." });
+    }
+
+    next();
 });
-*/
+
+// Email transporter setup
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: "mikejamesma23248@gmail.com",
+        // For Gmail, you'll need to create an App Password in your Google Account
+        pass: "eepw sstx qlmo sgts" // Replace with your app password
+    }
+});
+
+// Database setup
 const db = new Pool({
-    connectionString: "postgresql://neondb_owner:npg_N3jhmKgHalk6@ep-little-cell-a6siaqa3-pooler.us-west-2.aws.neon.tech/neondb?sslmode=require", // Using the Neon Database URL
+    connectionString: "postgresql://neondb_owner:npg_N3jhmKgHalk6@ep-little-cell-a6siaqa3-pooler.us-west-2.aws.neon.tech/neondb?sslmode=require",
     ssl: {
-        rejectUnauthorized: false, // Required for Neon
+        rejectUnauthorized: false,
     },
 });
 
+// Verify database connection
 db.connect()
     .then(() => console.log("✅ Connected to Neon PostgreSQL database."))
     .catch((err) => {
@@ -128,7 +97,11 @@ db.connect()
         process.exit(1);
     });
 
-module.exports = db;
+// Set up multer for file uploads
+const upload = multer({
+    dest: 'uploads/',
+    limits: { files: 10 }
+});
 app.post("/submitForm", upload.array("photos", 10), (req, res) => {
     res.header("Access-Control-Allow-Origin", "https://www.misscal.net");  // Set only your frontend domain
     res.header("Access-Control-Allow-Credentials", "true");  // Allow credentials (cookies, auth headers)
@@ -868,25 +841,41 @@ app.get("/searchStudents", (req, res) => {
             return res.status(404).json({ message: "No students found." });
         }
 
-        const students = results.rows.map(student => ({
-            userId: student.user_id,
-            name: student.name,
-            major: student.major,
-            gpa: student.gpa,
-            year: student.year,
-            personal_story: student.personal_story,
-            campaign_line: student.campaign_line,
-            experience: student.experience,
-            organizations: student.organizations,
-            instagram: student.instagram,
-            linkedin: student.linkedin,
-            facebook: student.facebook,
-            github: student.github,
-            tiktok: student.tiktok,
-            photo: (student.photos && Array.isArray(student.photos) && student.photos.length > 0)
-                ? student.photos[0]  // Use the first image
-                : "default-photo.jpg" // Use a placeholder if no photo exists
-        }));
+        const students = results.rows.map(student => {
+            // Debug the photo value
+            console.log(`Photo for ${student.name}:`, student.photo);
+
+            // Handle the single photo field
+            let photoUrl = "/default-photo.jpg"; // Default fallback
+
+            if (student.photo) {
+                photoUrl = student.photo;
+            }
+
+            // Check if the photo is a relative path or full URL
+            if (photoUrl && !photoUrl.startsWith('http') && !photoUrl.startsWith('/')) {
+                photoUrl = '/' + photoUrl;
+            }
+
+            return {
+                userId: student.user_id,
+                name: student.name,
+                major: student.major,
+                gpa: student.gpa,
+                year: student.year,
+                personal_story: student.personal_story,
+                campaign_line: student.campaign_line,
+                experience: student.experience,
+                organizations: student.organizations,
+                instagram: student.instagram,
+                linkedin: student.linkedin,
+                facebook: student.facebook,
+                github: student.github,
+                tiktok: student.tiktok,
+                snapchat: student.snapchat,
+                photo: photoUrl
+            };
+        });
 
         res.json(students);
     });
@@ -1212,7 +1201,7 @@ app.post("/forgot-password", async (req, res) => {
         }
 
         // Check if the email exists in your database
-        const userQuery = "SELECT user_id, name FROM Users WHERE email = $1";
+        const userQuery = "SELECT user_id, full_name FROM Users WHERE email = $1";
         const userResult = await db.query(userQuery, [email]);
 
         if (userResult.rows.length === 0) {
@@ -1298,10 +1287,10 @@ app.post("/reset-password", async (req, res) => {
 
         // Find the token in the database
         const tokenQuery = `
-      SELECT t.token_id, t.user_id, t.expires_at, t.used 
-      FROM password_reset_tokens t
-      WHERE t.token = $1
-    `;
+            SELECT t.token_id, t.user_id, t.expires_at, t.used
+            FROM password_reset_tokens t
+            WHERE t.token = $1
+        `;
         const tokenResult = await db.query(tokenQuery, [token]);
 
         if (tokenResult.rows.length === 0) {
@@ -1342,8 +1331,292 @@ app.post("/reset-password", async (req, res) => {
         return res.status(500).json({ message: "An error occurred. Please try again later." });
     }
 });
+app.post("/vote-by-email", async (req, res) => {
+    try {
+        const { email, candidateId } = req.body;
 
+        if (!email || !candidateId) {
+            return res.status(400).json({ message: "Email and candidate selection are required." });
+        }
 
+        // Verify it's a Berkeley email
+        if (!email.endsWith("@berkeley.edu")) {
+            return res.status(400).json({ message: "Please use your UC Berkeley email address." });
+        }
+
+        // Check if this email has already voted
+        const existingVoterQuery = "SELECT * FROM Users WHERE email = $1";
+        const existingVoterResult = await db.query(existingVoterQuery, [email]);
+
+        if (existingVoterResult.rows.length > 0) {
+            const userId = existingVoterResult.rows[0].user_id;
+
+            // Check if they already voted
+            const voterEntryQuery = "SELECT phase1_vote_done FROM ContestEntries WHERE user_id = $1";
+            const voterEntryResult = await db.query(voterEntryQuery, [userId]);
+
+            if (voterEntryResult.rows.length > 0 && voterEntryResult.rows[0].phase1_vote_done) {
+                return res.status(400).json({ message: "You have already voted." });
+            }
+        }
+
+        // Generate a voting token
+        const voteToken = crypto.randomBytes(32).toString('hex');
+
+        // Store vote intent (either create a user or just store the token)
+        let userId;
+        if (existingVoterResult.rows.length > 0) {
+            // User exists, just use their ID
+            userId = existingVoterResult.rows[0].user_id;
+        } else {
+            // Create a new user with a temporary status
+            const tempPassword = crypto.randomBytes(16).toString('hex');
+            const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+            const insertUserQuery = `
+        INSERT INTO Users (email, is_verified, password, full_name)
+        VALUES ($1, false, $2, $3)
+        RETURNING user_id
+      `;
+            // Use the part before @ as the temporary name
+            const tempName = email.split('@')[0];
+            const newUserResult = await db.query(insertUserQuery, [email, hashedPassword, tempName]);
+            userId = newUserResult.rows[0].user_id;
+
+            // Create empty contest entry to track their vote
+            const createEntryQuery = `
+        INSERT INTO ContestEntries (user_id, name, form_submitted)
+        VALUES ($1, $2, false)
+      `;
+            await db.query(createEntryQuery, [userId, tempName]);
+        }
+
+        // Create voting token table if it doesn't exist
+        await db.query(`
+      CREATE TABLE IF NOT EXISTS vote_tokens (
+        token_id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES Users(user_id),
+        token VARCHAR(100) NOT NULL,
+        candidate_id INTEGER NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP NOT NULL,
+        used BOOLEAN DEFAULT FALSE
+      )
+    `);
+
+        // Store the voting token
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24); // 24-hour expiration
+
+        const storeTokenQuery = `
+      INSERT INTO vote_tokens (user_id, token, candidate_id, expires_at)
+      VALUES ($1, $2, $3, $4)
+    `;
+        await db.query(storeTokenQuery, [userId, voteToken, candidateId, expiresAt]);
+
+        // Send verification email
+        const voteLink = `https://www.misscal.net/verify-vote?token=${voteToken}`;
+
+        const mailOptions = {
+            from: '"Miss Cal" <mikejamesma23248@gmail.com>',
+            to: email,
+            subject: "Verify Your Vote for Miss Cal",
+            text: `Thank you for voting in the Miss Cal pageant! Please click the link below to verify your vote:\n\n${voteLink}\n\nThis link will expire in 24 hours.\n\nIf you did not attempt to vote, please ignore this email.\n\nBest regards,\nMiss Cal Team`,
+            html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #333;">Verify Your Vote</h2>
+          <p>Thank you for voting in the Miss Cal pageant!</p>
+          <p>Please click the button below to verify your vote. This link will expire in 24 hours.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${voteLink}" style="background-color: #003262; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify My Vote</a>
+          </div>
+          <p>If the button above doesn't work, you can copy and paste the following link into your browser:</p>
+          <p>${voteLink}</p>
+          <p>If you did not attempt to vote, please ignore this email.</p>
+          <p>Best regards,<br>Miss Cal Team</p>
+        </div>
+      `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        return res.status(200).json({
+            message: "Please check your email to verify your vote."
+        });
+
+    } catch (error) {
+        console.error("Vote by email error:", error);
+        return res.status(500).json({ message: "An error occurred. Please try again later." });
+    }
+});
+
+// 2. Create endpoint to verify and process votes
+app.get("/verify-vote", async (req, res) => {
+    try {
+        const { token } = req.query;
+
+        if (!token) {
+            return res.status(400).json({ message: "Invalid verification link." });
+        }
+
+        // Find the token in the database
+        const tokenQuery = `
+      SELECT vt.*, u.email 
+      FROM vote_tokens vt
+      JOIN Users u ON vt.user_id = u.user_id
+      WHERE vt.token = $1 AND vt.used = false AND vt.expires_at > NOW()
+    `;
+        const tokenResult = await db.query(tokenQuery, [token]);
+
+        if (tokenResult.rows.length === 0) {
+            return res.status(400).json({ message: "Invalid or expired verification link." });
+        }
+
+        const voteData = tokenResult.rows[0];
+
+        // Process the vote
+        // 1. Increment candidate's vote count
+        const updateCandidateQuery = `
+      UPDATE ContestEntries
+      SET votes = COALESCE(votes, 0) + 1
+      WHERE user_id = $1
+    `;
+        await db.query(updateCandidateQuery, [voteData.candidate_id]);
+
+        // 2. Mark this user as having voted
+        const updateVoterQuery = `
+      UPDATE ContestEntries
+      SET phase1_vote_done = true
+      WHERE user_id = $1
+    `;
+        await db.query(updateVoterQuery, [voteData.user_id]);
+
+        // 3. Mark the token as used
+        const updateTokenQuery = `
+      UPDATE vote_tokens
+      SET used = true
+      WHERE token = $1
+    `;
+        await db.query(updateTokenQuery, [token]);
+
+        // 4. Set the user as verified
+        const verifyUserQuery = `
+      UPDATE Users
+      SET is_verified = true
+      WHERE user_id = $1
+    `;
+        await db.query(verifyUserQuery, [voteData.user_id]);
+
+        // Return a success page
+        res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Vote Confirmed - Miss Cal</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(to bottom right, #FDB515, #FDB515);
+            color: #333;
+            text-align: center;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+          }
+          h1 {
+            color: #003262;
+          }
+          .btn {
+            display: inline-block;
+            background: #003262;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 20px;
+          }
+          .create-account {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Vote Confirmed!</h1>
+          <p>Thank you for participating in the Miss Cal pageant voting.</p>
+          <p>Your vote has been successfully counted.</p>
+          
+          <div class="create-account">
+            <h2>Want to join the pageant?</h2>
+            <p>You already have an account created with your email. You can now set a password and participate in the Miss Cal pageant!</p>
+            <a href="https://www.misscal.net/create-password?email=${encodeURIComponent(voteData.email)}" class="btn">Create Password</a>
+          </div>
+        </div>
+      </body>
+      </html>
+    `);
+
+    } catch (error) {
+        console.error("Vote verification error:", error);
+        res.status(500).send("An error occurred. Please try again later.");
+    }
+});
+
+// 3. Add endpoint for users to set a password and "upgrade" to a full account
+app.post("/create-password", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email and password are required." });
+        }
+
+        // Verify password complexity
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            return res.status(400).json({
+                message: "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number."
+            });
+        }
+
+        // Find the user
+        const userQuery = "SELECT * FROM Users WHERE email = $1";
+        const userResult = await db.query(userQuery, [email]);
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Update the user's account
+        const updateUserQuery = `
+      UPDATE Users
+      SET password = $1
+      WHERE email = $2
+    `;
+        await db.query(updateUserQuery, [hashedPassword, email]);
+
+        return res.status(200).json({
+            message: "Password created successfully! You can now log in with your email and password."
+        });
+
+    } catch (error) {
+        console.error("Create password error:", error);
+        return res.status(500).json({ message: "An error occurred. Please try again later." });
+    }
+});
 
 
 
