@@ -490,82 +490,6 @@
 </div>
 
 <script>
-    /**
-     * Toggles the sidebar between hidden and shown
-     */
-    function toggleSidebar() {
-        const sidebar = document.getElementById("sidebar");
-        // if it's hidden, remove 'hidden' class and add 'show', otherwise do the opposite
-        sidebar.classList.toggle("hidden");
-        sidebar.classList.toggle("show");
-    }
-
-    /**
-     * Helper function to parse a specific cookie value.
-     * For example, if document.cookie = "user_id=123; session=abc"
-     * Then getCookieValue("user_id") -> "123"
-     */
-    function getCookieValue(name) {
-        const cookies = document.cookie.split(";");
-        for (let c of cookies) {
-            c = c.trim();
-            if (c.startsWith(name + "=")) {
-                return c.substring(name.length + 1, c.length);
-            }
-        }
-        return null;
-    }
-
-    // Dark mode toggle
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        const themeIcon = document.getElementById('theme-icon');
-        if (document.body.classList.contains('dark-mode')) {
-            themeIcon.classList.replace('fa-moon', 'fa-sun');
-            localStorage.setItem('darkMode', 'enabled');
-        } else {
-            themeIcon.classList.replace('fa-sun', 'fa-moon');
-            localStorage.setItem('darkMode', 'disabled');
-        }
-    }
-
-    // Check for saved dark mode preference
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        document.body.classList.add('dark-mode');
-        document.getElementById('theme-icon').classList.replace('fa-moon', 'fa-sun');
-    }
-
-    // Scroll to top function
-    function scrollToTop() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    }
-
-    // Show toast notification
-    function showToast(message, type = 'info') {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.className = 'toast show';
-
-        // Set color based on type
-        if (type === 'success') {
-            toast.style.background = '#28a745';
-        } else if (type === 'error') {
-            toast.style.background = '#dc3545';
-        } else {
-            toast.style.background = '#003262';
-        }
-
-        setTimeout(() => {
-            toast.className = 'toast';
-        }, 3000);
-    }
-
-    // Attempt to read the user ID from a cookie named "user_id"
-    const loggedInUserId = getCookieValue("user_id");
-
     async function searchStudents() {
         const query = document.getElementById("searchInput").value.trim();
         if (!query) {
@@ -578,9 +502,10 @@
         loader.style.display = 'block';
 
         try {
+            // Change this to remove credentials for the search endpoint
+            // This allows non-logged-in users to search
             const response = await fetch(
-                `https://server1.misscal.net/searchStudents?query=${encodeURIComponent(query)}`,
-                { credentials: "include" }
+                `https://server1.misscal.net/searchStudents?query=${encodeURIComponent(query)}`
             );
 
             // Hide loader
@@ -600,11 +525,12 @@
                 showToast(`Found ${students.length} students matching your search.`, "success");
 
                 students.forEach((student, index) => {
+                    // Create card elements as before
                     const card = document.createElement("div");
                     card.className = "student-card";
                     card.style.animationDelay = `${index * 0.1}s`;
 
-                    // Add favorite button in top right corner
+                    // Create favorite button as before
                     const favoriteBtn = document.createElement('div');
                     favoriteBtn.style.position = 'absolute';
                     favoriteBtn.style.top = '10px';
@@ -615,10 +541,15 @@
                     favoriteBtn.style.transition = 'all 0.3s ease';
                     favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
 
+                    // Only allow favorites for logged-in users
                     favoriteBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        const isFavorite = favoriteBtn.querySelector('i').classList.contains('fas');
+                        if (!loggedInUserId) {
+                            showToast("Please log in to add favorites", "error");
+                            return;
+                        }
 
+                        const isFavorite = favoriteBtn.querySelector('i').classList.contains('fas');
                         if (isFavorite) {
                             favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
                             favoriteBtn.style.color = '#003262';
@@ -634,84 +565,71 @@
                         }
                     });
 
-                    // Photo
+                    // Create other elements as before
+                    // Photo, name, major, etc.
                     const img = document.createElement("img");
                     img.src = student.photo
                     img.alt = student.name
                     img.onerror = function() {
                         this.src = "/default-photo.jpg";
-                        this.onerror = null; // Prevent infinite loop
+                        this.onerror = null;
                     };
 
-                    // Name
                     const nameEl = document.createElement("p");
                     nameEl.innerHTML = `<strong>Name:</strong> ${student.name || "N/A"}`;
 
-                    // Major
                     const majorEl = document.createElement("p");
                     majorEl.innerHTML = `<strong>Major:</strong> ${student.major || "N/A"}`;
 
-                    // Create container for extra fields
                     const extraFields = document.createElement("div");
                     extraFields.className = "extra-fields";
 
-                    // GPA
                     const gpaEl = document.createElement("p");
                     gpaEl.innerHTML = `<strong>GPA:</strong> ${student.gpa || "N/A"}`;
 
                     const yearEl = document.createElement("p");
                     yearEl.innerHTML = `<strong>Year:</strong> ${student.year || "N/A"}`;
 
-                    // Personal Story
+                    // Other fields as before
                     const personalStoryEl = document.createElement("p");
                     personalStoryEl.innerHTML = `<strong>Personal Story:</strong> ${student.personal_story || "N/A"}`;
 
-                    // Campaign Line
                     const campaignLineEl = document.createElement("p");
                     campaignLineEl.innerHTML = `<strong>Campaign Line:</strong> ${student.campaign_line || "N/A"}`;
 
-                    // Experience
                     const experienceEl = document.createElement("p");
                     experienceEl.innerHTML = `<strong>Experience:</strong> ${student.experience || "N/A"}`;
 
-                    // Organizations
                     const organizationsEl = document.createElement("p");
                     organizationsEl.innerHTML = `<strong>Organizations:</strong> ${student.organizations || "N/A"}`;
 
-                    // Social Media
                     const socialLinks = document.createElement("div");
                     socialLinks.className = "social-links";
 
-                    // Create social media icons
                     const socialIconsHTML = `
-                        <p><strong>Social Media:</strong></p>
-                        <div class="social-icons">
-                            ${student.instagram ? `<a href="${student.instagram}" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>` : ''}
-                            ${student.linkedin ? `<a href="${student.linkedin}" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>` : ''}
-                            ${student.facebook ? `<a href="${student.facebook}" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>` : ''}
-                            ${student.github ? `<a href="${student.github}" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>` : ''}
-                            ${student.snapchat ? `<a href="${student.snapchat}" target="_blank" class="social-icon"><i class="fab fa-snapchat"></i></a>` : ''}
-                            ${student.tiktok ? `<a href="${student.tiktok}" target="_blank" class="social-icon"><i class="fab fa-tiktok"></i></a>` : ''}
-                        </div>
-                    `;
+                    <p><strong>Social Media:</strong></p>
+                    <div class="social-icons">
+                        ${student.instagram ? `<a href="${student.instagram}" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>` : ''}
+                        ${student.linkedin ? `<a href="${student.linkedin}" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>` : ''}
+                        ${student.facebook ? `<a href="${student.facebook}" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>` : ''}
+                        ${student.github ? `<a href="${student.github}" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>` : ''}
+                        ${student.snapchat ? `<a href="${student.snapchat}" target="_blank" class="social-icon"><i class="fab fa-snapchat"></i></a>` : ''}
+                        ${student.tiktok ? `<a href="${student.tiktok}" target="_blank" class="social-icon"><i class="fab fa-tiktok"></i></a>` : ''}
+                    </div>
+                `;
                     socialLinks.innerHTML = socialIconsHTML;
 
-                    // Append extra fields
                     extraFields.appendChild(gpaEl);
                     extraFields.appendChild(campaignLineEl);
                     extraFields.appendChild(personalStoryEl);
                     extraFields.appendChild(experienceEl);
                     extraFields.appendChild(organizationsEl);
                     extraFields.appendChild(socialLinks);
-
-                    // Hide extra fields by default
                     extraFields.style.display = "none";
 
-                    // Buttons section (Show More / Show Less + Vote)
                     const buttonGroup = document.createElement("div");
                     buttonGroup.className = "button-group";
 
-                    // Toggle button for "Show More" / "Show Less"
                     const toggleButton = document.createElement("button");
                     toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
                     toggleButton.onclick = () => {
@@ -724,56 +642,61 @@
                         }
                     };
 
-                    // Vote button
-                    const voteButton = document.createElement("button");
-                    voteButton.className = "vote-button";
-                    voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
-                    voteButton.onclick = async () => {
-                        // Add pulse animation when clicked
-                        voteButton.style.animation = 'pulse 0.5s';
-                        setTimeout(() => {
-                            voteButton.style.animation = '';
-                        }, 500);
-
-                        // ---- FRONT-END SELF-VOTE CHECK ----
-                        if (String(student.userId) === String(loggedInUserId)) {
-                            showToast("You cannot vote for yourself!", "error");
-                            return;
-                        }
-
-                        // Show loading state
-                        voteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Voting...';
-
-                        // Otherwise, proceed with the vote
-                        try {
-                            const response = await fetch("https://server1.misscal.net/vote", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                credentials: "include",
-                                body: JSON.stringify({ candidateId: student.userId })
-                            });
-
-                            const data = await response.json();
-
-                            // Restore button state
-                            voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
-
-                            if (!response.ok) {
-                                showToast(`Vote failed: ${data.message}`, "error");
-                            } else {
-                                showToast(data.message || "Vote successful!", "success");
-                            }
-                        } catch (error) {
-                            console.error(error);
-                            voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
-                            showToast("An error occurred while casting your vote.", "error");
-                        }
-                    };
-
                     buttonGroup.appendChild(toggleButton);
-                    buttonGroup.appendChild(voteButton);
+
+                    // Only show vote button for logged-in users
+                    if (loggedInUserId) {
+                        const voteButton = document.createElement("button");
+                        voteButton.className = "vote-button";
+                        voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
+                        voteButton.onclick = async () => {
+                            voteButton.style.animation = 'pulse 0.5s';
+                            setTimeout(() => {
+                                voteButton.style.animation = '';
+                            }, 500);
+
+                            if (String(student.userId) === String(loggedInUserId)) {
+                                showToast("You cannot vote for yourself!", "error");
+                                return;
+                            }
+
+                            voteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Voting...';
+
+                            try {
+                                const response = await fetch("https://server1.misscal.net/vote", {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    credentials: "include",
+                                    body: JSON.stringify({ candidateId: student.userId })
+                                });
+
+                                const data = await response.json();
+                                voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
+
+                                if (!response.ok) {
+                                    showToast(`Vote failed: ${data.message}`, "error");
+                                } else {
+                                    showToast(data.message || "Vote successful!", "success");
+                                }
+                            } catch (error) {
+                                console.error(error);
+                                voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
+                                showToast("An error occurred while casting your vote.", "error");
+                            }
+                        };
+                        buttonGroup.appendChild(voteButton);
+                    } else {
+                        // Show login prompt for non-logged-in users
+                        const loginPrompt = document.createElement("button");
+                        loginPrompt.className = "login-prompt";
+                        loginPrompt.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Vote';
+                        loginPrompt.onclick = () => {
+                            window.location.href = "/sign-in.html";
+                        };
+                        buttonGroup.appendChild(loginPrompt);
+                    }
 
                     // Assemble the student card
                     card.appendChild(favoriteBtn);
@@ -797,21 +720,6 @@
             showToast("An error occurred while fetching students.", "error");
         }
     }
-
-    // Handle Enter key press in search input
-    document.getElementById("searchInput").addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            searchStudents();
-        }
-    });
-
-    // Show welcome message on page load
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
-            showToast("Welcome to the Student Voting System! Enter a name or major to search.", "info");
-        }, 1000);
-    });
 </script>
 </body>
 </html>

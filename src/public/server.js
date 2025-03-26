@@ -36,7 +36,8 @@ const PUBLIC_PATHS = [
     "/signup",
     "/forgot-password",
     "/reset-password",
-    "/verify-email"
+    "/verify-email",
+    "/searchStudents"
 ];
 
 // Serve static files (should come before auth middleware)
@@ -1024,23 +1025,22 @@ app.post("/vote", (req, res) => {
         return res.status(400).json({ message: "You cannot vote for yourself." });
     }
 
-    // 4. Check if the *voter* has already voted
+    // 4. Check if the *voter* has already voted - CHECK IN USERS TABLE INSTEAD
     const checkVoterQuery = `
         SELECT phase1_vote_done
-        FROM ContestEntries
+        FROM Users
         WHERE user_id = $1
     `;
+
     db.query(checkVoterQuery, [userId], (err, voterResults) => {
         if (err) {
             console.error("Database error (checkVoterQuery):", err);
             return res.status(500).json({ message: "Database error." });
         }
 
-        if (voterResults.rows.length > 0) {
-            const hasVoted = voterResults.rows[0].phase1_vote_done;
-            if (hasVoted === true) {
-                return res.status(400).json({ message: "You have already voted in phase 1." });
-            }
+        // If the user exists and has already voted
+        if (voterResults.rows.length > 0 && voterResults.rows[0].phase1_vote_done === true) {
+            return res.status(400).json({ message: "You have already voted in phase 1." });
         }
 
         // 5. Check if the candidate exists in the ContestEntries table
@@ -1073,23 +1073,19 @@ app.post("/vote", (req, res) => {
                     return res.status(500).json({ message: "Database error incrementing votes." });
                 }
 
-                // 7. Mark the voter as having voted
-                if (voterResults.rows.length > 0) {
-                    const updateVoterQuery = `
-                        UPDATE ContestEntries
-                        SET phase1_vote_done = true
-                        WHERE user_id = $1
-                    `;
-                    db.query(updateVoterQuery, [userId], (err, updateVoterRes) => {
-                        if (err) {
-                            console.error("Database error (updateVoterQuery):", err);
-                            return res.status(500).json({ message: "Database error marking user as voted." });
-                        }
-                        return res.status(200).json({ message: "Vote cast successfully!" });
-                    });
-                } else {
+                // 7. Mark the voter as having voted IN THE USERS TABLE
+                const updateVoterQuery = `
+                    UPDATE Users
+                    SET phase1_vote_done = true
+                    WHERE user_id = $1
+                `;
+                db.query(updateVoterQuery, [userId], (err, updateVoterRes) => {
+                    if (err) {
+                        console.error("Database error (updateVoterQuery):", err);
+                        return res.status(500).json({ message: "Database error marking user as voted." });
+                    }
                     return res.status(200).json({ message: "Vote cast successfully!" });
-                }
+                });
             });
         });
     });
