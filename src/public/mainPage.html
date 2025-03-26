@@ -15,8 +15,26 @@
         <h1 class="title">Welcome to Miss Cal</h1>
         <p class="subtitle">Celebrate Confidence, Talent, and Community</p>
         <!-- Added countdown timer -->
-        <div class="countdown-timer">
-            <p>Voting closes in: <span id="countdown">00:00:00</span></p>
+        <div class="countdown-container">
+            <p>Registration closes in:</p>
+            <div id="countdown" class="countdown">
+                <div class="countdown-item">
+                    <span id="days">00</span>
+                    <span>Days</span>
+                </div>
+                <div class="countdown-item">
+                    <span id="hours">00</span>
+                    <span>Hours</span>
+                </div>
+                <div class="countdown-item">
+                    <span id="minutes">00</span>
+                    <span>Minutes</span>
+                </div>
+                <div class="countdown-item">
+                    <span id="seconds">00</span>
+                    <span>Seconds</span>
+                </div>
+            </div>
         </div>
     </div>
 </header>
@@ -197,6 +215,34 @@
         font-size: 1.2rem;
         position: relative;
         z-index: 1;
+    }
+    .countdown-container {
+        margin-top: 40px;
+    }
+
+    .countdown-container p {
+        margin-bottom: 15px;
+    }
+
+    .countdown {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .countdown-item {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 15px;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .countdown-item span:first-child {
+        font-size: 2rem;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
     }
 
     .countdown-timer {
@@ -853,9 +899,40 @@
     // Sidebar toggle functionality
     const sidebar = document.getElementById("sidebar");
     const sidebarToggle = document.getElementById("sidebarToggle");
+    // Countdown timer functionality
+    function updateCountdown() {
+        // Set the target date (example: March 15, 2025)
+        const targetDate = new Date('2025-04-30T23:59:59').getTime();
+        const now = new Date().getTime();
+        const timeLeft = targetDate - now;
+
+        if (timeLeft <= 0) {
+            document.getElementById('days').innerText = '00';
+            document.getElementById('hours').innerText = '00';
+            document.getElementById('minutes').innerText = '00';
+            document.getElementById('seconds').innerText = '00';
+            return;
+        }
+
+        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+        document.getElementById('days').innerText = days.toString().padStart(2, '0');
+        document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
+        document.getElementById('minutes').innerText = minutes.toString().padStart(2, '0');
+        document.getElementById('seconds').innerText = seconds.toString().padStart(2, '0');
+    }
 
     sidebarToggle.addEventListener("click", () => {
         sidebar.classList.toggle("show");
+
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+        // Start countdown timer and update every second
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
     });
     function logout() {
         // 1) Call your server's "/logout" endpoint (or whichever route you set up)
