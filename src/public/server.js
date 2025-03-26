@@ -320,88 +320,88 @@ app.post("/signup", async (req, res) => {
         return res.status(400).json({ message: "All fields are required." });
     }
 
-    // Verify it's a Berkeley email
+    // Verify it's the right email format
     if (!email.endsWith("@gmail.com")) {
         return res.status(400).json({ message: "Email must be a UC Berkeley email." });
     }
 
-    // 1) Check if email exists
-    const queryCheckEmail = "SELECT email FROM Users WHERE email = $1";
-    db.query(queryCheckEmail, [email], async (err, results) => {
-        if (err) {
-            console.error("Database query error:", err);
-            return res.status(500).json({ message: "Database error." });
+    try {
+        // Check if email exists in the main Users table (already verified)
+        const userResults = await db.query("SELECT email FROM Users WHERE email = $1", [email]);
+
+        if (userResults.rows.length > 0) {
+            return res.status(409).json({ message: "Email already exists. Please log in." });
         }
 
-        if (results.rows.length > 0) {
-            return res.status(409).json({ message: "Email already exists." });
-        }
-
-        // 2) Generate verification token & hash password
+        // Generate token and hash password
         const verificationToken = crypto.randomBytes(32).toString('hex');
-        let hashedPassword;
-        try {
-            hashedPassword = await bcrypt.hash(password, 10);
-        } catch (hashErr) {
-            console.error("Error hashing password:", hashErr);
-            return res.status(500).json({ message: "Internal server error." });
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Set expiration (24 hours from now)
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24);
+
+        // Check if email exists in PendingVerifications
+        const pendingResults = await db.query(
+            "SELECT id FROM PendingVerifications WHERE email = $1",
+            [email]
+        );
+
+        if (pendingResults.rows.length > 0) {
+            // Email exists in pending verifications, update the existing record
+            await db.query(
+                `UPDATE PendingVerifications 
+                 SET full_name = $1, password = $2, verification_token = $3, 
+                     expires_at = $4, created_at = CURRENT_TIMESTAMP
+                 WHERE email = $5`,
+                [full_name, hashedPassword, verificationToken, expiresAt, email]
+            );
+        } else {
+            // New pending verification
+            await db.query(
+                `INSERT INTO PendingVerifications 
+                 (full_name, email, password, verification_token, expires_at)
+                 VALUES ($1, $2, $3, $4, $5)`,
+                [full_name, email, hashedPassword, verificationToken, expiresAt]
+            );
         }
 
-        // 3) Create user with is_verified=false and store verification token
-        const queryInsert = `
-            INSERT INTO Users (full_name, email, password, is_verified, email_verification_token)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING user_id
-        `;
+        // Send verification email
+        const verificationLink = `https://server1.misscal.net/verify-email?token=${verificationToken}`;
 
-        db.query(queryInsert, [full_name, email, hashedPassword, false, verificationToken], async (err, insertResults) => {
-            if (err) {
-                console.error("Database insertion error:", err);
-                return res.status(500).json({ message: "Database error." });
-            }
+        const mailOptions = {
+            from: '"Miss Cal" <mikejamesma23248@gmail.com>',
+            to: email,
+            subject: "Verify Your Email for Miss Cal",
+            text: `Hello ${full_name},\n\nThank you for signing up for Miss Cal! Please verify your email by clicking the link below:\n\n${verificationLink}\n\nThis link will expire in 24 hours.\n\nBest regards,\nMiss Cal Team`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #333;">Verify Your Email</h2>
+                    <p>Hello ${full_name},</p>
+                    <p>Thank you for signing up for Miss Cal! Please verify your email by clicking the button below:</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${verificationLink}" style="background-color: #003262; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify My Email</a>
+                    </div>
+                    <p>If the button above doesn't work, you can copy and paste the following link into your browser:</p>
+                    <p>${verificationLink}</p>
+                    <p>Best regards,<br>Miss Cal Team</p>
+                </div>
+            `
+        };
 
-            // 4) Send verification email
-            try {
-                // Create verification link
-                const verificationLink = `https://server1.misscal.net/verify-email?token=${verificationToken}`;
+        await transporter.sendMail(mailOptions);
 
-                // Prepare email
-                const mailOptions = {
-                    from: '"Miss Cal" <mikejamesma23248@gmail.com>',
-                    to: email,
-                    subject: "Verify Your Email for Miss Cal",
-                    text: `Hello ${full_name},\n\nThank you for signing up for Miss Cal! Please verify your email by clicking the link below:\n\n${verificationLink}\n\nThis link will expire in 24 hours.\n\nBest regards,\nMiss Cal Team`,
-                    html: `
-                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                            <h2 style="color: #333;">Verify Your Email</h2>
-                            <p>Hello ${full_name},</p>
-                            <p>Thank you for signing up for Miss Cal! Please verify your email by clicking the button below:</p>
-                            <div style="text-align: center; margin: 30px 0;">
-                                <a href="${verificationLink}" style="background-color: #003262; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify My Email</a>
-                            </div>
-                            <p>If the button above doesn't work, you can copy and paste the following link into your browser:</p>
-                            <p>${verificationLink}</p>
-                            <p>Best regards,<br>Miss Cal Team</p>
-                        </div>
-                    `
-                };
-
-                await transporter.sendMail(mailOptions);
-
-                res.status(201).json({
-                    message: "Signup successful! Please check your email to verify your account."
-                });
-            } catch (emailErr) {
-                console.error("Error sending verification email:", emailErr);
-
-                // If email fails, delete the user and return error
-                db.query("DELETE FROM Users WHERE user_id = $1", [insertResults.rows[0].user_id]);
-                return res.status(500).json({ message: "Failed to send verification email. Please try again." });
-            }
+        res.status(201).json({
+            message: "Signup successful! Please check your email to verify your account."
         });
-    });
-});
 
+    } catch (error) {
+        console.error("Error in signup process:", error);
+        return res.status(500).json({
+            message: "An error occurred during signup. Please try again."
+        });
+    }
+});
 
 
 app.post("/logout", (req, res) => {
@@ -1633,11 +1633,11 @@ app.get("/verify-email", async (req, res) => {
     }
 
     try {
-        // Find user with this token
-        const tokenQuery = "SELECT user_id, email FROM Users WHERE email_verification_token = $1";
-        const tokenResult = await db.query(tokenQuery, [token]);
+        // Find the pending verification with this token
+        const pendingQuery = "SELECT * FROM PendingVerifications WHERE verification_token = $1 AND expires_at > CURRENT_TIMESTAMP";
+        const pendingResult = await db.query(pendingQuery, [token]);
 
-        if (tokenResult.rows.length === 0) {
+        if (pendingResult.rows.length === 0) {
             return res.status(400).send(`
                 <!DOCTYPE html>
                 <html>
@@ -1686,13 +1686,72 @@ app.get("/verify-email", async (req, res) => {
             `);
         }
 
-        const userId = tokenResult.rows[0].user_id;
+        const pendingUser = pendingResult.rows[0];
 
-        // Update user as verified and clear token
+        // Check if email already exists in Users table (someone else verified with this email)
+        const existingUser = await db.query("SELECT user_id FROM Users WHERE email = $1", [pendingUser.email]);
+
+        if (existingUser.rows.length > 0) {
+            // Delete the pending verification
+            await db.query("DELETE FROM PendingVerifications WHERE id = $1", [pendingUser.id]);
+
+            return res.status(400).send(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Email Already Verified - Miss Cal</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 40px;
+                            background: linear-gradient(to bottom right, #FDB515, #FDB515);
+                            color: #333;
+                            text-align: center;
+                        }
+                        .container {
+                            max-width: 600px;
+                            margin: 0 auto;
+                            background: white;
+                            padding: 40px;
+                            border-radius: 10px;
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                        }
+                        h1 {
+                            color: #003262;
+                        }
+                        .btn {
+                            display: inline-block;
+                            background: #003262;
+                            color: white;
+                            padding: 12px 25px;
+                            text-decoration: none;
+                            border-radius: 5px;
+                            font-weight: bold;
+                            margin-top: 20px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1>Email Already Verified</h1>
+                        <p>This email address has already been verified.</p>
+                        <a href="https://www.misscal.net/sign-in.html" class="btn">Sign In</a>
+                    </div>
+                </body>
+                </html>
+            `);
+        }
+
+        // Create the verified user in the Users table
         await db.query(
-            "UPDATE Users SET is_verified = true, email_verification_token = NULL WHERE user_id = $1",
-            [userId]
+            `INSERT INTO Users (full_name, email, password, is_verified) 
+             VALUES ($1, $2, $3, true)`,
+            [pendingUser.full_name, pendingUser.email, pendingUser.password]
         );
+
+        // Delete the pending verification
+        await db.query("DELETE FROM PendingVerifications WHERE id = $1", [pendingUser.id]);
 
         // Return success page
         res.send(`
@@ -1745,6 +1804,85 @@ app.get("/verify-email", async (req, res) => {
     } catch (error) {
         console.error("Email verification error:", error);
         res.status(500).send("An error occurred. Please try again later.");
+    }
+});
+
+app.post("/resend-verification", async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ message: "Email is required." });
+    }
+
+    try {
+        // Check if user is already verified
+        const verifiedUser = await db.query("SELECT user_id FROM Users WHERE email = $1", [email]);
+
+        if (verifiedUser.rows.length > 0) {
+            return res.status(400).json({
+                message: "This email is already verified. Please log in."
+            });
+        }
+
+        // Get the pending verification
+        const pendingQuery = "SELECT * FROM PendingVerifications WHERE email = $1";
+        const pendingResult = await db.query(pendingQuery, [email]);
+
+        if (pendingResult.rows.length === 0) {
+            return res.status(404).json({
+                message: "Email not found. Please sign up first."
+            });
+        }
+
+        const pendingUser = pendingResult.rows[0];
+
+        // Generate new token and update expiration
+        const newToken = crypto.randomBytes(32).toString('hex');
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24);
+
+        // Update the pending verification
+        await db.query(
+            `UPDATE PendingVerifications 
+             SET verification_token = $1, expires_at = $2, created_at = CURRENT_TIMESTAMP
+             WHERE id = $3`,
+            [newToken, expiresAt, pendingUser.id]
+        );
+
+        // Send new verification email
+        const verificationLink = `https://server1.misscal.net/verify-email?token=${newToken}`;
+
+        const mailOptions = {
+            from: '"Miss Cal" <mikejamesma23248@gmail.com>',
+            to: email,
+            subject: "Verify Your Email for Miss Cal",
+            text: `Hello ${pendingUser.full_name},\n\nHere is your new verification link for Miss Cal. Please verify your email by clicking the link below:\n\n${verificationLink}\n\nThis link will expire in 24 hours.\n\nBest regards,\nMiss Cal Team`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #333;">Verify Your Email</h2>
+                    <p>Hello ${pendingUser.full_name},</p>
+                    <p>Here is your new verification link for Miss Cal. Please verify your email by clicking the button below:</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${verificationLink}" style="background-color: #003262; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify My Email</a>
+                    </div>
+                    <p>If the button above doesn't work, you can copy and paste the following link into your browser:</p>
+                    <p>${verificationLink}</p>
+                    <p>Best regards,<br>Miss Cal Team</p>
+                </div>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).json({
+            message: "Verification email resent successfully! Please check your email."
+        });
+
+    } catch (error) {
+        console.error("Error resending verification:", error);
+        return res.status(500).json({
+            message: "An error occurred. Please try again."
+        });
     }
 });
 
