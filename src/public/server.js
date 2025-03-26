@@ -37,7 +37,8 @@ const PUBLIC_PATHS = [
     "/forgot-password",
     "/reset-password",
     "/verify-email",
-    "/searchStudents"
+    "/searchStudents",
+    "/getTop20Leaderboard"
 ];
 
 // Serve static files (should come before auth middleware)
