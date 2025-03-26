@@ -1464,8 +1464,15 @@
             credentials: 'include',
             body: JSON.stringify({ candidateId: contestantId })
         })
-            .then(response => response.json())
-            .then(data => {
+            .then(response => {
+                // Store the response status first
+                const isSuccess = response.ok;
+                return response.json().then(data => {
+                    // Return both the data and the success status
+                    return { data, isSuccess };
+                });
+            })
+            .then(({ data, isSuccess }) => {
                 // Reset button
                 if (voteBtn) {
                     voteBtn.innerHTML = '<i class="fas fa-heart"></i> Vote';
@@ -1473,13 +1480,13 @@
                 }
 
                 if (data.message) {
-                    showToast(data.message, response.ok ? 'success' : 'error');
+                    showToast(data.message, isSuccess ? 'success' : 'error');
                 } else {
-                    showToast(response.ok ? 'Vote successful!' : 'Failed to vote', response.ok ? 'success' : 'error');
+                    showToast(isSuccess ? 'Vote successful!' : 'Failed to vote', isSuccess ? 'success' : 'error');
                 }
 
                 // Reload leaderboard to show updated votes
-                if (response.ok) {
+                if (isSuccess) {
                     setTimeout(() => {
                         loadLeaderboard();
                     }, 1000);
