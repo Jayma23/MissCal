@@ -490,6 +490,79 @@
 </div>
 
 <script>
+    /**
+     * Toggles the sidebar between hidden and shown
+     */
+    function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        // if it's hidden, remove 'hidden' class and add 'show', otherwise do the opposite
+        sidebar.classList.toggle("hidden");
+        sidebar.classList.toggle("show");
+    }
+
+    /**
+     * Helper function to parse a specific cookie value.
+     * For example, if document.cookie = "user_id=123; session=abc"
+     * Then getCookieValue("user_id") -> "123"
+     */
+    function getCookieValue(name) {
+        const cookies = document.cookie.split(";");
+        for (let c of cookies) {
+            c = c.trim();
+            if (c.startsWith(name + "=")) {
+                return c.substring(name.length + 1, c.length);
+            }
+        }
+        return null;
+    }
+
+    // Dark mode toggle
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const themeIcon = document.getElementById('theme-icon');
+        if (document.body.classList.contains('dark-mode')) {
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            themeIcon.classList.replace('fa-sun', 'fa-moon');
+            localStorage.setItem('darkMode', 'disabled');
+        }
+    }
+
+    // Check for saved dark mode preference
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('theme-icon').classList.replace('fa-moon', 'fa-sun');
+    }
+
+    // Scroll to top function
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'info') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = 'toast show';
+
+        // Set color based on type
+        if (type === 'success') {
+            toast.style.background = '#28a745';
+        } else if (type === 'error') {
+            toast.style.background = '#dc3545';
+        } else {
+            toast.style.background = '#003262';
+        }
+
+        setTimeout(() => {
+            toast.className = 'toast';
+        }, 3000);
+    }
+
     async function searchStudents() {
         const query = document.getElementById("searchInput").value.trim();
         if (!query) {
