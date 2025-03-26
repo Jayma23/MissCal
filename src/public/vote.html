@@ -562,6 +562,7 @@
             toast.className = 'toast';
         }, 3000);
     }
+    const loggedInUserId = getCookieValue("user_id");
 
     async function searchStudents() {
         const query = document.getElementById("searchInput").value.trim();
