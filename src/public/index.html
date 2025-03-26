@@ -1418,8 +1418,44 @@
                 justify-content: center;
             }
         }
+    .login-prompt {
+        background: var(--berkeley-blue);
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .login-prompt:hover {
+        background: var(--california-gold);
+        color: var(--berkeley-blue);
+        transform: translateY(-3px);
+    }
     </style>
 <script>
+    function isUserLoggedIn() {
+        // Check for user_id cookie
+        return !!getCookieValue("user_id");
+    }
+
+    // Function to get cookie value
+    function getCookieValue(name) {
+        const cookies = document.cookie.split(";");
+        for (let c of cookies) {
+            c = c.trim();
+            if (c.startsWith(name + "=")) {
+                return c.substring(name.length + 1, c.length);
+            }
+        }
+        return null;
+    }
     // Add JavaScript for interactive elements
 
     // Get DOM elements
@@ -1546,8 +1582,8 @@
         leaderboardList.innerHTML = '<div class="loader"></div>';
 
         try {
-            // Fetch data from the API endpoint
-            const response = await fetch("https://server1.misscal.net/getTop20Leaderboard", { credentials: "include" });
+            // Fetch data from the API endpoint - remove credentials for non-logged in users to view
+            const response = await fetch("https://server1.misscal.net/getTop20Leaderboard");
 
             const data = await response.json();
 
@@ -1559,6 +1595,9 @@
                 leaderboardList.innerHTML = '<div class="no-results">No contestants found</div>';
                 return;
             }
+
+            // Check if user is logged in
+            const userLoggedIn = isUserLoggedIn();
 
             // Show top contestants
             for (let i = 0; i < data.length; i++) {
@@ -1572,19 +1611,31 @@
                 else if (i === 1) rankClass = 'rank-2';
                 else if (i === 2) rankClass = 'rank-3';
 
-                item.innerHTML = `
-                <div class="rank ${rankClass}">${i + 1}</div>
-                <div class="contestant" onclick="showStudentProfile('${contestant.id}')">
-                    <img src="${contestant.photo}" alt="${contestant.name}" class="contestant-img">
-                    <div class="contestant-info">
-                        <div class="contestant-name">${contestant.name}</div>
-                    </div>
-                </div>
-                <div class="votes">${contestant.votes}</div>
-                <button class="vote-btn" onclick="voteForContestant('${contestant.id}')">
+                // Create button HTML based on login status
+                let buttonHtml = '';
+                if (userLoggedIn) {
+                    buttonHtml = `
+                <button class="vote-btn" onclick="voteForContestant('${contestant.user_id}')">
                     <i class="fas fa-heart"></i> Vote
-                </button>
-                `;
+                </button>`;
+                } else {
+                    buttonHtml = `
+                <button class="login-prompt" onclick="window.location.href='/sign-in.html'">
+                    <i class="fas fa-sign-in-alt"></i> Sign in to Vote
+                </button>`;
+                }
+
+                item.innerHTML = `
+            <div class="rank ${rankClass}">${i + 1}</div>
+            <div class="contestant" onclick="showStudentProfile('${contestant.id}')">
+                <img src="${contestant.photo}" alt="${contestant.name}" class="contestant-img">
+                <div class="contestant-info">
+                    <div class="contestant-name">${contestant.name}</div>
+                </div>
+            </div>
+            <div class="votes">${contestant.votes}</div>
+            ${buttonHtml}
+            `;
 
                 leaderboardList.appendChild(item);
             }
