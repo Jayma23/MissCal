@@ -323,7 +323,7 @@ app.post("/signup", async (req, res) => {
     }
 
     // Verify it's the right email format
-    if (!email.endsWith("@gmail.com")) {
+    if (!email.endsWith("@berkeley.edu")) {
         return res.status(400).json({ message: "Email must be a UC Berkeley email." });
     }
 
