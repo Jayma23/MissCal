@@ -86,7 +86,7 @@ const transporter = nodemailer.createTransport({
 
 // Database setup
 const db = new Pool({
-    connectionString: "postgresql://neondb_owner:npg_N3jhmKgHalk6@ep-little-cell-a6siaqa3-pooler.us-west-2.aws.neon.tech/neondb?sslmode=require",
+    connectionString: DATABASE_URL,
     ssl: {
         rejectUnauthorized: false,
     },
