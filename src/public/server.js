@@ -85,6 +85,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Database setup
+require("dotenv").config(); // Should be at the top
 const db = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
