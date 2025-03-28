@@ -78,9 +78,9 @@ app.use((req, res, next) => {
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: "mikejamesma23248@gmail.com",
+        user: process.env.GMAIL_USER,
         // For Gmail, you'll need to create an App Password in your Google Account
-        pass: "eepw sstx qlmo sgts" // Replace with your app password
+        pass: process.env.GMAIL_PASS// Replace with your app password
     }
 });
 
