@@ -10,14 +10,32 @@ const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const { Pool } = require("pg");
+const rateLimit = require("express-rate-limit");
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
+const helmet = require('helmet');
 require("dotenv").config(); // Load environment variables
+
 
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 attempts per window
+    message: "Too many login attempts, please try again later"
+});
 
 // Set up basic middleware in correct order
 app.use(cookieParser());
+app.use(helmet.contentSecurityPolicy({
+    directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:"],
+    }
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(bodyParser.json());
@@ -81,6 +99,8 @@ const transporter = nodemailer.createTransport({
         user: process.env.GMAIL_USER,
         // For Gmail, you'll need to create an App Password in your Google Account
         pass: process.env.GMAIL_PASS// Replace with your app password
+
+
     }
 });
 
@@ -104,9 +124,15 @@ db.connect()
 // Set up multer for file uploads
 const upload = multer({
     dest: 'uploads/',
-    limits: { files: 10 }
+    limits: { files: 10, fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/^image\/(jpeg|png|gif)$/)) {
+            return cb(new Error('Only image files are allowed'), false);
+        }
+        cb(null, true);
+    }
 });
-app.post("/submitForm", upload.array("photos", 10), (req, res) => {
+app.post("/submitForm", csrfProtection, upload.array("photos", 10), (req, res) => {
     res.header("Access-Control-Allow-Origin", "https://www.misscal.net");  // Set only your frontend domain
     res.header("Access-Control-Allow-Credentials", "true");  // Allow credentials (cookies, auth headers)
     res.header("Access-Control-Allow-Methods", "POST");
@@ -412,7 +438,7 @@ app.post("/logout", (req, res) => {
     res.status(200).json({ message: "Logged out successfully!" });
 });
 // Login Endpoint
-app.post("/login", (req, res) => {
+app.post("/login", loginLimiter, (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -450,6 +476,7 @@ app.post("/login", (req, res) => {
                 httpOnly: true,
                 secure: true,
                 sameSite: "None",
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days,
                 path: "/",
             });
 
