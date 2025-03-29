@@ -27,7 +27,7 @@ const loginLimiter = rateLimit({
 });
 
 // Set up basic middleware in correct order
-app.set("trust proxy", true);
+app.set('trust proxy', 1);
 app.use(cookieParser());
 app.use(helmet.contentSecurityPolicy({
     directives: {

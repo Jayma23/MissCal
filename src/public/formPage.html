@@ -119,28 +119,10 @@
     <form id="joinForm" action="/submitForm" method="POST" enctype="multipart/form-data">
         <!-- Step 1: Basic Information -->
         <div class="form-step active" id="step1">
-            <h2>Basic Information</h2>
+            <h2>Required Information</h2>
             <label for="name">Full Name: <span class="field-tooltip">ⓘ<span class="tooltip-text">Please enter your full legal name as it appears on your ID</span></span></label>
             <input type="text" id="name" name="name" placeholder="Enter your name" required>
 
-            <label for="major">Major: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your current academic major</span></span></label>
-            <input type="text" id="major" name="major" placeholder="Enter your major">
-
-            <label for="year">Year: <span class="field-tooltip">ⓘ<span class="tooltip-text">Year of Graduation</span></span></label>
-            <input type="number" id="year" name="year" placeholder="Enter your Year of Graduation">
-
-
-            <label for="gpa">GPA: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your current cumulative GPA on a 4.0 scale</span></span></label>
-            <input type="number" id="gpa" name="gpa" step="0.01" placeholder="Enter your GPA" min="0" max="4.0">
-
-            <div class="nav-buttons">
-                <div></div> <!-- Empty div for spacing -->
-                <button type="button" id="nextToStep2">Next: Photo Upload</button>
-            </div>
-        </div>
-
-        <!-- Step 2: Photo Upload -->
-        <div class="form-step" id="step2">
             <h2>Photo Upload</h2>
             <label for="photos">Upload Photos (Only One please pick the best one): <span class="field-tooltip">ⓘ<span class="tooltip-text">Choose a high-quality photo that best represents you</span></span></label>
             <input type="file" id="photos" name="photos" accept="image/*" required>
@@ -154,6 +136,25 @@
                 <button type="button" id="backToStep1">Back</button>
                 <button type="button" id="nextToStep3">Next: Your Story</button>
             </div>
+            <div class="nav-buttons">
+                <div></div> <!-- Empty div for spacing -->
+                <button type="button" id="nextToStep2">Next: Photo Upload</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Photo Upload -->
+        <div class="form-step" id="step2">
+
+
+            <label for="major">Major: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your current academic major</span></span></label>
+            <input type="text" id="major" name="major" placeholder="Enter your major">
+
+            <label for="year">Year: <span class="field-tooltip">ⓘ<span class="tooltip-text">Year of Graduation</span></span></label>
+            <input type="number" id="year" name="year" placeholder="Enter your Year of Graduation">
+
+
+
+
         </div>
 
         <!-- Step 3: Personal Story -->
@@ -172,6 +173,9 @@
 
             <label for="organizations">School Organizations: <span class="field-tooltip">ⓘ<span class="tooltip-text">Clubs, sororities, or other campus affiliations</span></span></label>
             <textarea id="organizations" name="organizations" placeholder="Clubs, sororities, or other affiliations"></textarea>
+
+            <label for="gpa">GPA: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your current cumulative GPA on a 4.0 scale</span></span></label>
+            <input type="number" id="gpa" name="gpa" step="0.01" placeholder="Enter your GPA" min="0" max="4.0">
 
             <div class="nav-buttons">
                 <button type="button" id="backToStep2">Back</button>
