@@ -1912,7 +1912,7 @@ app.post("/resend-verification", async (req, res) => {
     }
 });
 
-app.get('/api/stats', async (req, res) => {
+app.get('/stats', async (req, res) => {
     try {
         // Get participant count from contestentries table
         const participantQuery = await pool.query('SELECT COUNT(*) FROM public.contestentries WHERE form_submitted = true');
