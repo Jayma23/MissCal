@@ -1157,7 +1157,7 @@
 
     // Fetch real-time statistics from database
     async function fetchStatistics() {
-        try {
+
             const response = await fetch('https://server1.misscal.net/stats');
             if (!response.ok) {
                 throw new Error('Failed to fetch statistics');
@@ -1172,12 +1172,7 @@
             if (data.daysLeft !== undefined) {
                 document.getElementById('daysLeft').textContent = data.daysLeft;
             }
-        } catch (error) {
-            console.error('Error fetching statistics:', error);
-            // Use default values when API fails
-            document.getElementById('participantCount').textContent = '24';
-            document.getElementById('voteCount').textContent = '1,587';
-        }
+        
     }
 
     // Set default statistics in case API call fails
