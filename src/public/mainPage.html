@@ -1181,33 +1181,7 @@
     }
 
     // Set default statistics in case API call fails
-    function setDefaultStatistics() {
-        // Count participants from contestentries table
-        fetch('https://server1.misscal.net/api/countEntries', {
-            method: 'GET',
-            credentials: 'include'
-        })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('participantCount').innerText = data.count || '24';
-            })
-            .catch(() => {
-                document.getElementById('participantCount').innerText = '24';
-            });
 
-        // Count total votes
-        fetch('https://server1.misscal.net/api/countVotes', {
-            method: 'GET',
-            credentials: 'include'
-        })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('voteCount').innerText = data.count ? data.count.toLocaleString() : '1,587';
-            })
-            .catch(() => {
-                document.getElementById('voteCount').innerText = '1,587';
-            });
-    }
 
     // Set up all event listeners for interactive elements
     function setupEventListeners() {
@@ -1257,43 +1231,10 @@
         });
 
         // Subscription form handling
-        const subscriptionForm = document.getElementById('subscription-form');
-        if (subscriptionForm) {
-            subscriptionForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const email = e.target.querySelector('input[type="email"]').value;
-
-                // Submit subscription
-                fetch('https://server1.misscal.net/api/subscribe', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({email})
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Thank you for subscribing!');
-                            e.target.reset();
-                        } else {
-                            alert('Subscription failed. Please try again.');
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Subscription error:', err);
-                        alert('An error occurred. Please try again later.');
-                    });
-            });
-        }
+        
 
         // Prevent browser back button
-        window.history.pushState(null, "", window.location.href);
-        window.onpopstate = function () {
-            window.history.pushState(null, "", window.location.href);
-            alert("You are logged out. Please sign in again.");
-            window.location.href = "sign-in.html";
-        };
+
     }
 
     // Handle user logout
