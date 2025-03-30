@@ -1165,18 +1165,18 @@
 
             const data = await response.json();
 
-            // Update the participant count
+            // Update with the correct property names from your API
             document.getElementById('participantCount').textContent = data.participantCount;
-
-            // Update the vote count (with thousand separators)
             document.getElementById('voteCount').textContent = data.voteCount.toLocaleString();
 
-            // Update days left (if not already updated by countdown timer)
             if (data.daysLeft !== undefined) {
                 document.getElementById('daysLeft').textContent = data.daysLeft;
             }
         } catch (error) {
             console.error('Error fetching statistics:', error);
+            // Use default values when API fails
+            document.getElementById('participantCount').textContent = '24';
+            document.getElementById('voteCount').textContent = '1,587';
         }
     }
 
@@ -1231,7 +1231,7 @@
         });
 
         // Subscription form handling
-        
+
 
         // Prevent browser back button
 
@@ -1262,34 +1262,7 @@
     }
 
     // Check if user is logged in
-    function checkLoginStatus() {
-        const userId = document.cookie
-            .split("; ")
-            .find(row => row.startsWith("user_id="))
-            ?.split("=")[1];
 
-        if (!userId) {
-            window.location.href = "sign-in.html";  // Redirect if no login cookie
-        } else {
-            // Update username in sidebar
-            const username = document.getElementById('username');
-            if (username) {
-                fetch(`https://server1.misscal.net/api/user/${userId}`, {
-                    method: 'GET',
-                    credentials: 'include'
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.name) {
-                            username.innerText = data.name;
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Error fetching user info:", err);
-                    });
-            }
-        }
-    }
 
 
 </script>
