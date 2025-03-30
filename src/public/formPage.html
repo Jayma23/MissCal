@@ -83,6 +83,20 @@
             visibility: visible;
             opacity: 1;
         }
+        .required-field {
+            color: red;
+            margin-left: 5px;
+        }
+        .optional-section {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+        }
+        .optional-header {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 
@@ -113,36 +127,18 @@
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
-        <p id="progressText">Step 1 of 4: Basic Information</p>
+        <p id="progressText">Step 1 of 4: Required Information</p>
     </div>
 
     <form id="joinForm" action="/submitForm" method="POST" enctype="multipart/form-data">
-        <!-- Step 1: Basic Information -->
+        <!-- Step 1: Required Information -->
         <div class="form-step active" id="step1">
-            <h2>Basic Information</h2>
-            <label for="name">Full Name: <span class="field-tooltip">ⓘ<span class="tooltip-text">Please enter your full legal name as it appears on your ID</span></span></label>
+            <h2>Required Information <span class="required-field">*</span></h2>
+
+            <label for="name">Full Name: <span class="required-field">*</span> <span class="field-tooltip">ⓘ<span class="tooltip-text">Please enter your full legal name as it appears on your ID</span></span></label>
             <input type="text" id="name" name="name" placeholder="Enter your name" required>
 
-            <label for="major">Major: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your current academic major</span></span></label>
-            <input type="text" id="major" name="major" placeholder="Enter your major">
-
-            <label for="year">Year: <span class="field-tooltip">ⓘ<span class="tooltip-text">Year of Graduation</span></span></label>
-            <input type="number" id="year" name="year" placeholder="Enter your Year of Graduation">
-
-
-            <label for="gpa">GPA: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your current cumulative GPA on a 4.0 scale</span></span></label>
-            <input type="number" id="gpa" name="gpa" step="0.01" placeholder="Enter your GPA" min="0" max="4.0">
-
-            <div class="nav-buttons">
-                <div></div> <!-- Empty div for spacing -->
-                <button type="button" id="nextToStep2">Next: Photo Upload</button>
-            </div>
-        </div>
-
-        <!-- Step 2: Photo Upload -->
-        <div class="form-step" id="step2">
-            <h2>Photo Upload</h2>
-            <label for="photos">Upload Photos (Only One please pick the best one): <span class="field-tooltip">ⓘ<span class="tooltip-text">Choose a high-quality photo that best represents you</span></span></label>
+            <label for="photos">Upload Photo: <span class="required-field">*</span> <span class="field-tooltip">ⓘ<span class="tooltip-text">Choose a high-quality photo that best represents you</span></span></label>
             <input type="file" id="photos" name="photos" accept="image/*" required>
 
             <div class="preview-container">
@@ -150,15 +146,29 @@
                 <img id="imagePreview" class="image-preview" src="#" alt="Your image preview">
             </div>
 
+            <div class="optional-section">
+                <h3 class="optional-header">Optional Information</h3>
+
+                <label for="major">Major: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your current academic major</span></span></label>
+                <input type="text" id="major" name="major" placeholder="Enter your major">
+
+                <label for="year">Year: <span class="field-tooltip">ⓘ<span class="tooltip-text">Year of Graduation</span></span></label>
+                <input type="number" id="year" name="year" placeholder="Enter your Year of Graduation">
+
+                <label for="gpa">GPA: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your current cumulative GPA on a 4.0 scale</span></span></label>
+                <input type="number" id="gpa" name="gpa" step="0.01" placeholder="Enter your GPA" min="0" max="4.0">
+            </div>
+
             <div class="nav-buttons">
-                <button type="button" id="backToStep1">Back</button>
-                <button type="button" id="nextToStep3">Next: Your Story</button>
+                <div></div> <!-- Empty div for spacing -->
+                <button type="button" id="nextToStep2">Next: Your Story</button>
             </div>
         </div>
 
-        <!-- Step 3: Personal Story -->
-        <div class="form-step" id="step3">
-            <h2>Your Story</h2>
+        <!-- Step 2: Personal Story (now second step) -->
+        <div class="form-step" id="step2">
+            <h2>Your Story <span class="optional-header">(Optional)</span></h2>
+
             <label for="campaign_line">Campaign Line (50 words max): <span class="field-tooltip">ⓘ<span class="tooltip-text">A short, memorable slogan or phrase that represents your candidacy</span></span></label>
             <textarea id="campaign_line" name="campaign_line" maxlength="250" placeholder="Write your campaign line"></textarea>
             <div class="character-counter" id="campaignLineCounter">0/50 words</div>
@@ -174,14 +184,15 @@
             <textarea id="organizations" name="organizations" placeholder="Clubs, sororities, or other affiliations"></textarea>
 
             <div class="nav-buttons">
-                <button type="button" id="backToStep2">Back</button>
-                <button type="button" id="nextToStep4">Next: Social Media</button>
+                <button type="button" id="backToStep1">Back</button>
+                <button type="button" id="nextToStep3">Next: Social Media</button>
             </div>
         </div>
 
-        <!-- Step 4: Social Media -->
-        <div class="form-step" id="step4">
-            <h2>Social Media Links</h2>
+        <!-- Step 3: Social Media (now third step) -->
+        <div class="form-step" id="step3">
+            <h2>Social Media Links <span class="optional-header">(Optional)</span></h2>
+
             <label for="instagram">Instagram: <span class="field-tooltip">ⓘ<span class="tooltip-text">Your Instagram profile URL</span></span></label>
             <input type="url" id="instagram" name="instagram" placeholder="https://instagram.com/your-profile">
 
@@ -208,7 +219,7 @@
             </div>
 
             <div class="nav-buttons">
-                <button type="button" id="backToStep3">Back</button>
+                <button type="button" id="backToStep2">Back</button>
                 <button type="submit" id="submitButton">Submit Application</button>
             </div>
         </div>
@@ -250,7 +261,7 @@
     });
 
     // Multi-step form navigation
-    const steps = ["step1", "step2", "step3", "step4"];
+    const steps = ["step1", "step2", "step3"];
     let currentStep = 0;
 
     function updateProgressBar() {
@@ -260,7 +271,7 @@
     }
 
     function getStepName(step) {
-        const names = ["Basic Information", "Photo Upload", "Your Story", "Social Media"];
+        const names = ["Required Information", "Your Story", "Social Media"];
         return names[step];
     }
 
@@ -284,19 +295,15 @@
             alert("Please enter your name before proceeding.");
             return;
         }
-        showStep(1);
-    });
-
-    document.getElementById("nextToStep3").addEventListener("click", () => {
         if (!document.getElementById("photos").files.length) {
             alert("Please upload a photo before proceeding.");
             return;
         }
-        showStep(2);
+        showStep(1);
     });
 
-    document.getElementById("nextToStep4").addEventListener("click", () => {
-        showStep(3);
+    document.getElementById("nextToStep3").addEventListener("click", () => {
+        showStep(2);
         updateApplicationPreview();
     });
 
@@ -306,10 +313,6 @@
 
     document.getElementById("backToStep2").addEventListener("click", () => {
         showStep(1);
-    });
-
-    document.getElementById("backToStep3").addEventListener("click", () => {
-        showStep(2);
     });
 
     // Word counters
@@ -402,7 +405,7 @@
 
         if (!photos.length) {
             alert("Please upload a photo.");
-            showStep(1);
+            showStep(0);
             return;
         }
 
@@ -412,13 +415,13 @@
 
         if (campaignLineWordCount > 50) {
             alert("Your campaign line exceeds the 50-word limit. Please edit it before submitting.");
-            showStep(2);
+            showStep(1);
             return;
         }
 
         if (personalStoryWordCount > 200) {
             alert("Your personal story exceeds the 200-word limit. Please edit it before submitting.");
-            showStep(2);
+            showStep(1);
             return;
         }
 
@@ -467,7 +470,7 @@
     const formInputs = document.querySelectorAll('input, textarea');
     formInputs.forEach(input => {
         input.addEventListener('input', function() {
-            if (currentStep === 3) {
+            if (currentStep === 2) {
                 updateApplicationPreview();
             }
         });
