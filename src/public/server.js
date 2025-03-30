@@ -1927,23 +1927,11 @@ app.get('/api/stats', async (req, res) => {
         const deadline = new Date('2025-04-30T23:59:59');
         const daysLeft = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
 
-        // Get latest news (from a hypothetical news table, adjust as needed)
-        let latestNews = 'Welcome to Miss Cal 2024! Voting is now open for all contestants.';
-        try {
-            const newsQuery = await pool.query('SELECT content FROM news ORDER BY created_at DESC LIMIT 1');
-            if (newsQuery.rows.length > 0) {
-                latestNews = newsQuery.rows[0].content;
-            }
-        } catch (error) {
-            console.error('Error fetching news:', error);
-            // Use default news if table doesn't exist
-        }
-
+        // Return all statistics
         res.json({
             participantCount,
             voteCount,
-            daysLeft,
-            latestNews
+            daysLeft
         });
     } catch (error) {
         console.error('Error fetching statistics:', error);
@@ -1965,7 +1953,7 @@ app.get('/api/countEntries', async (req, res) => {
 });
 
 // API endpoint to count votes
-router.get('/api/countVotes', async (req, res) => {
+app.get('/api/countVotes', async (req, res) => {
     try {
         const query = await pool.query('SELECT SUM(votes) FROM public.contestentries');
         const count = parseInt(query.rows[0].sum) || 0;
