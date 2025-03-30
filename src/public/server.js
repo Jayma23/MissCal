@@ -1912,6 +1912,116 @@ app.post("/resend-verification", async (req, res) => {
     }
 });
 
+app.get('/api/stats', async (req, res) => {
+    try {
+        // Get participant count from contestentries table
+        const participantQuery = await pool.query('SELECT COUNT(*) FROM public.contestentries WHERE form_submitted = true');
+        const participantCount = parseInt(participantQuery.rows[0].count);
+
+        // Get total votes count
+        const votesQuery = await pool.query('SELECT SUM(votes) FROM public.contestentries');
+        const voteCount = parseInt(votesQuery.rows[0].sum) || 0;
+
+        // Calculate days left until deadline
+        const now = new Date();
+        const deadline = new Date('2025-04-30T23:59:59');
+        const daysLeft = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
+
+        // Get latest news (from a hypothetical news table, adjust as needed)
+        let latestNews = 'Welcome to Miss Cal 2024! Voting is now open for all contestants.';
+        try {
+            const newsQuery = await pool.query('SELECT content FROM news ORDER BY created_at DESC LIMIT 1');
+            if (newsQuery.rows.length > 0) {
+                latestNews = newsQuery.rows[0].content;
+            }
+        } catch (error) {
+            console.error('Error fetching news:', error);
+            // Use default news if table doesn't exist
+        }
+
+        res.json({
+            participantCount,
+            voteCount,
+            daysLeft,
+            latestNews
+        });
+    } catch (error) {
+        console.error('Error fetching statistics:', error);
+        res.status(500).json({ error: 'Failed to fetch statistics' });
+    }
+});
+
+// API endpoint to count entries
+app.get('/api/countEntries', async (req, res) => {
+    try {
+        const query = await pool.query('SELECT COUNT(*) FROM public.contestentries WHERE form_submitted = true');
+        const count = parseInt(query.rows[0].count);
+
+        res.json({ count });
+    } catch (error) {
+        console.error('Error counting entries:', error);
+        res.status(500).json({ error: 'Failed to count entries' });
+    }
+});
+
+// API endpoint to count votes
+router.get('/api/countVotes', async (req, res) => {
+    try {
+        const query = await pool.query('SELECT SUM(votes) FROM public.contestentries');
+        const count = parseInt(query.rows[0].sum) || 0;
+
+        res.json({ count });
+    } catch (error) {
+        console.error('Error counting votes:', error);
+        res.status(500).json({ error: 'Failed to count votes' });
+    }
+});
+
+// API endpoint to get user info
+app.get('/api/user/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const query = await pool.query('SELECT name FROM users WHERE user_id = $1', [userId]);
+
+        if (query.rows.length > 0) {
+            res.json({ name: query.rows[0].name });
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).json({ error: 'Failed to fetch user' });
+    }
+});
+
+// API endpoint to subscribe to newsletter
+app.post('/api/subscribe', async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+            return res.status(400).json({ success: false, error: 'Invalid email address' });
+        }
+
+        // Check if email already exists
+        const checkQuery = await pool.query('SELECT * FROM subscribers WHERE email = $1', [email]);
+
+        if (checkQuery.rows.length > 0) {
+            return res.json({ success: true, message: 'You are already subscribed' });
+        }
+
+        // Insert new subscriber
+        await pool.query('INSERT INTO subscribers (email, created_at) VALUES ($1, CURRENT_TIMESTAMP)', [email]);
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error subscribing:', error);
+        res.status(500).json({ success: false, error: 'Failed to subscribe' });
+    }
+});
+
+
+
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://0.0.0.0:${PORT}`);
