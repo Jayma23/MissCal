@@ -427,8 +427,6 @@
             return;
         }
 
-        const formData = new FormData(event.target);
-
         // Retrieve user_id from the cookie
         const getCookie = (name) => {
             const value = `; ${document.cookie}`;
@@ -442,16 +440,11 @@
             return;
         }
 
-        // Append the user_id to the form data
-        formData.append("user_id", userId);
-
         try {
             // First, get a CSRF token
             const tokenResponse = await fetch("https://server1.misscal.net/get-csrf-token", {
                 credentials: "include",
-                method: "GET",
-
-
+                method: "GET"
             });
 
             if (!tokenResponse.ok) {
@@ -460,23 +453,24 @@
 
             const tokenData = await tokenResponse.json();
 
-            // Create a single FormData instance
+            // Create FormData ONCE after getting the token
             const formData = new FormData(event.target);
 
-            // Add user ID once
-            const userId = getCookie("user_id");
+            // Add user ID
             formData.append("user_id", userId);
 
-            // Add CSRF token
+            // Add CSRF token to both form data and headers
             formData.append("_csrf", tokenData.csrfToken);
 
             // Submit form
             const response = await fetch("https://server1.misscal.net/submitForm", {
                 method: "POST",
                 body: formData,
-                credentials: "include"
+                credentials: "include",
+                headers: {
+                    'CSRF-Token': tokenData.csrfToken
+                }
             });
-
 
             if (response.ok) {
                 alert("Form submitted successfully!");
