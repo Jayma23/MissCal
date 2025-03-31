@@ -46,7 +46,7 @@ app.use(cors({
     origin: ["https://misscal.net", "https://www.misscal.net"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "CSRF-Token"],
 }));
 
 // Define public paths that don't need authentication
@@ -1205,15 +1205,23 @@ app.get("/getLeaderboard", (req, res) => {
         }
 
         const leaderboard = results.rows.map(entry => {
-            let photoUrl = "https://via.placeholder.com/80"; // 默认头像
+            let photoUrl = "https://via.placeholder.com/80"; // Default fallback
             try {
+                if (entry.photos) {
+                    // Handle both cases: string or already parsed array
+                    const photosArray = typeof entry.photos === 'string'
+                        ? JSON.parse(entry.photos)
+                        : entry.photos;
 
-                let photoArray = typeof entry.photos === "string" ? JSON.parse(entry.photos) : entry.photos;
-                photoUrl = Array.isArray(photoArray) && photoArray.length > 0 ? photoArray[0] : photoUrl;
+                    // Get first photo if available
+                    if (photosArray && photosArray.length > 0) {
+                        photoUrl = `https://server1.misscal.net/${photosArray[0]}`;
+                    }
+                }
             } catch (error) {
-                console.error("Error parsing photos:", error);
+                console.error("Error parsing photos for user:", entry.user_id, error);
+                // Keep the default placeholder
             }
-            photoUrl = `https://server1.misscal.net/${entry.photos}`;
 
             return {
                 id: entry.entry_id,
