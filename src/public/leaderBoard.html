@@ -683,7 +683,7 @@
         }
 
         // Check if voting for self
-        if (contestantId === userId) {
+        if (String(contestantId) === String(userId)) {
             showToast("You cannot vote for yourself!", "error");
             return;
         }
