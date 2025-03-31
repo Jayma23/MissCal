@@ -1,21 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<link rel="icon" href="/favicon.png" type="image/x-icon">
-<link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Miss Cal - Top 20 Leaderboard</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --berkeley-blue: #003262;
             --california-gold: #FDB515;
-            --light-gray: #f4f4f4;
             --white: #ffffff;
-            --dark: #222222;
-            --transition-speed: 0.3s;
         }
 
         body {
@@ -23,588 +17,158 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--california-gold);
             color: #333;
-            text-align: center;
-            transition: background-color var(--transition-speed), color var(--transition-speed);
         }
 
-        body.dark-mode {
-            background: #222;
-            color: #f0f0f0;
+        .main-container {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
         }
 
-        .leaderboard-container {
-            max-width: 700px;
-            margin: 50px auto;
+        .content-container {
+            max-width: 800px;
+            width: 100%;
             background: var(--white);
+            border-radius: 15px;
             padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            will-change: transform;
-            transform: translateZ(0);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        body.dark-mode .leaderboard-container {
-            background: #333;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .leaderboard-title {
+        .page-title {
             font-size: 2.5rem;
             color: var(--berkeley-blue);
-            margin-bottom: 30px;
+            text-align: center;
+            margin-bottom: 40px;
             position: relative;
-            display: inline-block;
-            transition: color var(--transition-speed);
         }
 
-        body.dark-mode .leaderboard-title {
-            color: var(--california-gold);
-        }
-
-        .leaderboard-title::after {
+        .page-title::after {
             content: '';
             position: absolute;
             bottom: -10px;
             left: 50%;
             transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
+            width: 100px;
+            height: 4px;
             background: var(--california-gold);
-            border-radius: 3px;
-            transition: width 0.5s ease;
-        }
-
-        .leaderboard-title:hover::after {
-            width: 120px;
-        }
-
-        .leaderboard {
-            max-height: 500px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: var(--berkeley-blue) var(--california-gold);
-            padding: 10px;
-        }
-
-        .leaderboard::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .leaderboard::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .leaderboard::-webkit-scrollbar-thumb {
-            background: var(--berkeley-blue);
-            border-radius: 10px;
+            border-radius: 2px;
         }
 
         .leaderboard-item {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             padding: 20px;
             margin-bottom: 15px;
-            border-radius: 15px;
-            background: var(--white);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: all var(--transition-speed);
-            position: relative;
-            overflow: hidden;
-        }
-
-        body.dark-mode .leaderboard-item {
-            background: #444;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .leaderboard-item:hover {
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background: #f9f9f9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
         .rank {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: bold;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
+            color: white;
+            background: var(--berkeley-blue);
             margin-right: 15px;
-            transition: all var(--transition-speed);
         }
 
         .rank-1 {
             background: linear-gradient(45deg, #FFD700, #FFA500);
-            color: white;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
         }
 
         .rank-2 {
             background: linear-gradient(45deg, #C0C0C0, #A9A9A9);
-            color: white;
-            box-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
+            box-shadow: 0 0 10px rgba(192, 192, 192, 0.4);
         }
 
         .rank-3 {
             background: linear-gradient(45deg, #CD7F32, #8B4513);
-            color: white;
-            box-shadow: 0 0 10px rgba(205, 127, 50, 0.5);
+            box-shadow: 0 0 10px rgba(205, 127, 50, 0.4);
         }
 
-        .rank-other {
-            background: var(--berkeley-blue);
-            color: white;
-        }
-
-        .leaderboard-item img {
+        .contestant-photo {
             width: 80px;
             height: 80px;
             border-radius: 50%;
             object-fit: cover;
-            margin-right: 20px;
             border: 3px solid var(--california-gold);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            will-change: transform;
-            transform: translateZ(0);
+            margin-right: 20px;
         }
 
-        .participant-info {
+        .contestant-info {
             flex-grow: 1;
-            text-align: left;
-            padding-right: 15px;
-            cursor: pointer;
         }
 
-        .participant-name {
+        .contestant-name {
             font-size: 1.3rem;
             font-weight: bold;
-            margin-bottom: 5px;
             color: var(--berkeley-blue);
-            transition: color var(--transition-speed);
+            margin: 0 0 5px 0;
         }
 
-        body.dark-mode .participant-name {
-            color: var(--california-gold);
+        .view-profile {
+            color: var(--berkeley-blue);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .view-profile i {
+            margin-right: 5px;
+        }
+
+        .vote-count {
+            font-weight: bold;
+            margin-right: 20px;
+            font-size: 1.2rem;
         }
 
         .vote-button {
             background: var(--berkeley-blue);
             color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
             border: none;
-            cursor: pointer;
-            transition: all var(--transition-speed);
+            border-radius: 30px;
+            padding: 10px 20px;
             font-weight: bold;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
         }
 
-        .vote-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-            z-index: -1;
-        }
-
-        .vote-button:hover::before {
-            left: 100%;
+        .vote-button i {
+            margin-right: 5px;
         }
 
         .vote-button:hover {
             background: var(--california-gold);
             color: var(--berkeley-blue);
-            box-shadow: 0 5px 15px rgba(0, 50, 98, 0.3);
         }
 
-        .vote-button:active {
-            transform: translateY(0);
-        }
-
-        /* Profile button */
-        .profile-btn {
-            background: transparent;
-            border: none;
-            color: var(--berkeley-blue);
-            font-size: 0.9rem;
-            padding: 5px 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-top: 5px;
-            transition: all 0.3s;
-        }
-
-        .profile-btn:hover {
-            background: #f0f0f0;
-            color: var(--california-gold);
-        }
-
-        body.dark-mode .profile-btn {
-            color: var(--california-gold);
-        }
-
-        body.dark-mode .profile-btn:hover {
-            background: #555;
-            color: white;
-        }
-
-        .sidebar {
-            background: var(--berkeley-blue);
-            color: white;
-            padding: 40px 30px;
-            width: 280px;
-            height: 100vh;
-            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            transform: translateX(-100%);
-            transition: transform var(--transition-speed);
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        body.dark-mode .sidebar {
-            background: #111;
-            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .sidebar h3 {
-            margin-bottom: 40px;
-            font-size: 1.8rem;
-            color: var(--california-gold);
-            position: relative;
-            padding-bottom: 15px;
-        }
-
-        .sidebar h3::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 50px;
-            height: 3px;
-            background: var(--california-gold);
-            border-radius: 3px;
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin-top: 30px;
-        }
-
-        .sidebar ul li {
-            margin: 15px 0;
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: all var(--transition-speed);
-        }
-
-        .sidebar.show ul li {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        /* Staggered animation for menu items */
-        .sidebar.show ul li:nth-child(1) { transition-delay: 0.1s; }
-        .sidebar.show ul li:nth-child(2) { transition-delay: 0.2s; }
-        .sidebar.show ul li:nth-child(3) { transition-delay: 0.3s; }
-        .sidebar.show ul li:nth-child(4) { transition-delay: 0.4s; }
-        .sidebar.show ul li:nth-child(5) { transition-delay: 0.5s; }
-        .sidebar.show ul li:nth-child(6) { transition-delay: 0.6s; }
-        .sidebar.show ul li:nth-child(7) { transition-delay: 0.7s; }
-
-        .sidebar ul li a {
-            color: white;
-            text-decoration: none;
-            padding: 12px 15px;
-            display: flex;
-            align-items: center;
-            border-radius: 10px;
-            transition: all var(--transition-speed);
-            font-weight: 500;
-            gap: 15px;
-        }
-
-        .sidebar ul li a i {
-            width: 20px;
-            text-align: center;
-            font-size: 1.2rem;
-        }
-
-        .sidebar ul li a:hover {
-            background: var(--california-gold);
-            color: var(--berkeley-blue);
-            transform: translateX(5px);
-        }
-
-        #logoffButton {
-            background: #dc3545;
-            color: white;
-            cursor: pointer;
-            margin-top: 30px;
-        }
-
-        #logoffButton:hover {
-            background: #bd2130;
-            color: white;
-        }
-
-        .sidebar.hidden {
-            transform: translateX(-100%);
-        }
-
-        .sidebar.show {
-            transform: translateX(0);
-        }
-
-        /* Toggle Button */
         .sidebar-toggle {
             position: fixed;
             top: 20px;
             left: 20px;
             background: var(--berkeley-blue);
-            color: var(--california-gold);
-            border: none;
-            padding: 12px 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            z-index: 1001;
-            font-size: 1.2rem;
-            transition: all var(--transition-speed);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar-toggle:hover {
-            background: var(--california-gold);
-            color: var(--berkeley-blue);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .sidebar-toggle:active {
-            transform: translateY(0);
-        }
-
-        /* Toast notification */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            max-width: 350px;
-            background: var(--berkeley-blue);
             color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transform: translateX(400px);
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            z-index: 1000;
-        }
-
-        .toast.success {
-            background: #28a745;
-        }
-
-        .toast.error {
-            background: #dc3545;
-        }
-
-        .toast.info {
-            background: var(--berkeley-blue);
-        }
-
-        .toast.show {
-            transform: translateX(0);
-            opacity: 1;
-        }
-
-        .toast-content {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .toast-icon {
-            font-size: 1.5rem;
-        }
-
-        .toast-close {
-            background: transparent;
             border: none;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            padding: 0;
-            margin-left: 15px;
-        }
-
-        .toast-close:hover {
-            transform: scale(1.2);
-        }
-
-        /* Floating buttons */
-        .floating-actions {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 999;
-        }
-
-        .floating-btn {
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: var(--berkeley-blue);
-            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.5rem;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            transition: all var(--transition-speed);
-            font-size: 1.2rem;
-        }
-
-        .floating-btn:hover {
-            background: var(--california-gold);
-            color: var(--berkeley-blue);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
-        }
-
-        /* Loader */
-        .loader-container {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .loader {
-            width: 60px;
-            height: 60px;
-            border: 5px solid var(--california-gold);
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Media Queries */
-        @media (max-width: 768px) {
-            .leaderboard-container {
-                margin: 70px 20px;
-                padding: 20px;
-            }
-
-            .leaderboard-item {
-                flex-direction: column;
-                text-align: center;
-                padding: 15px 10px;
-            }
-
-            .rank {
-                margin-right: 0;
-                margin-bottom: 10px;
-            }
-
-            .leaderboard-item img {
-                margin-right: 0;
-                margin-bottom: 15px;
-            }
-
-            .participant-info {
-                text-align: center;
-                padding-right: 0;
-                margin-bottom: 15px;
-            }
-
-            .sidebar {
-                width: 100%;
-                max-width: 300px;
-            }
-
-            .modal-content {
-                width: 95%;
-                margin: 20px auto;
-            }
-        }
-
-        /* Pulse animation */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* Badge styles */
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-
-        .badge-new {
-            background: #ff4757;
-            color: white;
-            animation: pulse 1.5s infinite;
-        }
-
-        .vote-animation {
-            position: absolute;
-            font-size: 24px;
-            color: var(--california-gold);
-            animation: float-up 2s forwards;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        @keyframes float-up {
-            0% {
-                transform: translate(-50%, 0);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -50px);
-                opacity: 0;
-            }
+            z-index: 100;
         }
 
         /* Profile Modal */
@@ -615,369 +179,171 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1500;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
-            overflow-y: auto;
         }
 
         .modal-content {
-            background-color: white;
-            width: 80%;
+            background: white;
+            width: 90%;
             max-width: 600px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            position: relative;
+            border-radius: 15px;
             padding: 30px;
-            margin: 50px auto;
-            transition: all 0.3s ease;
-            animation: modal-fade-in 0.3s;
-        }
-
-        body.dark-mode .modal-content {
-            background-color: #333;
-            color: #f0f0f0;
-        }
-
-        @keyframes modal-fade-in {
-            from { opacity: 0; transform: translateY(-50px); }
-            to { opacity: 1; transform: translateY(0); }
+            position: relative;
         }
 
         .modal-close {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 1.5rem;
-            color: #777;
-            cursor: pointer;
-            transition: all 0.3s;
+            top: 15px;
+            right: 15px;
             background: none;
             border: none;
-            z-index: 2;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
         }
 
-        .modal-close:hover {
-            color: var(--berkeley-blue);
-            transform: rotate(90deg);
-        }
-
-        body.dark-mode .modal-close:hover {
-            color: var(--california-gold);
-        }
-
-        /* Profile content styling */
         .profile-header {
             display: flex;
-            align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding-bottom: 20px;
             border-bottom: 1px solid #eee;
         }
 
-        body.dark-mode .profile-header {
-            border-bottom-color: #555;
-        }
-
         .profile-avatar {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            overflow: hidden;
-            margin-right: 25px;
-            border: 4px solid var(--california-gold);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            flex-shrink: 0;
-        }
-
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .profile-title {
-            flex: 1;
+            margin-right: 20px;
+            border: 3px solid var(--california-gold);
         }
 
         .profile-name {
-            font-size: 2rem;
+            font-size: 1.8rem;
             margin: 0 0 5px 0;
             color: var(--berkeley-blue);
         }
 
-        body.dark-mode .profile-name {
-            color: var(--california-gold);
+        .profile-info {
+            margin-bottom: 20px;
         }
 
-        .profile-subtitle {
-            font-size: 1.1rem;
-            color: #777;
-            margin: 0;
+        .info-section {
+            margin-bottom: 15px;
         }
 
-        body.dark-mode .profile-subtitle {
-            color: #bbb;
-        }
-
-        .profile-badge {
-            display: inline-block;
-            background: var(--california-gold);
+        .info-section h3 {
             color: var(--berkeley-blue);
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            margin-top: 10px;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
         }
 
-        .profile-sections {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
+        .loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--california-gold);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
-            .profile-sections {
-                grid-template-columns: 1fr;
+            .leaderboard-item {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 15px 10px;
+            }
+
+            .rank {
+                margin: 0 0 10px 0;
+            }
+
+            .contestant-photo {
+                margin: 0 0 15px 0;
+            }
+
+            .contestant-info {
+                margin-bottom: 15px;
+                text-align: center;
+            }
+
+            .vote-count {
+                margin: 0 0 15px 0;
             }
 
             .profile-header {
                 flex-direction: column;
+                align-items: center;
                 text-align: center;
             }
 
             .profile-avatar {
-                margin-right: 0;
-                margin-bottom: 15px;
+                margin: 0 0 15px 0;
             }
         }
-
-        .profile-section {
-            background: #f9f9f9;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            text-align: left;
-        }
-
-        body.dark-mode .profile-section {
-            background: #444;
-        }
-
-        .section-title {
-            color: var(--berkeley-blue);
-            margin-top: 0;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            position: relative;
-            display: inline-block;
-        }
-
-        body.dark-mode .section-title {
-            color: var(--california-gold);
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--california-gold);
-        }
-
-        .info-item {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: flex-start;
-        }
-
-        .info-item i {
-            margin-right: 10px;
-            color: var(--berkeley-blue);
-            font-size: 1.1rem;
-            margin-top: 3px;
-        }
-
-        body.dark-mode .info-item i {
-            color: var(--california-gold);
-        }
-
-        .info-content {
-            flex: 1;
-        }
-
-        .info-label {
-            font-weight: bold;
-            margin-bottom: 3px;
-            color: #555;
-            font-size: 0.9rem;
-        }
-
-        body.dark-mode .info-label {
-            color: #ddd;
-        }
-
-        .info-value {
-            line-height: 1.5;
-            color: #333;
-        }
-
-        body.dark-mode .info-value {
-            color: #f0f0f0;
-        }
-
-        .profile-actions {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .profile-action-btn {
-            background: var(--berkeley-blue);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 20px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .profile-action-btn:hover {
-            background: var(--california-gold);
-            color: var(--berkeley-blue);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .profile-action-btn:active {
-            transform: translateY(0);
-        }
-
-        .social-media {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 25px;
-        }
-
-        .social-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-decoration: none;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
-
-        .social-icon:hover {
-            opacity: 0.9;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .social-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
-        .social-linkedin { background: #0077b5; }
-        .social-facebook { background: #3b5998; }
-        .social-github { background: #333; }
-        .social-snapchat { background: #fffc00; color: black; }
-        .social-tiktok { background: #000000; }
     </style>
 </head>
 <body>
-<button id="sidebarToggle" class="sidebar-toggle"><i class="fas fa-bars"></i></button>
+<button class="sidebar-toggle" id="sidebarToggle">
+    <i class="fas fa-bars"></i>
+</button>
 
-<!-- Floating Action Buttons -->
-<div class="floating-actions">
-    <div class="floating-btn" id="darkModeToggle" title="Toggle Dark Mode">
-        <i class="fas fa-moon"></i>
+<div class="main-container">
+    <div class="content-container">
+        <h1 class="page-title">Top 20 Leaderboard</h1>
+        <div id="leaderboard">
+            <!-- Leaderboard content will be loaded here -->
+        </div>
     </div>
-    <div class="floating-btn" id="refreshBtn" title="Refresh Leaderboard">
-        <i class="fas fa-sync-alt"></i>
-    </div>
-    <div class="floating-btn" id="scrollTopBtn" title="Back to Top">
-        <i class="fas fa-arrow-up"></i>
+</div>
+
+<!-- Profile Modal -->
+<div class="modal" id="profileModal">
+    <div class="modal-content">
+        <button class="modal-close" id="modalClose">
+            <i class="fas fa-times"></i>
+        </button>
+        <div id="profileContent">
+            <!-- Profile content will be loaded here -->
+        </div>
     </div>
 </div>
 
 <!-- Loader -->
-<div class="loader-container" id="loaderContainer">
-    <div class="loader"></div>
-</div>
-
-<!-- Toast notification -->
-<div class="toast" id="toast">
-    <div class="toast-content">
-        <div class="toast-icon">
-            <i class="fas fa-info-circle"></i>
-        </div>
-        <div class="toast-message">This is a notification</div>
-    </div>
-    <button class="toast-close"><i class="fas fa-times"></i></button>
-</div>
-
-<!-- Student Profile Modal -->
-<div class="modal" id="profileModal">
-    <div class="modal-content">
-        <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
-        <div id="profileContent">
-            <!-- Student profile content will be loaded here -->
-        </div>
-    </div>
-</div>
-
-<div class="main-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar hidden" id="sidebar">
-        <h3>Dashboard</h3>
-        <ul>
-            <li><a href="mainPage.html"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="formPage.html"><i class="fas fa-user-plus"></i> Join the Pageant</a></li>
-            <li><a href="vote.html"><i class="fas fa-vote-yea"></i> Vote</a></li>
-            <li><a href="rule.html"><i class="fas fa-gavel"></i> Rules</a></li>
-            <li><a href="profile.html"><i class="fas fa-user-circle"></i> My Profile</a></li>
-            <li><a href="leaderBoard.html"><i class="fas fa-trophy"></i> Top 20 Leaderboard <span class="badge badge-new">Live</span></a></li>
-            <li><a id="logoffButton" class="btn btn-danger w-100"><i class="fas fa-sign-out-alt"></i> Log Off</a></li>
-        </ul>
-    </aside>
-    <div class="leaderboard-container">
-        <h2 class="leaderboard-title">Top 20 Leaderboard</h2>
-        <div class="leaderboard" id="leaderboard">
-            <!-- Leaderboard data will be inserted here dynamically -->
-        </div>
-    </div>
+<div class="loader" id="loader">
+    <div class="loader-spinner"></div>
 </div>
 
 <script>
     // DOM Elements
-    const sidebar = document.getElementById("sidebar");
-    const sidebarToggle = document.getElementById("sidebarToggle");
-    const darkModeToggle = document.getElementById("darkModeToggle");
-    const scrollTopBtn = document.getElementById("scrollTopBtn");
-    const refreshBtn = document.getElementById("refreshBtn");
-    const leaderboard = document.getElementById("leaderboard");
-    const loaderContainer = document.getElementById("loaderContainer");
-    const toast = document.getElementById("toast");
-    const toastClose = document.querySelector(".toast-close");
-    const toastMessage = document.querySelector(".toast-message");
-    const toastIcon = document.querySelector(".toast-icon i");
-    const profileModal = document.getElementById("profileModal");
-    const modalClose = document.getElementById("modalClose");
-    const profileContent = document.getElementById("profileContent");
+    const leaderboard = document.getElementById('leaderboard');
+    const profileModal = document.getElementById('profileModal');
+    const modalClose = document.getElementById('modalClose');
+    const profileContent = document.getElementById('profileContent');
+    const loader = document.getElementById('loader');
+    const sidebarToggle = document.getElementById('sidebarToggle');
 
-    // Cookie helper function
+    // Helper function to get cookie value
     function getCookieValue(name) {
         const cookies = document.cookie.split(";");
         for (let c of cookies) {
@@ -994,322 +360,110 @@
         return !!getCookieValue("user_id");
     }
 
-    // Get logged in user ID
-    const loggedInUserId = getCookieValue("user_id");
-
-    // Toggle sidebar
-    sidebarToggle.addEventListener("click", () => {
-        sidebar.classList.toggle("show");
-        sidebar.classList.toggle("hidden");
-    });
-
-    // Toggle dark mode
-    darkModeToggle.addEventListener("click", () => {
-        document.body.classList.toggle("dark-mode");
-
-        // Update icon
-        if (document.body.classList.contains("dark-mode")) {
-            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            localStorage.setItem("darkMode", "enabled");
-        } else {
-            darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-            localStorage.setItem("darkMode", "disabled");
-        }
-    });
-
-    // Check for saved dark mode preference
-    if (localStorage.getItem("darkMode") === "enabled") {
-        document.body.classList.add("dark-mode");
-        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    }
-
-    // Scroll to top
-    scrollTopBtn.addEventListener("click", () => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-    });
-
-    // Refresh leaderboard
-    refreshBtn.addEventListener("click", () => {
-        // Add rotation animation to refresh icon
-        refreshBtn.querySelector('i').classList.add('fa-spin');
-
-        // Fetch the leaderboard data
-        fetchLeaderboard();
-
-        // Remove animation after a short delay
-        setTimeout(() => {
-            refreshBtn.querySelector('i').classList.remove('fa-spin');
-            showToast("Leaderboard refreshed!", "success");
-        }, 1000);
-    });
-
-    // Toast functionality
-    function showToast(message, type = "info") {
-        toastMessage.textContent = message;
-        toast.className = "toast";
-        toast.classList.add(type);
-        toast.classList.add("show");
-
-        // Update icon based on type
-        if (type === "success") {
-            toastIcon.className = "fas fa-check-circle";
-        } else if (type === "error") {
-            toastIcon.className = "fas fa-exclamation-circle";
-        } else {
-            toastIcon.className = "fas fa-info-circle";
-        }
-
-        // Auto hide after 5 seconds
-        setTimeout(() => {
-            toast.classList.remove("show");
-        }, 5000);
-    }
-
-    // Close toast manually
-    toastClose.addEventListener("click", () => {
-        toast.classList.remove("show");
-    });
-
-    // Profile modal functions
+    // Modal functions
     function openProfileModal() {
         profileModal.style.display = "flex";
-        document.body.style.overflow = "hidden"; // Prevent scrolling behind modal
+        document.body.style.overflow = "hidden";
     }
 
     function closeProfileModal() {
         profileModal.style.display = "none";
-        document.body.style.overflow = ""; // Restore scrolling
+        document.body.style.overflow = "";
     }
 
-    // Close modal on click
     modalClose.addEventListener("click", closeProfileModal);
-
-    // Close modal when clicking outside content
     profileModal.addEventListener("click", (e) => {
-        if (e.target === profileModal) {
-            closeProfileModal();
-        }
+        if (e.target === profileModal) closeProfileModal();
     });
-
-    // Close modal with Escape key
     document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-            closeProfileModal();
-        }
+        if (e.key === "Escape") closeProfileModal();
     });
 
     // Get student details from API
     async function getStudentDetails(userId) {
         try {
-            // Show loader
-            loaderContainer.style.display = "flex";
+            loader.style.display = "flex";
 
             const response = await fetch(`https://server1.misscal.net/getStudent?userId=${userId}`, {
                 method: "GET",
                 credentials: "include"
             });
 
-            // Hide loader
-            loaderContainer.style.display = "none";
+            loader.style.display = "none";
 
             if (!response.ok) {
-                showToast("Failed to load student details", "error");
+                alert("Failed to load student details");
                 return null;
             }
 
-            const studentData = await response.json();
-            return studentData;
-
+            return await response.json();
         } catch (error) {
-            // Hide loader
-            loaderContainer.style.display = "none";
+            loader.style.display = "none";
             console.error("Error fetching student details:", error);
-            showToast("Error loading student details", "error");
+            alert("Error loading student details");
             return null;
         }
     }
 
-    // Display student profile in modal
-    async function showStudentProfile(userId) {
+    // Display student profile
+    async function viewProfile(userId) {
         const studentData = await getStudentDetails(userId);
 
-        if (!studentData) {
-            return;
-        }
+        if (!studentData) return;
 
-        // Create profile content HTML
         let profileHTML = `
-        <div class="profile-header">
-            <div class="profile-avatar">
-                <img src="${studentData.photo || 'https://via.placeholder.com/120'}"
-                     alt="${studentData.name || 'Student'}"
-                     onerror="this.src='https://via.placeholder.com/120'">
-            </div>
-            <div class="profile-title">
-                <h3 class="profile-name">${studentData.name || 'Student'}</h3>
-                <p class="profile-subtitle">${studentData.major || 'N/A'}${studentData.year ? `, Year ${studentData.year}` : ''}</p>
-                ${studentData.gpa ? `<div class="profile-badge">GPA: ${studentData.gpa}</div>` : ''}
-            </div>
-        </div>
-
-        <div class="profile-sections">
-            <div class="profile-section">
-                <h4 class="section-title">Personal Story</h4>
-                <div class="info-item">
-                    <i class="fas fa-quote-left"></i>
-                    <div class="info-content">
-                        <div class="info-value">${studentData.personal_story || 'No personal story provided'}</div>
+                <div class="profile-header">
+                    <img class="profile-avatar" src="${studentData.photo || 'https://via.placeholder.com/100'}"
+                         alt="${studentData.name}" onerror="this.src='https://via.placeholder.com/100'">
+                    <div>
+                        <h2 class="profile-name">${studentData.name || 'Student'}</h2>
+                        <p>${studentData.major || 'N/A'}${studentData.year ? `, Year ${studentData.year}` : ''}</p>
+                        ${studentData.gpa ? `<p>GPA: ${studentData.gpa}</p>` : ''}
                     </div>
                 </div>
-            </div>
 
-            <div class="profile-section">
-                <h4 class="section-title">Campaign</h4>
-                <div class="info-item">
-                    <i class="fas fa-bullhorn"></i>
-                    <div class="info-content">
-                        <div class="info-label">Campaign Line</div>
-                        <div class="info-value">${studentData.campaign_line || 'No campaign line provided'}</div>
+                <div class="profile-info">
+                    <div class="info-section">
+                        <h3>Campaign Line</h3>
+                        <p>${studentData.campaign_line || 'No campaign line provided'}</p>
+                    </div>
+
+                    <div class="info-section">
+                        <h3>Personal Story</h3>
+                        <p>${studentData.personal_story || 'No personal story provided'}</p>
+                    </div>
+
+                    <div class="info-section">
+                        <h3>Experience</h3>
+                        <p>${studentData.experience || 'No experience listed'}</p>
+                    </div>
+
+                    <div class="info-section">
+                        <h3>Organizations</h3>
+                        <p>${studentData.organizations || 'No organizations listed'}</p>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="profile-section">
-            <h4 class="section-title">Experience & Organizations</h4>
-            <div class="info-item">
-                <i class="fas fa-briefcase"></i>
-                <div class="info-content">
-                    <div class="info-label">Experience</div>
-                    <div class="info-value">${studentData.experience || 'No experience listed'}</div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="vote-button" onclick="vote('${userId}')">
+                        <i class="fas fa-heart"></i> Vote
+                    </button>
                 </div>
-            </div>
+            `;
 
-            <div class="info-item">
-                <i class="fas fa-users"></i>
-                <div class="info-content">
-                    <div class="info-label">Organizations</div>
-                    <div class="info-value">${studentData.organizations || 'No organizations listed'}</div>
-                </div>
-            </div>
-        </div>
-    `;
-
-        // Add social media if available
-        const socialLinks = [];
-
-        if (studentData.instagram) socialLinks.push(`<a href="${studentData.instagram}" target="_blank" class="social-icon social-instagram" title="Instagram"><i class="fab fa-instagram"></i></a>`);
-        if (studentData.linkedin) socialLinks.push(`<a href="${studentData.linkedin}" target="_blank" class="social-icon social-linkedin" title="LinkedIn"><i class="fab fa-linkedin"></i></a>`);
-        if (studentData.facebook) socialLinks.push(`<a href="${studentData.facebook}" target="_blank" class="social-icon social-facebook" title="Facebook"><i class="fab fa-facebook"></i></a>`);
-        if (studentData.github) socialLinks.push(`<a href="${studentData.github}" target="_blank" class="social-icon social-github" title="GitHub"><i class="fab fa-github"></i></a>`);
-        if (studentData.snapchat) socialLinks.push(`<a href="${studentData.snapchat}" target="_blank" class="social-icon social-snapchat" title="Snapchat"><i class="fab fa-snapchat"></i></a>`);
-        if (studentData.tiktok) socialLinks.push(`<a href="${studentData.tiktok}" target="_blank" class="social-icon social-tiktok" title="TikTok"><i class="fab fa-tiktok"></i></a>`);
-
-        if (socialLinks.length > 0) {
-            profileHTML += `
-            <div class="social-media">
-                ${socialLinks.join('')}
-            </div>
-        `;
-        }
-
-        // Add action buttons
-        profileHTML += `
-        <div class="profile-actions">
-            ${isUserLoggedIn() ?
-            `<button class="profile-action-btn" onclick="vote('${userId}')">
-                <i class="fas fa-heart"></i> Vote
-              </button>` :
-            `<button class="profile-action-btn" onclick="window.location.href='sign-in.html'">
-                <i class="fas fa-sign-in-alt"></i> Sign in to Vote
-              </button>`
-        }
-            <button class="profile-action-btn" onclick="closeProfileModal()">
-                <i class="fas fa-times"></i> Close
-            </button>
-        </div>
-    `;
-
-        // Update modal content
         profileContent.innerHTML = profileHTML;
-
-        // Show modal
         openProfileModal();
-    }
-
-    // Logout function
-    document.getElementById("logoffButton").addEventListener("click", async () => {
-        try {
-            // Show loader
-            loaderContainer.style.display = "flex";
-
-            const response = await fetch("https://server1.misscal.net/logout", {
-                method: "POST",
-                credentials: "include",
-            });
-
-            // Hide loader
-            loaderContainer.style.display = "none";
-
-            if (response.ok) {
-                // Remove user_id cookie manually (for frontend visibility)
-                document.cookie = "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-
-                showToast("You have been logged out. Redirecting...", "success");
-
-                // Redirect after a short delay
-                setTimeout(() => {
-                    window.location.href = "sign-in.html";
-                }, 1500);
-            } else {
-                showToast("Logoff failed. Please try again.", "error");
-            }
-        } catch (error) {
-            // Hide loader
-            loaderContainer.style.display = "none";
-            console.error("Error logging out:", error);
-            showToast("An error occurred while logging out.", "error");
-        }
-    });
-
-    // Create vote animation
-    function createVoteAnimation(button) {
-        const heart = document.createElement('div');
-        heart.className = 'vote-animation';
-        heart.innerHTML = '<i class="fas fa-heart"></i>';
-        heart.style.left = button.offsetLeft + (button.offsetWidth / 2) + 'px';
-        heart.style.top = button.offsetTop + 'px';
-
-        document.body.appendChild(heart);
-
-        // Remove after animation
-        setTimeout(() => {
-            heart.remove();
-        }, 2000);
     }
 
     // Vote function
     async function vote(candidateId) {
         try {
-            if (!candidateId) {
-                showToast("Error: No candidate ID provided.", "error");
-                return;
-            }
-
-            // Check if user is logged in
             if (!isUserLoggedIn()) {
-                showToast("Please log in to vote.", "error");
-                setTimeout(() => {
-                    window.location.href = "sign-in.html";
-                }, 1500);
+                window.location.href = "sign-in.html";
                 return;
             }
 
-            // Show loader
-            loaderContainer.style.display = "flex";
+            loader.style.display = "flex";
 
             const response = await fetch("https://server1.misscal.net/vote", {
                 method: "POST",
@@ -1318,41 +472,29 @@
                 body: JSON.stringify({ candidateId })
             });
 
-            // Hide loader
-            loaderContainer.style.display = "none";
+            loader.style.display = "none";
 
             const data = await response.json();
-            if (!response.ok) {
-                showToast(`Vote failed: ${data.message}`, "error");
-            } else {
-                showToast(data.message || "Vote successful!", "success");
-                // Create heart animation on success
-                const voteButton = document.querySelector(`[data-candidate-id="${candidateId}"]`);
-                if (voteButton) createVoteAnimation(voteButton);
 
-                // Refresh leaderboard after voting
-                setTimeout(() => {
-                    fetchLeaderboard();
-                }, 1000);
+            if (!response.ok) {
+                alert(`Vote failed: ${data.message}`);
+            } else {
+                alert(data.message || "Vote successful!");
+                fetchLeaderboard();
             }
         } catch (error) {
-            // Hide loader
-            loaderContainer.style.display = "none";
+            loader.style.display = "none";
             console.error("Error while voting:", error);
-            showToast("An error occurred while casting your vote.", "error");
+            alert("An error occurred while casting your vote.");
         }
     }
 
     // Fetch leaderboard data
     async function fetchLeaderboard() {
         try {
-            // Show loader
-            loaderContainer.style.display = "flex";
+            loader.style.display = "flex";
+            leaderboard.innerHTML = '<div style="text-align: center;">Loading...</div>';
 
-            // Clear current leaderboard
-            leaderboard.innerHTML = '<div class="loader"></div>';
-
-            // Fetch data from the API
             const response = await fetch("https://server1.misscal.net/getTop20Leaderboard");
 
             if (!response.ok) {
@@ -1361,95 +503,63 @@
 
             const data = await response.json();
 
-            // Hide loader
-            loaderContainer.style.display = "none";
+            loader.style.display = "none";
 
-            // Check if any data returned
             if (!data || data.length === 0) {
-                leaderboard.innerHTML = '<div style="padding: 20px; text-align: center;">No contestants found.</div>';
+                leaderboard.innerHTML = '<div style="text-align: center; padding: 20px;">No contestants found.</div>';
                 return;
             }
 
-            // Clear loader if it exists
             leaderboard.innerHTML = '';
 
-            // Create and add each leaderboard item
-            // Preload all images to prevent layout shifts
-            const preloadImages = data.map(contestant => {
-                return new Promise((resolve) => {
-                    if (contestant.photo) {
-                        const img = new Image();
-                        img.onload = () => resolve();
-                        img.onerror = () => resolve();
-                        img.src = contestant.photo;
-                    } else {
-                        resolve();
-                    }
-                });
-            });
+            data.forEach((contestant, index) => {
+                const item = document.createElement('div');
+                item.className = 'leaderboard-item';
 
-            // Wait for images to preload before rendering
-            Promise.all(preloadImages).then(() => {
-                data.forEach((contestant, index) => {
-                    // Create leaderboard item
-                    const item = document.createElement('div');
-                    item.className = 'leaderboard-item';
-                    item.style.height = '120px'; // Fixed height to prevent layout shifts
+                let rankClass = '';
+                if (index === 0) rankClass = 'rank-1';
+                else if (index === 1) rankClass = 'rank-2';
+                else if (index === 2) rankClass = 'rank-3';
 
-                    // Determine rank styling
-                    let rankClass = 'rank-other';
-                    if (index === 0) rankClass = 'rank-1';
-                    else if (index === 1) rankClass = 'rank-2';
-                    else if (index === 2) rankClass = 'rank-3';
-
-                    // Create vote button based on login status
-                    const voteButton = isUserLoggedIn()
-                        ? `<button class="vote-button" onclick="vote('${contestant.user_id}')" data-candidate-id="${contestant.user_id}">
-                            <i class="fas fa-heart"></i> Vote
-                          </button>`
-                        : `<button class="vote-button" onclick="window.location.href='sign-in.html'">
-                            <i class="fas fa-sign-in-alt"></i> Sign in to Vote
-                          </button>`;
-
-                    // Set HTML content
-                    item.innerHTML = `
+                item.innerHTML = `
                         <div class="rank ${rankClass}">${index + 1}</div>
-                        <img src="${contestant.photo || 'https://via.placeholder.com/80'}"
-                            alt="${contestant.name}"
-                            onclick="showStudentProfile('${contestant.user_id}')"
-                            onerror="this.src='https://via.placeholder.com/80'">
-                        <div class="participant-info" onclick="showStudentProfile('${contestant.user_id}')">
-                            <div class="participant-name">${contestant.name}</div>
-                            <button class="profile-btn">
+                        <img class="contestant-photo"
+                             src="${contestant.photo || 'https://via.placeholder.com/80'}"
+                             alt="${contestant.name}"
+                             onerror="this.src='https://via.placeholder.com/80'">
+                        <div class="contestant-info">
+                            <h3 class="contestant-name">${contestant.name}</h3>
+                            <a href="javascript:void(0)" class="view-profile" onclick="viewProfile('${contestant.user_id}')">
                                 <i class="fas fa-user"></i> View Profile
-                            </button>
+                            </a>
                         </div>
-                        <div class="votes">${contestant.votes || 0}</div>
-                        ${voteButton}
+                        <div class="vote-count">${contestant.votes || 0}</div>
+                        <button class="vote-button" onclick="vote('${contestant.user_id}')">
+                            <i class="fas fa-heart"></i> Vote
+                        </button>
                     `;
 
-                    // Add to leaderboard
-                    leaderboard.appendChild(item);
-                });
+                leaderboard.appendChild(item);
             });
 
         } catch (error) {
-            // Hide loader
-            loaderContainer.style.display = "none";
+            loader.style.display = "none";
             console.error("Error fetching leaderboard:", error);
-            leaderboard.innerHTML = '<div style="padding: 20px; text-align: center; color: #dc3545;">Error loading leaderboard. Please try again later.</div>';
-            showToast("Failed to load leaderboard data", "error");
+            leaderboard.innerHTML = '<div style="text-align: center; padding: 20px; color: red;">Error loading leaderboard. Please try again later.</div>';
         }
     }
 
-    // Initialize the page
+    // Initialize
     document.addEventListener('DOMContentLoaded', () => {
-        // Load the leaderboard on page load
         fetchLeaderboard();
 
-        // Show welcome toast
-        setTimeout(() => {
-            showToast("Welcome to the Miss Cal Top 20 Leaderboard! Click on any contestant to view their profile.", "info");
-        }, 1000);
+        sidebarToggle.addEventListener('click', () => {
+            // This would normally toggle your sidebar
+            // Since we don't have the sidebar in this simplified version,
+            // we can make it redirect to the home page
+            window.location.href = "mainPage.html";
+        });
     });
-    </script>
+</script>
+</body>
+</html>
