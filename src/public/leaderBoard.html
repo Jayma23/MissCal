@@ -1320,83 +1320,73 @@
     }
 
     // Fetch leaderboard data - modified to include profile view option
-    async function fetchLeaderboard() {
-        try {
-            // Show loader
-            loaderContainer.style.display = "flex";
+    async function loadLeaderboard() {
+        // Show loader
+        leaderboardList.innerHTML = '<div class="loader"></div>';
 
-            const response = await fetch("https://server1.misscal.net/getLeaderboard", { credentials: "include" });
+        try {
+            // Fetch data from the API endpoint - remove credentials for non-logged in users to view
+            const response = await fetch("https://server1.misscal.net/getTop20Leaderboard");
+
             const data = await response.json();
 
-            // Hide loader
-            loaderContainer.style.display = "none";
+            // Clear loader
+            leaderboardList.innerHTML = '';
 
-            const leaderboard = document.getElementById("leaderboard");
-            leaderboard.innerHTML = "";
+            // Display data
+            if (data.length === 0) {
+                leaderboardList.innerHTML = '<div class="no-results">No contestants found</div>';
+                return;
+            }
 
-            // Get top 5 participants
-            const top5Participants = data.slice(0, 5);
+            // Check if user is logged in
+            const userLoggedIn = isUserLoggedIn();
 
-            top5Participants.forEach((participant, index) => {
-                const entry = document.createElement("div");
-                entry.className = "leaderboard-item animate__animated animate__fadeInUp";
-
-                // Add animation delay based on index
-                entry.style.animationDelay = `${index * 0.1}s`;
+            // Show top contestants
+            for (let i = 0; i < data.length; i++) {
+                const contestant = data[i];
+                const item = document.createElement('div');
+                item.className = 'leaderboard-item';
 
                 // Determine rank class
-                let rankClass = "rank-other";
-                if (index === 0) rankClass = "rank-1";
-                else if (index === 1) rankClass = "rank-2";
-                else if (index === 2) rankClass = "rank-3";
+                let rankClass = 'rank-other';
+                if (i === 0) rankClass = 'rank-1';
+                else if (i === 1) rankClass = 'rank-2';
+                else if (i === 2) rankClass = 'rank-3';
 
-                entry.innerHTML = `
-                <div class="rank ${rankClass}">${index + 1}</div>
-                <img src="${participant.photo}" alt="${participant.name}" class="contestant-img">
-                <div class="participant-info" onclick="showStudentProfile('${participant.user_id}')">
-                    <div class="participant-name">${participant.name}</div>
-                    <button class="profile-btn">
-                        <i class="fas fa-id-card"></i> View Profile
-                    </button>
-                </div>
-                <button class="vote-button" id="vote-btn-${participant.user_id}">
+                // Create button HTML based on login status
+                let buttonHtml = '';
+                if (userLoggedIn) {
+                    buttonHtml = `
+                <button class="vote-btn" onclick="voteForContestant('${contestant.user_id}')">
                     <i class="fas fa-heart"></i> Vote
-                </button>
+                </button>`;
+                } else {
+                    buttonHtml = `
+                <button class="login-prompt" onclick="window.location.href='/sign-in.html'">
+                    <i class="fas fa-sign-in-alt"></i> Sign in to Vote
+                </button>`;
+                }
+
+                item.innerHTML = `
+            <div class="rank ${rankClass}">${i + 1}</div>
+            <div class="contestant" onclick="showStudentProfile('${contestant.id}')">
+                <img src="${contestant.photo}" alt="${contestant.name}" class="contestant-img">
+                <div class="contestant-info">
+                    <div class="contestant-name">${contestant.name}</div>
+                </div>
+            </div>
+            <div class="votes">${contestant.votes}</div>
+            ${buttonHtml}
             `;
 
-                leaderboard.appendChild(entry);
-
-                // Attach event listener to vote button
-                const voteButton = document.getElementById(`vote-btn-${participant.user_id}`);
-                if (voteButton) {
-                    voteButton.addEventListener("click", (e) => {
-                        // Prevent opening profile when clicking vote button
-                        e.stopPropagation();
-
-                        // Add vote animation
-                        createVoteAnimation(voteButton);
-
-                        // Add button animation
-                        voteButton.style.animation = 'pulse 0.5s';
-
-                        // Call vote function
-                        vote(participant.user_id);
-
-                        // Remove animation after it completes
-                        setTimeout(() => {
-                            voteButton.style.animation = '';
-                        }, 500);
-                    });
-                } else {
-                    console.error(`Vote button not found for ${participant.name} (${participant.user_id})`);
-                }
-            });
+                leaderboardList.appendChild(item);
+            }
 
         } catch (error) {
-            // Hide loader
-            loaderContainer.style.display = "none";
-            console.error("Error fetching leaderboard:", error);
-            showToast("Failed to load leaderboard. Please try again.", "error");
+            console.error('Error loading leaderboard:', error);
+            leaderboardList.innerHTML = '<div class="error-message">Failed to load leaderboard</div>';
+            showToast('Failed to load leaderboard', 'error');
         }
     }
 
