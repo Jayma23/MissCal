@@ -1352,10 +1352,7 @@
 
                 entry.innerHTML = `
                 <div class="rank ${rankClass}">${index + 1}</div>
-                <img src="${participant.photo || 'https://randomuser.me/api/portraits/lego/0.jpg'}"
-                    alt="${participant.name}"
-                    onerror="this.src='https://randomuser.me/api/portraits/lego/0.jpg'"
-                    onclick="showStudentProfile('${participant.user_id}')">
+                <img src="${participant.photo}" alt="${participant.name}" class="contestant-img">
                 <div class="participant-info" onclick="showStudentProfile('${participant.user_id}')">
                     <div class="participant-name">${participant.name}</div>
                     <button class="profile-btn">
