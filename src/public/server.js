@@ -66,6 +66,7 @@ app.use("/photos", express.static(path.join(__dirname, "uploads")));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Handle OPTIONS requests for CORS
+
 app.use((req, res, next) => {
     if (req.method === "OPTIONS") {
         return res.sendStatus(200);
@@ -106,7 +107,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Database setup
-require("dotenv").config(); // Should be at the top
+
 const db = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -1937,6 +1938,10 @@ app.get('/stats', async (req, res) => {
         console.error('Error fetching statistics:', error);
         res.status(500).json({ error: 'Failed to fetch statistics' });
     }
+});
+
+app.get('/get-csrf-token', csrfProtection, (req, res) => {
+    res.json({ csrfToken: req.csrfToken() });
 });
 
 // API endpoint to count entries
