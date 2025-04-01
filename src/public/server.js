@@ -56,6 +56,8 @@ const PUBLIC_PATHS = [
     "/forgot-password",
     "/reset-password",
     "/verify-email",
+    "/vote-by-email",
+    "/verify-vote",
     "/searchStudents",
     "/getTop20Leaderboard"
 ];
