@@ -59,6 +59,7 @@ const PUBLIC_PATHS = [
     "/vote-by-email",
     "/verify-vote",
     "/searchStudents",
+    "/create-password",
     "/getTop20Leaderboard"
 ];
 
@@ -359,11 +360,32 @@ app.post("/signup", async (req, res) => {
     }
 
     try {
-        // Check if email exists in the main Users table (already verified)
-        const userResults = await db.query("SELECT email FROM Users WHERE email = $1", [email]);
+        // Check if email exists in the main Users table
+        const userResults = await db.query("SELECT user_id, is_verified, needs_password, phase1_vote_done FROM Users WHERE email = $1", [email]);
 
         if (userResults.rows.length > 0) {
-            return res.status(409).json({ message: "Email already exists. Please log in." });
+            const user = userResults.rows[0];
+
+            // If the user account exists but was created through email voting (needs_password=true)
+            if (user.needs_password) {
+                // Update the existing account instead of creating a new one
+                const hashedPassword = await bcrypt.hash(password, 10);
+
+                await db.query(
+                    `UPDATE Users 
+                     SET full_name = $1, password = $2, is_verified = true, needs_password = false
+                     WHERE user_id = $3`,
+                    [full_name, hashedPassword, user.user_id]
+                );
+
+                return res.status(200).json({
+                    message: "Account setup complete! You can now log in with your email and password.",
+                    votingStatus: user.phase1_vote_done ? "Your vote has already been counted." : "You can now vote for your favorite contestant!"
+                });
+            } else {
+                // Regular account already exists
+                return res.status(409).json({ message: "Email already exists. Please log in." });
+            }
         }
 
         // Generate token and hash password
@@ -383,8 +405,8 @@ app.post("/signup", async (req, res) => {
         if (pendingResults.rows.length > 0) {
             // Email exists in pending verifications, update the existing record
             await db.query(
-                `UPDATE PendingVerifications 
-                 SET full_name = $1, password = $2, verification_token = $3, 
+                `UPDATE PendingVerifications
+                 SET full_name = $1, password = $2, verification_token = $3,
                      expires_at = $4, created_at = CURRENT_TIMESTAMP
                  WHERE email = $5`,
                 [full_name, hashedPassword, verificationToken, expiresAt, email]
@@ -392,8 +414,8 @@ app.post("/signup", async (req, res) => {
         } else {
             // New pending verification
             await db.query(
-                `INSERT INTO PendingVerifications 
-                 (full_name, email, password, verification_token, expires_at)
+                `INSERT INTO PendingVerifications
+                     (full_name, email, password, verification_token, expires_at)
                  VALUES ($1, $2, $3, $4, $5)`,
                 [full_name, email, hashedPassword, verificationToken, expiresAt]
             );
@@ -1386,31 +1408,51 @@ app.post("/vote-by-email", async (req, res) => {
         }
 
         // Check if this email has already voted
-        const existingVoteQuery = "SELECT * FROM email_votes WHERE email = $1";
-        const existingVoteResult = await db.query(existingVoteQuery, [email]);
+        const userQuery = "SELECT user_id, phase1_vote_done FROM Users WHERE email = $1";
+        const userResult = await db.query(userQuery, [email]);
 
-        if (existingVoteResult.rows.length > 0) {
-            const vote = existingVoteResult.rows[0];
-            if (vote.is_verified) {
+        if (userResult.rows.length > 0) {
+            // User exists
+            const user = userResult.rows[0];
+
+            if (user.phase1_vote_done) {
                 return res.status(400).json({ message: "This email has already been used to vote." });
-            } else {
-                // Previous vote attempt wasn't verified - remove it
-                await db.query("DELETE FROM email_votes WHERE id = $1", [vote.id]);
             }
+
+            // Generate a voting verification token
+            const voteToken = crypto.randomBytes(32).toString('hex');
+
+            // Update the user with the new verification token and candidate choice
+            await db.query(
+                "UPDATE Users SET email_verification_token = $1, temp_candidate_id = $2 WHERE user_id = $3",
+                [voteToken, candidateId, user.user_id]
+            );
+        } else {
+            // User doesn't exist, create a temporary account
+            const voteToken = crypto.randomBytes(32).toString('hex');
+            const tempPassword = crypto.randomBytes(16).toString('hex');
+            const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+            // Extract name from email (part before @)
+            const emailParts = email.split('@');
+            const tempName = emailParts[0];
+
+            // Create new unverified user with vote intent
+            await db.query(
+                `INSERT INTO Users (email, password, full_name, is_verified, phase1_vote_done,
+                                    email_verification_token, temp_candidate_id, needs_password)
+                 VALUES ($1, $2, $3, false, false, $4, $5, true)`,
+                [email, hashedPassword, tempName, voteToken, candidateId]
+            );
         }
 
-        // Generate a voting verification token
-        const voteToken = crypto.randomBytes(32).toString('hex');
-
-        // Store the vote intent
-        const storeVoteQuery = `
-      INSERT INTO email_votes (email, candidate_id, verification_token)
-      VALUES ($1, $2, $3)
-    `;
-        await db.query(storeVoteQuery, [email, candidateId, voteToken]);
+        // Get the token (whether from existing or new user)
+        const tokenQuery = "SELECT email_verification_token FROM Users WHERE email = $1";
+        const tokenResult = await db.query(tokenQuery, [email]);
+        const voteToken = tokenResult.rows[0].email_verification_token;
 
         // Send verification email
-        const voteLink = `https://www.misscal.net/verify-vote?token=${voteToken}`;
+        const voteLink = `https://server1.misscal.net/verify-vote?token=${voteToken}`;
 
         const mailOptions = {
             from: '"Miss Cal" <mikejamesma23248@gmail.com>',
@@ -1421,7 +1463,7 @@ app.post("/vote-by-email", async (req, res) => {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Verify Your Vote</h2>
           <p>Thank you for voting in the Miss Cal pageant!</p>
-          <p>Please click the button below to verify your vote.</p>
+          <p>Please click the button below to verify your vote:</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${voteLink}" style="background-color: #003262; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify My Vote</a>
           </div>
@@ -1436,7 +1478,7 @@ app.post("/vote-by-email", async (req, res) => {
         await transporter.sendMail(mailOptions);
 
         return res.status(200).json({
-            message: "Please check your email to verify your vote."
+            message: "Please check your email or Spam to verify your vote. "
         });
 
     } catch (error) {
@@ -1445,7 +1487,6 @@ app.post("/vote-by-email", async (req, res) => {
     }
 });
 
-// 2. Create endpoint to verify and process votes
 app.get("/verify-vote", async (req, res) => {
     try {
         const { token } = req.query;
@@ -1454,14 +1495,14 @@ app.get("/verify-vote", async (req, res) => {
             return res.status(400).send("Missing verification token.");
         }
 
-        // Find the vote with this token
-        const voteQuery = `
-            SELECT * FROM email_votes
-            WHERE verification_token = $1 AND is_verified = false
+        // Find the user with this token
+        const userQuery = `
+            SELECT * FROM Users
+            WHERE email_verification_token = $1 AND phase1_vote_done = false
         `;
-        const voteResult = await db.query(voteQuery, [token]);
+        const userResult = await db.query(userQuery, [token]);
 
-        if (voteResult.rows.length === 0) {
+        if (userResult.rows.length === 0) {
             return res.status(400).send(`
         <!DOCTYPE html>
         <html>
@@ -1510,7 +1551,8 @@ app.get("/verify-vote", async (req, res) => {
       `);
         }
 
-        const vote = voteResult.rows[0];
+        const user = userResult.rows[0];
+        const candidateId = user.temp_candidate_id;
 
         // Increment candidate's vote count
         const updateCandidateQuery = `
@@ -1518,15 +1560,16 @@ app.get("/verify-vote", async (req, res) => {
             SET votes = COALESCE(votes, 0) + 1
             WHERE user_id = $1
         `;
-        await db.query(updateCandidateQuery, [vote.candidate_id]);
+        await db.query(updateCandidateQuery, [candidateId]);
 
-        // Mark this vote as verified
-        const updateVoteQuery = `
-            UPDATE email_votes
-            SET is_verified = true
-            WHERE verification_token = $1
+        // Mark this user as having voted and clear the token
+        const updateUserQuery = `
+            UPDATE Users
+            SET phase1_vote_done = true,
+                email_verification_token = NULL
+            WHERE user_id = $1
         `;
-        await db.query(updateVoteQuery, [token]);
+        await db.query(updateUserQuery, [user.user_id]);
 
         // Return a success page
         res.send(`
@@ -1554,6 +1597,11 @@ app.get("/verify-vote", async (req, res) => {
           h1 {
             color: #003262;
           }
+          .success-icon {
+            font-size: 64px;
+            color: #28a745;
+            margin-bottom: 20px;
+          }
           .btn {
             display: inline-block;
             background: #003262;
@@ -1564,14 +1612,32 @@ app.get("/verify-vote", async (req, res) => {
             font-weight: bold;
             margin-top: 20px;
           }
+          .create-account {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+          }
         </style>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
       </head>
       <body>
         <div class="container">
+          <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
           <h1>Vote Confirmed!</h1>
           <p>Thank you for participating in the Miss Cal pageant voting.</p>
           <p>Your vote has been successfully counted.</p>
+          
           <a href="https://www.misscal.net/" class="btn">Return to Home</a>
+          
+          ${user.needs_password ? `
+          <div class="create-account">
+            <h2>Want to join the pageant?</h2>
+            <p>You already have an account created with your email. You can now set a password and participate in the Miss Cal pageant!</p>
+            <a href="https://www.misscal.net/signup.html" class="btn">Create Password</a>
+          </div>
+          ` : ''}
         </div>
       </body>
       </html>
@@ -1582,51 +1648,264 @@ app.get("/verify-vote", async (req, res) => {
         res.status(500).send("An error occurred. Please try again later.");
     }
 });
-
 // 3. Add endpoint for users to set a password and "upgrade" to a full account
-app.post("/create-password", async (req, res) => {
-    try {
-        const { email, password } = req.body;
+// GET endpoint to serve the create-password form
+app.get("/create-password", (req, res) => {
+    const email = req.query.email;
 
-        if (!email || !password) {
-            return res.status(400).json({ message: "Email and password are required." });
-        }
-
-        // Verify password complexity
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-        if (!passwordRegex.test(password)) {
-            return res.status(400).json({
-                message: "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number."
-            });
-        }
-
-        // Find the user
-        const userQuery = "SELECT * FROM Users WHERE email = $1";
-        const userResult = await db.query(userQuery, [email]);
-
-        if (userResult.rows.length === 0) {
-            return res.status(404).json({ message: "User not found." });
-        }
-
-        // Hash the new password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Update the user's account
-        const updateUserQuery = `
-      UPDATE Users
-      SET password = $1
-      WHERE email = $2
-    `;
-        await db.query(updateUserQuery, [hashedPassword, email]);
-
-        return res.status(200).json({
-            message: "Password created successfully! You can now log in with your email and password."
-        });
-
-    } catch (error) {
-        console.error("Create password error:", error);
-        return res.status(500).json({ message: "An error occurred. Please try again later." });
+    if (!email) {
+        return res.status(400).send("Email parameter is missing.");
     }
+
+    res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Create Password - Miss Cal</title>
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+      <style>
+        :root {
+          --berkeley-blue: #003262;
+          --california-gold: #FDB515;
+          --accent-pink: #ff6f61;
+        }
+        
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          line-height: 1.6;
+          margin: 0;
+          padding: 0;
+          background: linear-gradient(to bottom right, #FDB515, #FDB515);
+          color: #333;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .container {
+          width: 90%;
+          max-width: 500px;
+          background: white;
+          padding: 30px;
+          border-radius: 10px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+          color: var(--berkeley-blue);
+          text-align: center;
+          margin-bottom: 25px;
+        }
+        
+        .form-group {
+          margin-bottom: 20px;
+        }
+        
+        .form-group label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: bold;
+        }
+        
+        .form-control {
+          width: 100%;
+          padding: 12px 15px;
+          border: 2px solid #ddd;
+          border-radius: 8px;
+          font-size: 1rem;
+          transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+          border-color: var(--berkeley-blue);
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(0, 50, 98, 0.2);
+        }
+        
+        .password-container {
+          position: relative;
+        }
+        
+        .toggle-password {
+          position: absolute;
+          right: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: pointer;
+          color: #666;
+        }
+        
+        .password-requirements {
+          font-size: 0.9rem;
+          color: #666;
+          margin-top: 8px;
+        }
+        
+        .btn {
+          display: block;
+          width: 100%;
+          padding: 12px 0;
+          background: var(--berkeley-blue);
+          color: white;
+          border: none;
+          border-radius: 30px;
+          font-size: 1rem;
+          font-weight: bold;
+          cursor: pointer;
+          transition: all 0.3s;
+          text-align: center;
+        }
+        
+        .btn:hover {
+          background: var(--california-gold);
+          color: var(--berkeley-blue);
+          transform: translateY(-3px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .alert {
+          padding: 15px;
+          border-radius: 8px;
+          margin-bottom: 20px;
+          display: none;
+        }
+        
+        .alert-success {
+          background-color: #d4edda;
+          color: #155724;
+          border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+          background-color: #f8d7da;
+          color: #721c24;
+          border: 1px solid #f5c6cb;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>Create Your Password</h1>
+        <div id="alertBox" class="alert"></div>
+        
+        <form id="createPasswordForm">
+          <input type="hidden" id="emailInput" name="email" value="${email}">
+          
+          <div class="form-group">
+            <label for="passwordInput">New Password</label>
+            <div class="password-container">
+              <input type="password" id="passwordInput" name="password" class="form-control" required>
+              <i class="toggle-password fas fa-eye"></i>
+            </div>
+            <div class="password-requirements">
+              Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="confirmPasswordInput">Confirm Password</label>
+            <div class="password-container">
+              <input type="password" id="confirmPasswordInput" class="form-control" required>
+              <i class="toggle-password fas fa-eye"></i>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn">Create Password</button>
+        </form>
+      </div>
+      
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const form = document.getElementById('createPasswordForm');
+          const alertBox = document.getElementById('alertBox');
+          const passwordInput = document.getElementById('passwordInput');
+          const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+          const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+          
+          // Toggle password visibility
+          togglePasswordButtons.forEach(button => {
+            button.addEventListener('click', function() {
+              const input = this.previousElementSibling;
+              if (input.type === 'password') {
+                input.type = 'text';
+                this.classList.remove('fa-eye');
+                this.classList.add('fa-eye-slash');
+              } else {
+                input.type = 'password';
+                this.classList.remove('fa-eye-slash');
+                this.classList.add('fa-eye');
+              }
+            });
+          });
+          
+          // Form submission
+          form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Clear previous alerts
+            alertBox.style.display = 'none';
+            alertBox.textContent = '';
+            alertBox.className = 'alert';
+            
+            // Get values
+            const email = document.getElementById('emailInput').value;
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            // Validate password match
+            if (password !== confirmPassword) {
+              showAlert('Passwords do not match.', 'danger');
+              return;
+            }
+            
+            // Validate password requirements
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$/;
+            if (!passwordRegex.test(password)) {
+              showAlert('Password does not meet the requirements.', 'danger');
+              return;
+            }
+            
+            try {
+              // Submit the form data
+              const response = await fetch('server1.misscal.net/create-password', {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+              });
+              
+              const data = await response.json();
+              
+              if (response.ok) {
+                showAlert(data.message, 'success');
+                // Redirect to login page after 2 seconds
+                setTimeout(() => {
+                  window.location.href = '/sign-in.html';
+                }, 2000);
+              } else {
+                showAlert(data.message || 'An error occurred.', 'danger');
+              }
+            } catch (error) {
+              showAlert('An error occurred. Please try again.', 'danger');
+              console.error('Error:', error);
+            }
+          });
+          
+          function showAlert(message, type) {
+            alertBox.textContent = message;
+            alertBox.className = 'alert alert-' + type;
+            alertBox.style.display = 'block';
+          }
+        });
+      </script>
+    </body>
+    </html>
+  `);
 });
 app.get("/verify-email", async (req, res) => {
     const { token } = req.query;

@@ -524,7 +524,7 @@
 
             if (response.ok) {
                 // Using your original redirect
-                alert('Signup successful!, Please check your email or email spam to Verify your account. ');
+                alert('Signup successful!, Please check your email or email spam to Verify your account. If you already voted through email, you are good. ');
                 window.location.href = 'sign-in.html';
             } else {
                 const error = await response.json();
