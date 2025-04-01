@@ -1384,74 +1384,28 @@ app.post("/vote-by-email", async (req, res) => {
         }
 
         // Check if this email has already voted
-        const existingVoterQuery = "SELECT * FROM Users WHERE email = $1";
-        const existingVoterResult = await db.query(existingVoterQuery, [email]);
+        const existingVoteQuery = "SELECT * FROM email_votes WHERE email = $1";
+        const existingVoteResult = await db.query(existingVoteQuery, [email]);
 
-        if (existingVoterResult.rows.length > 0) {
-            const userId = existingVoterResult.rows[0].user_id;
-
-            // Check if they already voted
-            const voterEntryQuery = "SELECT phase1_vote_done FROM ContestEntries WHERE user_id = $1";
-            const voterEntryResult = await db.query(voterEntryQuery, [userId]);
-
-            if (voterEntryResult.rows.length > 0 && voterEntryResult.rows[0].phase1_vote_done) {
-                return res.status(400).json({ message: "You have already voted." });
+        if (existingVoteResult.rows.length > 0) {
+            const vote = existingVoteResult.rows[0];
+            if (vote.is_verified) {
+                return res.status(400).json({ message: "This email has already been used to vote." });
+            } else {
+                // Previous vote attempt wasn't verified - remove it
+                await db.query("DELETE FROM email_votes WHERE id = $1", [vote.id]);
             }
         }
 
-        // Generate a voting token
+        // Generate a voting verification token
         const voteToken = crypto.randomBytes(32).toString('hex');
 
-        // Store vote intent (either create a user or just store the token)
-        let userId;
-        if (existingVoterResult.rows.length > 0) {
-            // User exists, just use their ID
-            userId = existingVoterResult.rows[0].user_id;
-        } else {
-            // Create a new user with a temporary status
-            const tempPassword = crypto.randomBytes(16).toString('hex');
-            const hashedPassword = await bcrypt.hash(tempPassword, 10);
-
-            const insertUserQuery = `
-        INSERT INTO Users (email, is_verified, password, full_name)
-        VALUES ($1, false, $2, $3)
-        RETURNING user_id
-      `;
-            // Use the part before @ as the temporary name
-            const tempName = email.split('@')[0];
-            const newUserResult = await db.query(insertUserQuery, [email, hashedPassword, tempName]);
-            userId = newUserResult.rows[0].user_id;
-
-            // Create empty contest entry to track their vote
-            const createEntryQuery = `
-        INSERT INTO ContestEntries (user_id, name, form_submitted)
-        VALUES ($1, $2, false)
-      `;
-            await db.query(createEntryQuery, [userId, tempName]);
-        }
-
-        // Create voting token table if it doesn't exist
-        await db.query(`
-      CREATE TABLE IF NOT EXISTS vote_tokens (
-        token_id SERIAL PRIMARY KEY,
-        user_id INTEGER NOT NULL REFERENCES Users(user_id),
-        token VARCHAR(100) NOT NULL,
-        candidate_id INTEGER NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        expires_at TIMESTAMP NOT NULL,
-        used BOOLEAN DEFAULT FALSE
-      )
-    `);
-
-        // Store the voting token
-        const expiresAt = new Date();
-        expiresAt.setHours(expiresAt.getHours() + 24); // 24-hour expiration
-
-        const storeTokenQuery = `
-      INSERT INTO vote_tokens (user_id, token, candidate_id, expires_at)
-      VALUES ($1, $2, $3, $4)
+        // Store the vote intent
+        const storeVoteQuery = `
+      INSERT INTO email_votes (email, candidate_id, verification_token)
+      VALUES ($1, $2, $3)
     `;
-        await db.query(storeTokenQuery, [userId, voteToken, candidateId, expiresAt]);
+        await db.query(storeVoteQuery, [email, candidateId, voteToken]);
 
         // Send verification email
         const voteLink = `https://www.misscal.net/verify-vote?token=${voteToken}`;
@@ -1465,7 +1419,7 @@ app.post("/vote-by-email", async (req, res) => {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Verify Your Vote</h2>
           <p>Thank you for voting in the Miss Cal pageant!</p>
-          <p>Please click the button below to verify your vote. This link will expire in 24 hours.</p>
+          <p>Please click the button below to verify your vote.</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${voteLink}" style="background-color: #003262; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify My Vote</a>
           </div>
@@ -1495,56 +1449,82 @@ app.get("/verify-vote", async (req, res) => {
         const { token } = req.query;
 
         if (!token) {
-            return res.status(400).json({ message: "Invalid verification link." });
+            return res.status(400).send("Missing verification token.");
         }
 
-        // Find the token in the database
-        const tokenQuery = `
-      SELECT vt.*, u.email 
-      FROM vote_tokens vt
-      JOIN Users u ON vt.user_id = u.user_id
-      WHERE vt.token = $1 AND vt.used = false AND vt.expires_at > NOW()
-    `;
-        const tokenResult = await db.query(tokenQuery, [token]);
+        // Find the vote with this token
+        const voteQuery = `
+            SELECT * FROM email_votes
+            WHERE verification_token = $1 AND is_verified = false
+        `;
+        const voteResult = await db.query(voteQuery, [token]);
 
-        if (tokenResult.rows.length === 0) {
-            return res.status(400).json({ message: "Invalid or expired verification link." });
+        if (voteResult.rows.length === 0) {
+            return res.status(400).send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Invalid Token - Miss Cal</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 0;
+              padding: 40px;
+              background: linear-gradient(to bottom right, #FDB515, #FDB515);
+              color: #333;
+              text-align: center;
+            }
+            .container {
+              max-width: 600px;
+              margin: 0 auto;
+              background: white;
+              padding: 40px;
+              border-radius: 10px;
+              box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            }
+            h1 {
+              color: #003262;
+            }
+            .btn {
+              display: inline-block;
+              background: #003262;
+              color: white;
+              padding: 12px 25px;
+              text-decoration: none;
+              border-radius: 5px;
+              font-weight: bold;
+              margin-top: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Invalid or Expired Token</h1>
+            <p>The verification link is invalid or has expired.</p>
+            <a href="https://www.misscal.net/" class="btn">Return to Home</a>
+          </div>
+        </body>
+        </html>
+      `);
         }
 
-        const voteData = tokenResult.rows[0];
+        const vote = voteResult.rows[0];
 
-        // Process the vote
-        // 1. Increment candidate's vote count
+        // Increment candidate's vote count
         const updateCandidateQuery = `
-      UPDATE ContestEntries
-      SET votes = COALESCE(votes, 0) + 1
-      WHERE user_id = $1
-    `;
-        await db.query(updateCandidateQuery, [voteData.candidate_id]);
+            UPDATE ContestEntries
+            SET votes = COALESCE(votes, 0) + 1
+            WHERE user_id = $1
+        `;
+        await db.query(updateCandidateQuery, [vote.candidate_id]);
 
-        // 2. Mark this user as having voted
-        const updateVoterQuery = `
-      UPDATE ContestEntries
-      SET phase1_vote_done = true
-      WHERE user_id = $1
-    `;
-        await db.query(updateVoterQuery, [voteData.user_id]);
-
-        // 3. Mark the token as used
-        const updateTokenQuery = `
-      UPDATE vote_tokens
-      SET used = true
-      WHERE token = $1
-    `;
-        await db.query(updateTokenQuery, [token]);
-
-        // 4. Set the user as verified
-        const verifyUserQuery = `
-      UPDATE Users
-      SET is_verified = true
-      WHERE user_id = $1
-    `;
-        await db.query(verifyUserQuery, [voteData.user_id]);
+        // Mark this vote as verified
+        const updateVoteQuery = `
+            UPDATE email_votes
+            SET is_verified = true
+            WHERE verification_token = $1
+        `;
+        await db.query(updateVoteQuery, [token]);
 
         // Return a success page
         res.send(`
@@ -1582,11 +1562,6 @@ app.get("/verify-vote", async (req, res) => {
             font-weight: bold;
             margin-top: 20px;
           }
-          .create-account {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-          }
         </style>
       </head>
       <body>
@@ -1594,12 +1569,7 @@ app.get("/verify-vote", async (req, res) => {
           <h1>Vote Confirmed!</h1>
           <p>Thank you for participating in the Miss Cal pageant voting.</p>
           <p>Your vote has been successfully counted.</p>
-          
-          <div class="create-account">
-            <h2>Want to join the pageant?</h2>
-            <p>You already have an account created with your email. You can now set a password and participate in the Miss Cal pageant!</p>
-            <a href="https://www.misscal.net/create-password?email=${encodeURIComponent(voteData.email)}" class="btn">Create Password</a>
-          </div>
+          <a href="https://www.misscal.net/" class="btn">Return to Home</a>
         </div>
       </body>
       </html>
