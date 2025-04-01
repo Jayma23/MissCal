@@ -444,6 +444,127 @@
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            position: relative;
+            animation: modalFadeIn 0.3s;
+        }
+
+        .dark-mode .modal-content {
+            background-color: #333;
+            color: #f0f0f0;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #003262;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #FDB515;
+            transform: rotate(90deg);
+        }
+
+        .dark-mode .modal-close {
+            color: #FDB515;
+        }
+
+        .dark-mode .modal-close:hover {
+            color: #fff;
+        }
+
+        .email-vote-form {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #003262;
+        }
+
+        .dark-mode .form-group label {
+            color: #FDB515;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #003262;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 50, 98, 0.2);
+        }
+
+        .dark-mode .form-group input {
+            background: #444;
+            border-color: #FDB515;
+            color: #fff;
+        }
+
+        .form-actions {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .modal h2 {
+            color: #003262;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .dark-mode .modal h2 {
+            color: #FDB515;
+        }
+
+        .modal p {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .dark-mode .modal p {
+            color: #ccc;
+        }
     </style>
 </head>
 
@@ -458,6 +579,35 @@
     </div>
     <div class="floating-btn" onclick="scrollToTop()" title="Back to Top">
         <i class="fas fa-arrow-up"></i>
+    </div>
+</div>
+<div class="modal" id="emailVoteModal">
+    <div class="modal-content">
+        <button class="modal-close" id="emailVoteModalClose"><i class="fas fa-times"></i></button>
+        <h2>Vote with Your Berkeley Email</h2>
+        <p>No account needed! Enter your UC Berkeley email to vote for this contestant.</p>
+
+        <form id="emailVoteForm" class="email-vote-form">
+            <input type="hidden" id="candidateIdInput" name="candidateId">
+            <input type="hidden" id="candidateNameInput" name="candidateName">
+
+            <div class="form-group">
+                <label for="emailInput">Your Berkeley Email:</label>
+                <input type="email" id="emailInput" name="email" placeholder="yourname@berkeley.edu" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" id="emailVoteSubmit" class="vote-button">
+                    <i class="fas fa-paper-plane"></i> Send Verification Email
+                </button>
+            </div>
+        </form>
+
+        <div id="emailVoteConfirmation" style="display: none; text-align: center; padding: 20px;">
+            <i class="fas fa-check-circle" style="color: #28a745; font-size: 3rem; margin-bottom: 15px;"></i>
+            <h3 style="margin-bottom: 10px;">Verification Email Sent!</h3>
+            <p>Please check your email and click the verification link to complete your vote.</p>
+        </div>
     </div>
 </div>
 
@@ -492,99 +642,95 @@
     /**
      * Toggles the sidebar between hidden and shown
      */
-    function toggleSidebar() {
-        const sidebar = document.getElementById("sidebar");
-        // if it's hidden, remove 'hidden' class and add 'show', otherwise do the opposite
-        sidebar.classList.toggle("hidden");
-        sidebar.classList.toggle("show");
+    const emailVoteModal = document.getElementById('emailVoteModal');
+    const emailVoteModalClose = document.getElementById('emailVoteModalClose');
+    const emailVoteForm = document.getElementById('emailVoteForm');
+    const emailVoteConfirmation = document.getElementById('emailVoteConfirmation');
+    const candidateIdInput = document.getElementById('candidateIdInput');
+    const candidateNameInput = document.getElementById('candidateNameInput');
+    const emailInput = document.getElementById('emailInput');
+
+    // Open email voting modal
+    function openEmailVoteModal(candidateId, candidateName) {
+        candidateIdInput.value = candidateId;
+        candidateNameInput.value = candidateName;
+        emailVoteForm.style.display = 'block';
+        emailVoteConfirmation.style.display = 'none';
+        emailVoteModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
     }
 
-    /**
-     * Helper function to parse a specific cookie value.
-     * For example, if document.cookie = "user_id=123; session=abc"
-     * Then getCookieValue("user_id") -> "123"
-     */
-    function getCookieValue(name) {
-        const cookies = document.cookie.split(";");
-        for (let c of cookies) {
-            c = c.trim();
-            if (c.startsWith(name + "=")) {
-                return c.substring(name.length + 1, c.length);
-            }
-        }
-        return null;
-    }
+    // Close email voting modal
+    emailVoteModalClose.addEventListener('click', () => {
+        emailVoteModal.style.display = 'none';
+        document.body.style.overflow = ''; // Restore scrolling
+    });
 
-    // Dark mode toggle
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        const themeIcon = document.getElementById('theme-icon');
-        if (document.body.classList.contains('dark-mode')) {
-            themeIcon.classList.replace('fa-moon', 'fa-sun');
-            localStorage.setItem('darkMode', 'enabled');
-        } else {
-            themeIcon.classList.replace('fa-sun', 'fa-moon');
-            localStorage.setItem('darkMode', 'disabled');
-        }
-    }
-
-    // Check for saved dark mode preference
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        document.body.classList.add('dark-mode');
-        document.getElementById('theme-icon').classList.replace('fa-moon', 'fa-sun');
-    }
-
-    // Scroll to top function
-    function scrollToTop() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    }
-    document.getElementById("logoffButton").addEventListener("click", async () => {
-        try {
-            const response = await fetch("https://server1.misscal.net/logout", {
-                method: "POST",
-                credentials: "include",
-            });
-
-            if (response.ok) {
-                // Remove user_id cookie manually (for frontend visibility)
-                document.cookie = "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-
-                alert("You have been logged out.");
-                window.location.href = "sign-in.html";  // Redirect to login page
-            } else {
-                alert("Logoff failed. Please try again.");
-            }
-        } catch (error) {
-            console.error("Error logging out:", error);
-            alert("An error occurred while logging out.");
+    // Close modal when clicking outside content
+    emailVoteModal.addEventListener('click', (e) => {
+        if (e.target === emailVoteModal) {
+            emailVoteModal.style.display = 'none';
+            document.body.style.overflow = ''; // Restore scrolling
         }
     });
 
-    // Show toast notification
-    function showToast(message, type = 'info') {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.className = 'toast show';
+    // Handle email vote form submission
+    emailVoteForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-        // Set color based on type
-        if (type === 'success') {
-            toast.style.background = '#28a745';
-        } else if (type === 'error') {
-            toast.style.background = '#dc3545';
-        } else {
-            toast.style.background = '#003262';
+        const email = emailInput.value.trim();
+        const candidateId = candidateIdInput.value;
+        const candidateName = candidateNameInput.value;
+
+        // Validate Berkeley email
+        if (!email.endsWith('@berkeley.edu')) {
+            showToast('Please use your UC Berkeley email address', 'error');
+            return;
         }
 
-        setTimeout(() => {
-            toast.className = 'toast';
-        }, 3000);
-    }
-    const loggedInUserId = getCookieValue("user_id");
+        // Disable submit button and show loading state
+        const submitBtn = document.getElementById('emailVoteSubmit');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
-    async function searchStudents() {
+        try {
+            const response = await fetch('https://server1.misscal.net/vote-by-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    candidateId: candidateId
+                })
+            });
+
+            const data = await response.json();
+
+            // Reset button state
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Verification Email';
+
+            if (response.ok) {
+                // Show confirmation message
+                emailVoteForm.style.display = 'none';
+                emailVoteConfirmation.style.display = 'block';
+                showToast('Verification email sent! Please check your inbox.', 'success');
+            } else {
+                showToast(data.message || 'Failed to send verification email', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('An error occurred. Please try again.', 'error');
+
+            // Reset button state
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Verification Email';
+        }
+    });
+
+    // Update the searchStudents function to modify how vote buttons are created
+    function searchStudents() {
         const query = document.getElementById("searchInput").value.trim();
         if (!query) {
             showToast("Please enter a name or major to search.", "error");
@@ -598,215 +744,232 @@
         try {
             // Change this to remove credentials for the search endpoint
             // This allows non-logged-in users to search
-            const response = await fetch(
-                `https://server1.misscal.net/searchStudents?query=${encodeURIComponent(query)}`
-            );
+            fetch(`https://server1.misscal.net/searchStudents?query=${encodeURIComponent(query)}`)
+                .then(response => {
+                    // Hide loader
+                    loader.style.display = 'none';
 
-            // Hide loader
-            loader.style.display = 'none';
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(students => {
+                    const resultsContainer = document.getElementById("results");
+                    resultsContainer.innerHTML = "";
 
-            if (response.ok) {
-                const students = await response.json();
-                const resultsContainer = document.getElementById("results");
-                resultsContainer.innerHTML = "";
+                    if (students.length === 0) {
+                        resultsContainer.innerHTML = `<p>No students found.</p>`;
+                        showToast("No students found matching your search.", "info");
+                        return;
+                    }
 
-                if (students.length === 0) {
-                    resultsContainer.innerHTML = `<p>No students found.</p>`;
-                    showToast("No students found matching your search.", "info");
-                    return;
-                }
+                    showToast(`Found ${students.length} students matching your search.`, "success");
 
-                showToast(`Found ${students.length} students matching your search.`, "success");
+                    students.forEach((student, index) => {
+                        // Create card elements as before
+                        const card = document.createElement("div");
+                        card.className = "student-card";
+                        card.style.animationDelay = `${index * 0.1}s`;
 
-                students.forEach((student, index) => {
-                    // Create card elements as before
-                    const card = document.createElement("div");
-                    card.className = "student-card";
-                    card.style.animationDelay = `${index * 0.1}s`;
+                        // Create favorite button as before
+                        const favoriteBtn = document.createElement('div');
+                        favoriteBtn.style.position = 'absolute';
+                        favoriteBtn.style.top = '10px';
+                        favoriteBtn.style.right = '10px';
+                        favoriteBtn.style.color = '#003262';
+                        favoriteBtn.style.cursor = 'pointer';
+                        favoriteBtn.style.fontSize = '1.2rem';
+                        favoriteBtn.style.transition = 'all 0.3s ease';
+                        favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
 
-                    // Create favorite button as before
-                    const favoriteBtn = document.createElement('div');
-                    favoriteBtn.style.position = 'absolute';
-                    favoriteBtn.style.top = '10px';
-                    favoriteBtn.style.right = '10px';
-                    favoriteBtn.style.color = '#003262';
-                    favoriteBtn.style.cursor = 'pointer';
-                    favoriteBtn.style.fontSize = '1.2rem';
-                    favoriteBtn.style.transition = 'all 0.3s ease';
-                    favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
-
-                    // Only allow favorites for logged-in users
-                    favoriteBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        if (!loggedInUserId) {
-                            showToast("Please log in to add favorites", "error");
-                            return;
-                        }
-
-                        const isFavorite = favoriteBtn.querySelector('i').classList.contains('fas');
-                        if (isFavorite) {
-                            favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
-                            favoriteBtn.style.color = '#003262';
-                            showToast(`Removed ${student.name} from favorites`, "info");
-                        } else {
-                            favoriteBtn.innerHTML = '<i class="fas fa-star"></i>';
-                            favoriteBtn.style.color = '#FDB515';
-                            favoriteBtn.style.transform = 'scale(1.2)';
-                            setTimeout(() => {
-                                favoriteBtn.style.transform = 'scale(1)';
-                            }, 300);
-                            showToast(`Added ${student.name} to favorites`, "success");
-                        }
-                    });
-
-                    // Create other elements as before
-                    // Photo, name, major, etc.
-                    const img = document.createElement("img");
-                    img.src = student.photo
-                    img.alt = student.name
-                    img.onerror = function() {
-                        this.src = "/default-photo.jpg";
-                        this.onerror = null;
-                    };
-
-                    const nameEl = document.createElement("p");
-                    nameEl.innerHTML = `<strong>Name:</strong> ${student.name || "N/A"}`;
-
-                    const majorEl = document.createElement("p");
-                    majorEl.innerHTML = `<strong>Major:</strong> ${student.major || "N/A"}`;
-
-                    const extraFields = document.createElement("div");
-                    extraFields.className = "extra-fields";
-
-                    const gpaEl = document.createElement("p");
-                    gpaEl.innerHTML = `<strong>GPA:</strong> ${student.gpa || "N/A"}`;
-
-                    const yearEl = document.createElement("p");
-                    yearEl.innerHTML = `<strong>Year:</strong> ${student.year || "N/A"}`;
-
-                    // Other fields as before
-                    const personalStoryEl = document.createElement("p");
-                    personalStoryEl.innerHTML = `<strong>Personal Story:</strong> ${student.personal_story || "N/A"}`;
-
-                    const campaignLineEl = document.createElement("p");
-                    campaignLineEl.innerHTML = `<strong>Campaign Line:</strong> ${student.campaign_line || "N/A"}`;
-
-                    const experienceEl = document.createElement("p");
-                    experienceEl.innerHTML = `<strong>Experience:</strong> ${student.experience || "N/A"}`;
-
-                    const organizationsEl = document.createElement("p");
-                    organizationsEl.innerHTML = `<strong>Organizations:</strong> ${student.organizations || "N/A"}`;
-
-                    const socialLinks = document.createElement("div");
-                    socialLinks.className = "social-links";
-
-                    const socialIconsHTML = `
-                    <p><strong>Social Media:</strong></p>
-                    <div class="social-icons">
-                        ${student.instagram ? `<a href="${student.instagram}" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>` : ''}
-                        ${student.linkedin ? `<a href="${student.linkedin}" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>` : ''}
-                        ${student.facebook ? `<a href="${student.facebook}" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>` : ''}
-                        ${student.github ? `<a href="${student.github}" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>` : ''}
-                        ${student.snapchat ? `<a href="${student.snapchat}" target="_blank" class="social-icon"><i class="fab fa-snapchat"></i></a>` : ''}
-                        ${student.tiktok ? `<a href="${student.tiktok}" target="_blank" class="social-icon"><i class="fab fa-tiktok"></i></a>` : ''}
-                    </div>
-                `;
-                    socialLinks.innerHTML = socialIconsHTML;
-
-                    extraFields.appendChild(gpaEl);
-                    extraFields.appendChild(campaignLineEl);
-                    extraFields.appendChild(personalStoryEl);
-                    extraFields.appendChild(experienceEl);
-                    extraFields.appendChild(organizationsEl);
-                    extraFields.appendChild(socialLinks);
-                    extraFields.style.display = "none";
-
-                    const buttonGroup = document.createElement("div");
-                    buttonGroup.className = "button-group";
-
-                    const toggleButton = document.createElement("button");
-                    toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
-                    toggleButton.onclick = () => {
-                        if (extraFields.style.display === "none") {
-                            extraFields.style.display = "block";
-                            toggleButton.innerHTML = '<i class="fas fa-chevron-up"></i> Show Less';
-                        } else {
-                            extraFields.style.display = "none";
-                            toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
-                        }
-                    };
-
-                    buttonGroup.appendChild(toggleButton);
-
-                    // Only show vote button for logged-in users
-                    if (loggedInUserId) {
-                        const voteButton = document.createElement("button");
-                        voteButton.className = "vote-button";
-                        voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
-                        voteButton.onclick = async () => {
-                            voteButton.style.animation = 'pulse 0.5s';
-                            setTimeout(() => {
-                                voteButton.style.animation = '';
-                            }, 500);
-
-                            if (String(student.userId) === String(loggedInUserId)) {
-                                showToast("You cannot vote for yourself!", "error");
+                        // Only allow favorites for logged-in users
+                        favoriteBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (!loggedInUserId) {
+                                showToast("Please log in to add favorites", "error");
                                 return;
                             }
 
-                            voteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Voting...';
+                            const isFavorite = favoriteBtn.querySelector('i').classList.contains('fas');
+                            if (isFavorite) {
+                                favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
+                                favoriteBtn.style.color = '#003262';
+                                showToast(`Removed ${student.name} from favorites`, "info");
+                            } else {
+                                favoriteBtn.innerHTML = '<i class="fas fa-star"></i>';
+                                favoriteBtn.style.color = '#FDB515';
+                                favoriteBtn.style.transform = 'scale(1.2)';
+                                setTimeout(() => {
+                                    favoriteBtn.style.transform = 'scale(1)';
+                                }, 300);
+                                showToast(`Added ${student.name} to favorites`, "success");
+                            }
+                        });
 
-                            try {
-                                const response = await fetch("https://server1.misscal.net/vote", {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json"
-                                    },
-                                    credentials: "include",
-                                    body: JSON.stringify({ candidateId: student.userId })
-                                });
+                        // Create other elements as before
+                        // Photo, name, major, etc.
+                        const img = document.createElement("img");
+                        img.src = student.photo
+                        img.alt = student.name
+                        img.onerror = function() {
+                            this.src = "/default-photo.jpg";
+                            this.onerror = null;
+                        };
 
-                                const data = await response.json();
-                                voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
+                        const nameEl = document.createElement("p");
+                        nameEl.innerHTML = `<strong>Name:</strong> ${student.name || "N/A"}`;
 
-                                if (!response.ok) {
-                                    showToast(`Vote failed: ${data.message}`, "error");
-                                } else {
-                                    showToast(data.message || "Vote successful!", "success");
-                                }
-                            } catch (error) {
-                                console.error(error);
-                                voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
-                                showToast("An error occurred while casting your vote.", "error");
+                        const majorEl = document.createElement("p");
+                        majorEl.innerHTML = `<strong>Major:</strong> ${student.major || "N/A"}`;
+
+                        const extraFields = document.createElement("div");
+                        extraFields.className = "extra-fields";
+
+                        const gpaEl = document.createElement("p");
+                        gpaEl.innerHTML = `<strong>GPA:</strong> ${student.gpa || "N/A"}`;
+
+                        const yearEl = document.createElement("p");
+                        yearEl.innerHTML = `<strong>Year:</strong> ${student.year || "N/A"}`;
+
+                        // Other fields as before
+                        const personalStoryEl = document.createElement("p");
+                        personalStoryEl.innerHTML = `<strong>Personal Story:</strong> ${student.personal_story || "N/A"}`;
+
+                        const campaignLineEl = document.createElement("p");
+                        campaignLineEl.innerHTML = `<strong>Campaign Line:</strong> ${student.campaign_line || "N/A"}`;
+
+                        const experienceEl = document.createElement("p");
+                        experienceEl.innerHTML = `<strong>Experience:</strong> ${student.experience || "N/A"}`;
+
+                        const organizationsEl = document.createElement("p");
+                        organizationsEl.innerHTML = `<strong>Organizations:</strong> ${student.organizations || "N/A"}`;
+
+                        const socialLinks = document.createElement("div");
+                        socialLinks.className = "social-links";
+
+                        const socialIconsHTML = `
+                        <p><strong>Social Media:</strong></p>
+                        <div class="social-icons">
+                            ${student.instagram ? `<a href="${student.instagram}" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>` : ''}
+                            ${student.linkedin ? `<a href="${student.linkedin}" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>` : ''}
+                            ${student.facebook ? `<a href="${student.facebook}" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>` : ''}
+                            ${student.github ? `<a href="${student.github}" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>` : ''}
+                            ${student.snapchat ? `<a href="${student.snapchat}" target="_blank" class="social-icon"><i class="fab fa-snapchat"></i></a>` : ''}
+                            ${student.tiktok ? `<a href="${student.tiktok}" target="_blank" class="social-icon"><i class="fab fa-tiktok"></i></a>` : ''}
+                        </div>
+                    `;
+                        socialLinks.innerHTML = socialIconsHTML;
+
+                        extraFields.appendChild(gpaEl);
+                        extraFields.appendChild(campaignLineEl);
+                        extraFields.appendChild(personalStoryEl);
+                        extraFields.appendChild(experienceEl);
+                        extraFields.appendChild(organizationsEl);
+                        extraFields.appendChild(socialLinks);
+                        extraFields.style.display = "none";
+
+                        const buttonGroup = document.createElement("div");
+                        buttonGroup.className = "button-group";
+
+                        const toggleButton = document.createElement("button");
+                        toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
+                        toggleButton.onclick = () => {
+                            if (extraFields.style.display === "none") {
+                                extraFields.style.display = "block";
+                                toggleButton.innerHTML = '<i class="fas fa-chevron-up"></i> Show Less';
+                            } else {
+                                extraFields.style.display = "none";
+                                toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
                             }
                         };
-                        buttonGroup.appendChild(voteButton);
-                    } else {
-                        // Show login prompt for non-logged-in users
-                        const loginPrompt = document.createElement("button");
-                        loginPrompt.className = "login-prompt";
-                        loginPrompt.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Vote';
-                        loginPrompt.onclick = () => {
-                            window.location.href = "/sign-in.html";
-                        };
-                        buttonGroup.appendChild(loginPrompt);
-                    }
 
-                    // Assemble the student card
-                    card.appendChild(favoriteBtn);
-                    card.appendChild(img);
-                    card.appendChild(nameEl);
-                    card.appendChild(yearEl);
-                    card.appendChild(majorEl);
-                    card.appendChild(buttonGroup);
-                    card.appendChild(extraFields);
+                        buttonGroup.appendChild(toggleButton);
 
-                    // Append card to results
-                    resultsContainer.appendChild(card);
+                        // Modified voting options based on login status
+                        if (loggedInUserId) {
+                            // For logged-in users - regular voting
+                            const voteButton = document.createElement("button");
+                            voteButton.className = "vote-button";
+                            voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
+                            voteButton.onclick = async () => {
+                                voteButton.style.animation = 'pulse 0.5s';
+                                setTimeout(() => {
+                                    voteButton.style.animation = '';
+                                }, 500);
+
+                                if (String(student.userId) === String(loggedInUserId)) {
+                                    showToast("You cannot vote for yourself!", "error");
+                                    return;
+                                }
+
+                                voteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Voting...';
+
+                                try {
+                                    const response = await fetch("https://server1.misscal.net/vote", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json"
+                                        },
+                                        credentials: "include",
+                                        body: JSON.stringify({ candidateId: student.userId })
+                                    });
+
+                                    const data = await response.json();
+                                    voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
+
+                                    if (!response.ok) {
+                                        showToast(`Vote failed: ${data.message}`, "error");
+                                    } else {
+                                        showToast(data.message || "Vote successful!", "success");
+                                    }
+                                } catch (error) {
+                                    console.error(error);
+                                    voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
+                                    showToast("An error occurred while casting your vote.", "error");
+                                }
+                            };
+                            buttonGroup.appendChild(voteButton);
+                        } else {
+                            // For non-logged in users - offer email voting
+                            const voteByEmailButton = document.createElement("button");
+                            voteByEmailButton.className = "vote-button";
+                            voteByEmailButton.innerHTML = '<i class="fas fa-envelope"></i> Vote by Email';
+                            voteByEmailButton.onclick = () => {
+                                openEmailVoteModal(student.userId, student.name);
+                            };
+                            buttonGroup.appendChild(voteByEmailButton);
+
+                            // Also offer login option
+                            const loginButton = document.createElement("button");
+                            loginButton.style.marginTop = "10px";
+                            loginButton.style.backgroundColor = "#003262";
+                            loginButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In to Vote';
+                            loginButton.onclick = () => {
+                                window.location.href = "/sign-in.html";
+                            };
+                            buttonGroup.appendChild(loginButton);
+                        }
+
+                        // Assemble the student card
+                        card.appendChild(favoriteBtn);
+                        card.appendChild(img);
+                        card.appendChild(nameEl);
+                        card.appendChild(yearEl);
+                        card.appendChild(majorEl);
+                        card.appendChild(buttonGroup);
+                        card.appendChild(extraFields);
+
+                        // Append card to results
+                        resultsContainer.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    // Hide loader on error
+                    loader.style.display = 'none';
+                    console.error("Error fetching students:", error);
+                    showToast("An error occurred while fetching students.", "error");
                 });
-            } else {
-                showToast("Failed to fetch students.", "error");
-            }
         } catch (error) {
             // Hide loader on error
             loader.style.display = 'none';
