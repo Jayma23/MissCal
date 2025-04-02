@@ -202,13 +202,19 @@
             left: 10px;
             background: #003262;
             color: white;
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             opacity: 0;
             transform: translateY(-10px);
             transition: all 0.3s ease;
             z-index: 2;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+
+        .student-card .card-badge strong {
+            color: #FDB515;
+            margin-right: 3px;
         }
 
         .student-card:hover .card-badge {
@@ -240,22 +246,36 @@
 
         .student-card .major-year {
             display: flex;
-            justify-content: space-between;
-            margin: 5px 0 15px;
+            flex-direction: column;
+            gap: 8px;
+            margin: 10px 0 18px;
             padding: 0 5px;
         }
 
         .student-card .major-year span {
             background: #eef2f7;
-            padding: 3px 8px;
-            border-radius: 15px;
-            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: left;
+        }
+
+        .student-card .major-year span strong {
+            color: #003262;
+            font-size: 1rem;
+            margin-right: 4px;
         }
 
         .student-card:hover .major-year span {
             background: #003262;
             color: white;
+            transform: translateX(3px);
+        }
+
+        .student-card:hover .major-year span strong {
+            color: #FDB515;
         }
 
         .extra-fields {
@@ -978,27 +998,7 @@
             submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Verification Email';
         }
     });
-    document.getElementById("logoffButton").addEventListener("click", async () => {
-        try {
-            const response = await fetch("https://server1.misscal.net/logout", {
-                method: "POST",
-                credentials: "include",
-            });
 
-            if (response.ok) {
-                // Remove user_id cookie manually (for frontend visibility)
-                document.cookie = "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-
-                alert("You have been logged out.");
-                window.location.href = "sign-in.html";  // Redirect to login page
-            } else {
-                alert("Logoff failed. Please try again.");
-            }
-        } catch (error) {
-            console.error("Error logging out:", error);
-            alert("An error occurred while logging out.");
-        }
-    });
     // Function to get cookie value
     function getCookieValue(name) {
         const cookies = document.cookie.split(";");
@@ -1057,7 +1057,7 @@
                         // Add class badge
                         const badge = document.createElement('div');
                         badge.className = 'card-badge';
-                        badge.innerHTML = student.year || 'Student';
+                        badge.innerHTML = `<strong>Class of:</strong> ${student.year || 'Student'}`;
                         card.appendChild(badge);
 
                         // Create favorite button with enhanced animation
@@ -1115,14 +1115,15 @@
                         const majorYearDiv = document.createElement("div");
                         majorYearDiv.className = "major-year";
 
-                        const majorSpan = document.createElement("span");
-                        majorSpan.innerHTML = `<i class="fas fa-graduation-cap"></i> ${student.major || "Undeclared"}`;
-
+                        // Year comes first now and is more prominent
                         const yearSpan = document.createElement("span");
-                        yearSpan.innerHTML = `<i class="fas fa-calendar-alt"></i> ${student.year || "Year Unknown"}`;
+                        yearSpan.innerHTML = `<i class="fas fa-calendar-alt"></i> <strong>Class of:</strong> ${student.year || "Year Unknown"}`;
 
-                        majorYearDiv.appendChild(majorSpan);
+                        const majorSpan = document.createElement("span");
+                        majorSpan.innerHTML = `<i class="fas fa-graduation-cap"></i> <strong>Major in:</strong> ${student.major || "Undeclared"}`;
+
                         majorYearDiv.appendChild(yearSpan);
+                        majorYearDiv.appendChild(majorSpan);
 
                         infoSection.appendChild(nameEl);
                         infoSection.appendChild(majorYearDiv);
