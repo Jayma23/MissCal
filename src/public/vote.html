@@ -164,6 +164,10 @@
             height: 220px;
             overflow: hidden;
             border-radius: 12px 12px 0 0;
+            background-color: #f0f0f0; /* Fallback background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .student-card img {
@@ -171,6 +175,8 @@
             height: 100%;
             object-fit: cover;
             transition: transform 0.8s ease;
+            display: block; /* Ensure proper block display */
+            background-color: #f5f5f5; /* Light background for image area */
         }
 
         .student-card:hover img {
@@ -877,6 +883,19 @@
     /**
      * Toggles the sidebar between hidden and shown
      */
+    const sidebar = document.getElementById("sidebar");
+    const sidebarToggle = document.getElementById("sidebarToggle");
+
+    sidebarToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+    });
+
+    // Close sidebar when clicking outside
+    document.addEventListener("click", (event) => {
+        if (!sidebar.contains(event.target) && event.target !== sidebarToggle) {
+            sidebar.classList.remove("show");
+        }
+    });
     function showToast(message, type = 'info') {
         const toast = document.getElementById('toast');
         toast.textContent = message;
