@@ -802,7 +802,7 @@
 
             // Update basic info fields
 
-            document.getElementById("votes").innerHTML = data.votes || "Not provided";
+            document.getElementById("votes").innerText = (data.votes === 0 || data.votes) ? data.votes.toString() : "Not provided";
             document.getElementById("rank").innerHTML = '<div class="loading-spinner"></div>';
             document.getElementById("name").innerText = data.name || "Not provided";
             document.getElementById("major").innerText = data.major || "Not provided";
