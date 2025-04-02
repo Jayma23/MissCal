@@ -135,83 +135,205 @@
 
         .student-card {
             background: white;
-            border: 1px solid #003262; /* Berkeley Blue */
-            padding: 15px;
-            border-radius: 10px;
+            border: none;
+            padding: 0;
+            border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .dark-mode .student-card {
+            background: #2d2d2d;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         }
 
         .student-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 50, 98, 0.2);
+        }
+
+        .student-card-image-container {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+            border-radius: 12px 12px 0 0;
         }
 
         .student-card img {
-            max-width: 100%;
-            height: 180px;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            transition: transform 0.5s ease;
+            transition: transform 0.8s ease;
         }
 
         .student-card:hover img {
-            transform: scale(1.05);
+            transform: scale(1.08);
         }
 
-        .student-card p {
-            margin: 10px 0;
-            font-weight: bold;
+        .favorite-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.85);
+            color: #003262;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .favorite-btn {
+            background: rgba(61, 61, 61, 0.85);
+            color: #FDB515;
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.15);
+            background: white;
+        }
+
+        .student-info {
+            padding: 20px;
             text-align: left;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .student-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+            color: #003262;
+        }
+
+        .dark-mode .student-name {
+            color: #FDB515;
+        }
+
+        .student-highlight {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .student-year, .student-major {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+
+        .dark-mode .student-year, .dark-mode .student-major {
+            color: #ccc;
+        }
+
+        .student-year {
+            margin-right: 15px;
+        }
+
+        .student-year i, .student-major i {
+            margin-right: 5px;
+            color: #003262;
+        }
+
+        .dark-mode .student-year i, .dark-mode .student-major i {
+            color: #FDB515;
+        }
+
+        .campaign-line {
+            font-style: italic;
+            font-size: 0.95rem;
+            color: #666;
+            margin: 0 0 15px 0;
+            line-height: 1.4;
+            padding-left: 10px;
+            border-left: 3px solid #FDB515;
+        }
+
+        .dark-mode .campaign-line {
+            color: #bbb;
         }
 
         .extra-fields {
-            display: none; /* Hide by default */
-            margin-top: 10px;
-            text-align: left; /* Make sure the extra fields align left */
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .student-card .social-links {
             margin-top: 15px;
+            text-align: left;
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            animation: fadeSlideIn 0.4s ease;
+            display: none;
         }
 
-        .student-card .social-links p {
-            margin-bottom: 10px;
+        .dark-mode .extra-fields {
+            background: #3d3d3d;
         }
 
-        .student-card .social-links a {
-            display: inline-block;
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .student-detail {
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+
+        .student-detail-label {
+            font-weight: 600;
             color: #003262;
-            text-decoration: none;
-            margin: 5px 8px;
-            padding: 5px 10px;
-            border-radius: 5px;
-            background: #f0f0f0;
-            transition: all 0.3s ease;
+            display: block;
+            margin-bottom: 3px;
         }
 
-        .student-card .social-links a:hover {
-            background: #003262;
-            color: white;
-            transform: translateY(-3px);
+        .dark-mode .student-detail-label {
+            color: #FDB515;
+        }
+
+        .student-detail-content {
+            display: block;
+            color: #444;
+            line-height: 1.4;
+        }
+
+        .dark-mode .student-detail-content {
+            color: #ddd;
+        }
+
+        .social-links {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .dark-mode .social-links {
+            border-top: 1px solid #4d4d4d;
         }
 
         .social-icons {
             display: flex;
-            justify-content: center;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-top: 8px;
         }
 
         .social-icon {
@@ -221,60 +343,173 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            background: #003262;
+            background: linear-gradient(145deg, #003262, #004b92);
             color: white;
             transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
 
         .social-icon:hover {
-            background: #FDB515;
+            transform: translateY(-3px) rotate(10deg);
+            background: linear-gradient(145deg, #FDB515, #e0a814);
             color: #003262;
-            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(253, 181, 21, 0.4);
         }
 
-        /* Button container for show more / show less and vote */
-        .button-group {
+        /* Card actions container */
+        .card-actions {
+            padding: 15px 20px;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
-            margin-top: 10px;
+            border-top: 1px solid #f0f0f0;
+            margin-top: auto;
         }
 
-        .student-card button {
-            padding: 8px 15px;
-            background: #003262; /* Berkeley Blue */
+        .dark-mode .card-actions {
+            border-top: 1px solid #3a3a3a;
+        }
+
+        .toggle-details {
+            background: transparent;
+            border: none;
+            color: #003262;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.25s ease;
+            border-radius: 6px;
+        }
+
+        .toggle-details:hover {
+            background: rgba(0, 50, 98, 0.08);
+            transform: translateX(2px);
+        }
+
+        .dark-mode .toggle-details {
+            color: #FDB515;
+        }
+
+        .dark-mode .toggle-details:hover {
+            background: rgba(253, 181, 21, 0.15);
+        }
+
+        .toggle-details i {
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-details.expanded i {
+            transform: rotate(180deg);
+        }
+
+        .vote-button {
+            padding: 10px 18px;
+            background: linear-gradient(145deg, #003262, #004b92);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 30px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-        }
-
-        .student-card button:hover {
-            background: #e0a814;
-            transform: translateY(-2px);
-        }
-
-        /* Make Vote button bigger and centered */
-        .vote-button {
-            font-size: 1.2rem;
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #003262, #0a4d8c);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0, 50, 98, 0.2);
             position: relative;
             overflow: hidden;
         }
 
-        .vote-button::before {
+        .vote-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 50, 98, 0.3);
+            background: linear-gradient(145deg, #004b92, #003262);
+        }
+
+        .vote-button:active {
+            transform: translateY(-1px);
+        }
+
+        .vote-button::after {
             content: '';
             position: absolute;
             top: 0;
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent);
             transition: 0.5s;
         }
+
+        .vote-button:hover::after {
+            left: 100%;
+        }
+
+        .vote-button i {
+            font-size: 1rem;
+        }
+
+        .email-vote-button {
+            background: linear-gradient(145deg, #FDB515, #e0a814);
+            color: #003262;
+        }
+
+        .email-vote-button:hover {
+            background: linear-gradient(145deg, #e0a814, #FDB515);
+            box-shadow: 0 6px 15px rgba(253, 181, 21, 0.3);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            color: #003262;
+            border: 1px solid #003262;
+            border-radius: 30px;
+            margin-top: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-button:hover {
+            background: rgba(0, 50, 98, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .dark-mode .login-button {
+            border-color: #FDB515;
+            color: #FDB515;
+        }
+
+        .dark-mode .login-button:hover {
+            background: rgba(253, 181, 21, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .card-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .vote-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .toggle-details {
+                width: 100%;
+                justify-content: center;
+                order: 2;
+            }
+        }
+
 
 
 
@@ -764,8 +999,6 @@
         loader.style.display = 'block';
 
         try {
-            // Change this to remove credentials for the search endpoint
-            // This allows non-logged-in users to search
             fetch(`https://server1.misscal.net/searchStudents?query=${encodeURIComponent(query)}`)
                 .then(response => {
                     // Hide loader
@@ -789,21 +1022,30 @@
                     showToast(`Found ${students.length} students matching your search.`, "success");
 
                     students.forEach((student, index) => {
-                        // Create card elements as before
+                        // Create enhanced student card
                         const card = document.createElement("div");
                         card.className = "student-card";
                         card.style.animationDelay = `${index * 0.1}s`;
 
+                        // Image container for better control
+                        const imgContainer = document.createElement("div");
+                        imgContainer.className = "student-card-image-container";
+
+                        const img = document.createElement("img");
+                        img.src = student.photo || "/default-photo.jpg";
+                        img.alt = student.name || "Student";
+                        img.onerror = function() {
+                            this.src = "/default-photo.jpg";
+                            this.onerror = null;
+                        };
+
                         // Create favorite button
                         const favoriteBtn = document.createElement('div');
-                        favoriteBtn.style.position = 'absolute';
-                        favoriteBtn.style.top = '10px';
-                        favoriteBtn.style.right = '10px';
-                        favoriteBtn.style.color = '#003262';
-                        favoriteBtn.style.cursor = 'pointer';
-                        favoriteBtn.style.fontSize = '1.2rem';
-                        favoriteBtn.style.transition = 'all 0.3s ease';
+                        favoriteBtn.className = 'favorite-btn';
                         favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
+
+                        // Get the cookie value for user_id
+                        const loggedInUserId = getCookieValue("user_id");
 
                         // Only allow favorites for logged-in users
                         favoriteBtn.addEventListener('click', (e) => {
@@ -816,7 +1058,6 @@
                             const isFavorite = favoriteBtn.querySelector('i').classList.contains('fas');
                             if (isFavorite) {
                                 favoriteBtn.innerHTML = '<i class="far fa-star"></i>';
-                                favoriteBtn.style.color = '#003262';
                                 showToast(`Removed ${student.name} from favorites`, "info");
                             } else {
                                 favoriteBtn.innerHTML = '<i class="fas fa-star"></i>';
@@ -829,89 +1070,183 @@
                             }
                         });
 
-                        // Create other elements
-                        const img = document.createElement("img");
-                        img.src = student.photo
-                        img.alt = student.name
-                        img.onerror = function() {
-                            this.src = "/default-photo.jpg";
-                            this.onerror = null;
-                        };
+                        imgContainer.appendChild(img);
+                        imgContainer.appendChild(favoriteBtn);
 
-                        const nameEl = document.createElement("p");
-                        nameEl.innerHTML = `<strong>Name:</strong> ${student.name || "N/A"}`;
+                        // Student info section
+                        const infoSection = document.createElement("div");
+                        infoSection.className = "student-info";
+
+                        // Student name
+                        const nameEl = document.createElement("h3");
+                        nameEl.className = "student-name";
+                        nameEl.textContent = student.name || "N/A";
+
+                        // Student highlights - year and major
+                        const highlightDiv = document.createElement("div");
+                        highlightDiv.className = "student-highlight";
+
+                        const yearEl = document.createElement("p");
+                        yearEl.className = "student-year";
+                        yearEl.innerHTML = `<i class="fas fa-graduation-cap"></i> ${student.year || "N/A"}`;
 
                         const majorEl = document.createElement("p");
-                        majorEl.innerHTML = `<strong>Major:</strong> ${student.major || "N/A"}`;
+                        majorEl.className = "student-major";
+                        majorEl.innerHTML = `<i class="fas fa-book"></i> ${student.major || "N/A"}`;
 
+                        highlightDiv.appendChild(yearEl);
+                        highlightDiv.appendChild(majorEl);
+
+                        // Campaign line with special styling
+                        const campaignLineEl = document.createElement("p");
+                        campaignLineEl.className = "campaign-line";
+                        campaignLineEl.textContent = student.campaign_line || "";
+
+                        // Extra fields section (hidden by default)
                         const extraFields = document.createElement("div");
                         extraFields.className = "extra-fields";
 
-                        const gpaEl = document.createElement("p");
-                        gpaEl.innerHTML = `<strong>GPA:</strong> ${student.gpa || "N/A"}`;
+                        // GPA
+                        if (student.gpa) {
+                            const gpaEl = document.createElement("div");
+                            gpaEl.className = "student-detail";
+                            gpaEl.innerHTML = `
+                            <span class="student-detail-label">GPA</span>
+                            <span class="student-detail-content">${student.gpa}</span>
+                        `;
+                            extraFields.appendChild(gpaEl);
+                        }
 
-                        const yearEl = document.createElement("p");
-                        yearEl.innerHTML = `<strong>Year:</strong> ${student.year || "N/A"}`;
+                        // Personal Story
+                        if (student.personal_story) {
+                            const storyEl = document.createElement("div");
+                            storyEl.className = "student-detail";
+                            storyEl.innerHTML = `
+                            <span class="student-detail-label">Personal Story</span>
+                            <span class="student-detail-content">${student.personal_story}</span>
+                        `;
+                            extraFields.appendChild(storyEl);
+                        }
 
-                        // Other fields
-                        const personalStoryEl = document.createElement("p");
-                        personalStoryEl.innerHTML = `<strong>Personal Story:</strong> ${student.personal_story || "N/A"}`;
+                        // Experience
+                        if (student.experience) {
+                            const expEl = document.createElement("div");
+                            expEl.className = "student-detail";
+                            expEl.innerHTML = `
+                            <span class="student-detail-label">Experience</span>
+                            <span class="student-detail-content">${student.experience}</span>
+                        `;
+                            extraFields.appendChild(expEl);
+                        }
 
-                        const campaignLineEl = document.createElement("p");
-                        campaignLineEl.innerHTML = `<strong>Campaign Line:</strong> ${student.campaign_line || "N/A"}`;
+                        // Organizations
+                        if (student.organizations) {
+                            const orgEl = document.createElement("div");
+                            orgEl.className = "student-detail";
+                            orgEl.innerHTML = `
+                            <span class="student-detail-label">Organizations</span>
+                            <span class="student-detail-content">${student.organizations}</span>
+                        `;
+                            extraFields.appendChild(orgEl);
+                        }
 
-                        const experienceEl = document.createElement("p");
-                        experienceEl.innerHTML = `<strong>Experience:</strong> ${student.experience || "N/A"}`;
+                        // Social Links
+                        const hasSocialLinks = student.instagram || student.linkedin ||
+                            student.facebook || student.github ||
+                            student.snapchat || student.tiktok;
 
-                        const organizationsEl = document.createElement("p");
-                        organizationsEl.innerHTML = `<strong>Organizations:</strong> ${student.organizations || "N/A"}`;
+                        if (hasSocialLinks) {
+                            const socialLinks = document.createElement("div");
+                            socialLinks.className = "social-links";
 
-                        const socialLinks = document.createElement("div");
-                        socialLinks.className = "social-links";
+                            const socialTitle = document.createElement("span");
+                            socialTitle.className = "student-detail-label";
+                            socialTitle.textContent = "Connect";
 
-                        const socialIconsHTML = `
-                        <p><strong>Social Media:</strong></p>
-                        <div class="social-icons">
-                            ${student.instagram ? `<a href="${student.instagram}" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>` : ''}
-                            ${student.linkedin ? `<a href="${student.linkedin}" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>` : ''}
-                            ${student.facebook ? `<a href="${student.facebook}" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>` : ''}
-                            ${student.github ? `<a href="${student.github}" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>` : ''}
-                            ${student.snapchat ? `<a href="${student.snapchat}" target="_blank" class="social-icon"><i class="fab fa-snapchat"></i></a>` : ''}
-                            ${student.tiktok ? `<a href="${student.tiktok}" target="_blank" class="social-icon"><i class="fab fa-tiktok"></i></a>` : ''}
-                        </div>
-                    `;
-                        socialLinks.innerHTML = socialIconsHTML;
+                            const socialIcons = document.createElement("div");
+                            socialIcons.className = "social-icons";
 
-                        extraFields.appendChild(gpaEl);
-                        extraFields.appendChild(campaignLineEl);
-                        extraFields.appendChild(personalStoryEl);
-                        extraFields.appendChild(experienceEl);
-                        extraFields.appendChild(organizationsEl);
-                        extraFields.appendChild(socialLinks);
-                        extraFields.style.display = "none";
+                            if (student.instagram) {
+                                const instaLink = document.createElement("a");
+                                instaLink.href = student.instagram;
+                                instaLink.target = "_blank";
+                                instaLink.className = "social-icon";
+                                instaLink.innerHTML = '<i class="fab fa-instagram"></i>';
+                                socialIcons.appendChild(instaLink);
+                            }
 
-                        const buttonGroup = document.createElement("div");
-                        buttonGroup.className = "button-group";
+                            if (student.linkedin) {
+                                const linkedinLink = document.createElement("a");
+                                linkedinLink.href = student.linkedin;
+                                linkedinLink.target = "_blank";
+                                linkedinLink.className = "social-icon";
+                                linkedinLink.innerHTML = '<i class="fab fa-linkedin-in"></i>';
+                                socialIcons.appendChild(linkedinLink);
+                            }
 
+                            if (student.facebook) {
+                                const fbLink = document.createElement("a");
+                                fbLink.href = student.facebook;
+                                fbLink.target = "_blank";
+                                fbLink.className = "social-icon";
+                                fbLink.innerHTML = '<i class="fab fa-facebook-f"></i>';
+                                socialIcons.appendChild(fbLink);
+                            }
+
+                            if (student.github) {
+                                const githubLink = document.createElement("a");
+                                githubLink.href = student.github;
+                                githubLink.target = "_blank";
+                                githubLink.className = "social-icon";
+                                githubLink.innerHTML = '<i class="fab fa-github"></i>';
+                                socialIcons.appendChild(githubLink);
+                            }
+
+                            if (student.snapchat) {
+                                const snapLink = document.createElement("a");
+                                snapLink.href = student.snapchat;
+                                snapLink.target = "_blank";
+                                snapLink.className = "social-icon";
+                                snapLink.innerHTML = '<i class="fab fa-snapchat-ghost"></i>';
+                                socialIcons.appendChild(snapLink);
+                            }
+
+                            if (student.tiktok) {
+                                const tiktokLink = document.createElement("a");
+                                tiktokLink.href = student.tiktok;
+                                tiktokLink.target = "_blank";
+                                tiktokLink.className = "social-icon";
+                                tiktokLink.innerHTML = '<i class="fab fa-tiktok"></i>';
+                                socialIcons.appendChild(tiktokLink);
+                            }
+
+                            socialLinks.appendChild(socialTitle);
+                            socialLinks.appendChild(socialIcons);
+                            extraFields.appendChild(socialLinks);
+                        }
+
+                        // Actions section (toggle details and vote)
+                        const actionsSection = document.createElement("div");
+                        actionsSection.className = "card-actions";
+
+                        // Toggle details button
                         const toggleButton = document.createElement("button");
-                        toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
+                        toggleButton.className = "toggle-details";
+                        toggleButton.innerHTML = 'View details <i class="fas fa-chevron-down"></i>';
                         toggleButton.onclick = (e) => {
                             e.stopPropagation();
-                            if (extraFields.style.display === "none") {
+                            if (extraFields.style.display === "none" || !extraFields.style.display) {
                                 extraFields.style.display = "block";
-                                toggleButton.innerHTML = '<i class="fas fa-chevron-up"></i> Show Less';
+                                toggleButton.innerHTML = 'Hide details <i class="fas fa-chevron-up"></i>';
+                                toggleButton.classList.add('expanded');
                             } else {
                                 extraFields.style.display = "none";
-                                toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
+                                toggleButton.innerHTML = 'View details <i class="fas fa-chevron-down"></i>';
+                                toggleButton.classList.remove('expanded');
                             }
                         };
 
-                        buttonGroup.appendChild(toggleButton);
-
-                        // Get the cookie value for user_id
-                        const loggedInUserId = getCookieValue("user_id");
-
-                        // Modified voting options based on login status
+                        // Voting options based on login status
                         if (loggedInUserId) {
                             // For logged-in users - regular voting
                             const voteButton = document.createElement("button");
@@ -919,10 +1254,6 @@
                             voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
                             voteButton.onclick = async (e) => {
                                 e.stopPropagation();
-                                voteButton.style.animation = 'pulse 0.5s';
-                                setTimeout(() => {
-                                    voteButton.style.animation = '';
-                                }, 500);
 
                                 if (String(student.userId) === String(loggedInUserId)) {
                                     showToast("You cannot vote for yourself!", "error");
@@ -955,40 +1286,78 @@
                                     showToast("An error occurred while casting your vote.", "error");
                                 }
                             };
-                            buttonGroup.appendChild(voteButton);
+                            actionsSection.appendChild(toggleButton);
+                            actionsSection.appendChild(voteButton);
                         } else {
                             // For non-logged in users - offer email voting
                             const voteByEmailButton = document.createElement("button");
-                            voteByEmailButton.className = "vote-button";
+                            voteByEmailButton.className = "vote-button email-vote-button";
                             voteByEmailButton.innerHTML = '<i class="fas fa-envelope"></i> Vote by Email';
                             voteByEmailButton.onclick = (e) => {
                                 e.stopPropagation();
                                 openEmailVoteModal(student.userId, student.name);
                             };
-                            buttonGroup.appendChild(voteByEmailButton);
 
-                            // Also offer login option
+                            const loginButtonContainer = document.createElement("div");
+                            loginButtonContainer.style.display = "flex";
+                            loginButtonContainer.style.flexDirection = "column";
+                            loginButtonContainer.style.width = "100%";
+
+                            loginButtonContainer.appendChild(toggleButton);
+
                             const loginButton = document.createElement("button");
-                            loginButton.style.marginTop = "10px";
-                            loginButton.style.backgroundColor = "#003262";
+                            loginButton.className = "login-button";
                             loginButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In to Vote';
                             loginButton.onclick = (e) => {
                                 e.stopPropagation();
                                 window.location.href = "/sign-in.html";
                             };
-                            buttonGroup.appendChild(loginButton);
+
+                            actionsSection.appendChild(loginButtonContainer);
+                            actionsSection.appendChild(voteByEmailButton);
+
+                            // Add login button below in mobile view
+                            const mobileActions = document.createElement("div");
+                            mobileActions.className = "mobile-actions";
+                            mobileActions.style.padding = "0 20px 15px";
+                            mobileActions.style.display = "none";
+
+                            mobileActions.appendChild(loginButton);
+
+                            // Add media query for mobile
+                            const mediaQuery = window.matchMedia('(max-width: 768px)');
+                            const handleMobileChange = (e) => {
+                                if (e.matches) {
+                                    mobileActions.style.display = "block";
+                                } else {
+                                    mobileActions.style.display = "none";
+                                }
+                            };
+
+                            mediaQuery.addListener(handleMobileChange);
+                            handleMobileChange(mediaQuery);
+
+                            // For desktop view, add login button to loginButtonContainer
+                            if (window.innerWidth > 768) {
+                                loginButtonContainer.appendChild(loginButton);
+                            }
                         }
 
-                        // Assemble the student card
-                        card.appendChild(favoriteBtn);
-                        card.appendChild(img);
-                        card.appendChild(nameEl);
-                        card.appendChild(yearEl);
-                        card.appendChild(majorEl);
-                        card.appendChild(buttonGroup);
-                        card.appendChild(extraFields);
+                        // Build the card
+                        infoSection.appendChild(nameEl);
+                        infoSection.appendChild(highlightDiv);
 
-                        // Append card to results
+                        if (student.campaign_line) {
+                            infoSection.appendChild(campaignLineEl);
+                        }
+
+                        infoSection.appendChild(extraFields);
+
+                        card.appendChild(imgContainer);
+                        card.appendChild(infoSection);
+                        card.appendChild(actionsSection);
+
+                        // Add the card to results
                         resultsContainer.appendChild(card);
                     });
                 })
