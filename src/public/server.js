@@ -481,7 +481,7 @@ app.post("/login", loginLimiter, (req, res) => {
         }
 
         if (!results.rows || results.rows.length === 0) {
-            return res.status(404).json({ message: "Email not found." });
+            return res.status(401).json({ message: "Invalid login credentials." });
         }
 
         const user = results.rows[0];
