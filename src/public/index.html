@@ -1522,6 +1522,32 @@
         justify-content: center;
         margin-top: 25px;
     }
+    .profile-view-btn {
+        background: transparent;
+        border: 1px solid var(--berkeley-blue);
+        color: var(--berkeley-blue);
+        border-radius: 15px;
+        padding: 3px 8px;
+        font-size: 0.8rem;
+        margin-top: 5px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .profile-view-btn:hover {
+        background: var(--berkeley-blue);
+        color: white;
+    }
+
+    body.dark-mode .profile-view-btn {
+        border-color: var(--california-gold);
+        color: var(--california-gold);
+    }
+
+    body.dark-mode .profile-view-btn:hover {
+        background: var(--california-gold);
+        color: var(--berkeley-blue);
+    }
     </style>
 <script>
     function voteForContestant(contestantId) {
@@ -1995,17 +2021,19 @@
                     </div>`;
                     }
 
+                    // Updated item.innerHTML with a View Profile button:
                     item.innerHTML = `
-                <div class="rank ${rankClass}">${i + 1}</div>
-                <div class="contestant" onclick="showStudentProfile('${contestant.id}')">
-                    <img src="${contestant.photo}" alt="${contestant.name}" class="contestant-img">
-                    <div class="contestant-info">
-                        <div class="contestant-name">${contestant.name}</div>
-                    </div>
-                </div>
-                <div class="votes">${contestant.votes}</div>
-                ${buttonHtml}
-                `;
+    <div class="rank ${rankClass}">${i + 1}</div>
+    <div class="contestant" onclick="showStudentProfile('${contestant.user_id}')">
+        <img src="${contestant.photo}" alt="${contestant.name}" class="contestant-img">
+        <div class="contestant-info">
+            <div class="contestant-name">${contestant.name}</div>
+            <button class="profile-view-btn"><i class="fas fa-user"></i> View Profile</button>
+        </div>
+    </div>
+    <div class="votes">${contestant.votes}</div>
+    ${buttonHtml}
+`;
 
                     leaderboardList.appendChild(item);
                 }
