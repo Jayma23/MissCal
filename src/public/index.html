@@ -2081,7 +2081,7 @@
         document.getElementById('loaderContainer').style.display = 'flex';
 
         // Use the public endpoint
-        fetch(`https://server1.misscal.net/getPublicStudentProfile?userId=${userId}`)
+        fetch(`/api/getPublicStudentProfile?userId=${userId}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to load profile');
