@@ -838,18 +838,23 @@
                     }, 1000);
 
                     // Add suffix to rank number (1st, 2nd, 3rd, etc.)
-                    let rankText = rank.toString();
-                    if (rank % 10 === 1 && rank !== 11) {
-                        rankText += "st";
-                    } else if (rank % 10 === 2 && rank !== 12) {
-                        rankText += "nd";
-                    } else if (rank % 10 === 3 && rank !== 13) {
-                        rankText += "rd";
+                    if (rank <= 0) {
+                        rankElement.innerText = "Not ranked";
                     } else {
-                        rankText += "th";
+                        let rankText = rank.toString();
+                        if (rank % 10 === 1 && rank !== 11) {
+                            rankText += "st";
+                        } else if (rank % 10 === 2 && rank !== 12) {
+                            rankText += "nd";
+                        } else if (rank % 10 === 3 && rank !== 13) {
+                            rankText += "rd";
+                        } else {
+                            rankText += "th";
+                        }
+                        rankElement.innerText = rankText;
                     }
 
-                    rankElement.innerText = rankText;
+
 
                     // Show special styling for top 3 ranks
                     if (rank <= 3) {
