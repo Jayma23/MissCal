@@ -55,6 +55,7 @@
                 <div class="profile-details">
                     <h3 id="name">Loading...</h3>
                     <p><span class="badge">Class of <span id="year">Loading...</span></span></p>
+                    <p class="votes-badge"><i class="fas fa-heart"></i> <span id="votes">Loading...</span> votes</p>
                 </div>
             </div>
             <div class="profile-body">
@@ -603,6 +604,39 @@
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
         }
     }
+    .votes-badge {
+        background: #003262;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .votes-badge i {
+        color: #FDB515;
+        margin-right: 5px;
+    }
+
+    .votes-badge:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Animation for vote count */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .votes-highlight {
+        animation: pulse 1s ease;
+    }
 </style>
 
 <script>
@@ -701,6 +735,9 @@
             document.getElementById("organizations-content").innerText = data.organizations || "No organizations listed yet.";
 
             // Update social links
+            const votesElement = document.getElementById("votes");
+            votesElement.innerText = data.votes || "0";
+            votesElement.parentElement.classList.add("votes-highlight");
             const socialPlatforms = ["instagram", "linkedin", "facebook", "github", "tiktok"];
             socialPlatforms.forEach((platform) => {
                 const linkElement = document.getElementById(platform);
