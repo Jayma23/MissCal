@@ -642,6 +642,19 @@
     /**
      * Toggles the sidebar between hidden and shown
      */
+    const sidebar = document.getElementById("sidebar");
+    const sidebarToggle = document.getElementById("sidebarToggle");
+
+    sidebarToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+    });
+
+    // Close sidebar when clicking outside
+    document.addEventListener("click", (event) => {
+        if (!sidebar.contains(event.target) && event.target !== sidebarToggle) {
+            sidebar.classList.remove("show");
+        }
+    });
     function showToast(message, type = 'info') {
         const toast = document.getElementById('toast');
         toast.textContent = message;
