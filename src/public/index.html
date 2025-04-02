@@ -1548,6 +1548,22 @@
         background: var(--california-gold);
         color: var(--berkeley-blue);
     }
+    .view-profile-btn {
+        background: var(--berkeley-blue);
+        color: white;
+        border: none;
+        border-radius: 15px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        margin-top: 5px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .view-profile-btn:hover {
+        background: var(--california-gold);
+        color: var(--berkeley-blue);
+    }
     </style>
 <script>
     function voteForContestant(contestantId) {
@@ -1878,7 +1894,7 @@
         // Show loader
         document.getElementById('loaderContainer').style.display = 'flex';
 
-        // Use the existing getStudent endpoint which already accepts a userId parameter
+        // Use the new public endpoint
         fetch(`https://server1.misscal.net/getPublicStudentProfile?userId=${userId}`)
             .then(response => {
                 if (!response.ok) {
@@ -1894,9 +1910,9 @@
                 let photoHtml = '';
                 if (student.photo) {
                     photoHtml = `
-          <div class="profile-avatar">
-            <img src="https://server1.misscal.net/${student.photo}" alt="${student.name}">
-          </div>`;
+                    <div class="profile-avatar">
+                        <img src="https://server1.misscal.net/${student.photo}" alt="${student.name}">
+                    </div>`;
                 }
 
                 // Build social media links if they exist
@@ -1909,53 +1925,48 @@
 
                 // Create the profile modal content
                 const profileHTML = `
-        <div class="profile-header">
-          ${photoHtml}
-          <div class="profile-title">
-            <h2 class="profile-name">${student.name || 'Unnamed Contestant'}</h2>
-            <p class="profile-subtitle">${student.major || ''} ${student.year ? '- Year ' + student.year : ''}</p>
-            ${student.gpa ? `<p class="profile-subtitle">GPA: ${student.gpa}</p>` : ''}
-          </div>
-        </div>
+                <div class="profile-header">
+                    ${photoHtml}
+                    <div class="profile-title">
+                        <h2 class="profile-name">${student.name || 'Unnamed Contestant'}</h2>
+                        <p class="profile-subtitle">${student.major || ''} ${student.year ? '- Year ' + student.year : ''}</p>
+                        ${student.gpa ? `<p class="profile-subtitle">GPA: ${student.gpa}</p>` : ''}
+                        <div class="profile-badge">Votes: ${student.votes || 0}</div>
+                    </div>
+                </div>
 
-        <div class="profile-sections">
-          ${student.campaign_line ? `
-          <div class="profile-section">
-            <h3 class="section-title">Campaign Line</h3>
-            <p>${student.campaign_line}</p>
-          </div>` : ''}
+                <div class="profile-sections">
+                    ${student.campaign_line ? `
+                    <div class="profile-section">
+                        <h3 class="section-title">Campaign Line</h3>
+                        <p>${student.campaign_line}</p>
+                    </div>` : ''}
 
-          ${student.personal_story ? `
-          <div class="profile-section">
-            <h3 class="section-title">Personal Story</h3>
-            <p>${student.personal_story}</p>
-          </div>` : ''}
+                    ${student.personal_story ? `
+                    <div class="profile-section">
+                        <h3 class="section-title">Personal Story</h3>
+                        <p>${student.personal_story}</p>
+                    </div>` : ''}
 
-          ${student.experience ? `
-          <div class="profile-section">
-            <h3 class="section-title">Experience</h3>
-            <p>${student.experience}</p>
-          </div>` : ''}
+                    ${student.experience ? `
+                    <div class="profile-section">
+                        <h3 class="section-title">Experience</h3>
+                        <p>${student.experience}</p>
+                    </div>` : ''}
 
-          ${student.organizations ? `
-          <div class="profile-section">
-            <h3 class="section-title">Organizations</h3>
-            <p>${student.organizations}</p>
-          </div>` : ''}
-        </div>
+                    ${student.organizations ? `
+                    <div class="profile-section">
+                        <h3 class="section-title">Organizations</h3>
+                        <p>${student.organizations}</p>
+                    </div>` : ''}
+                </div>
 
-        ${socialLinks ? `
-        <div class="profile-social">
-          <h3 class="section-title">Connect With ${student.name}</h3>
-          <div class="social-icons">${socialLinks}</div>
-        </div>` : ''}
-
-        <div class="profile-actions">
-          <button class="profile-action-btn" onclick="voteForContestant('${userId}')">
-            <i class="fas fa-heart"></i> Vote
-          </button>
-        </div>
-      `;
+                ${socialLinks ? `
+                <div class="profile-social">
+                    <h3 class="section-title">Connect With ${student.name}</h3>
+                    <div class="social-icons">${socialLinks}</div>
+                </div>` : ''}
+            `;
 
                 // Set content and show modal
                 document.getElementById('profileContent').innerHTML = profileHTML;
@@ -2024,11 +2035,11 @@
                     // Updated item.innerHTML with a View Profile button:
                     item.innerHTML = `
     <div class="rank ${rankClass}">${i + 1}</div>
-    <div class="contestant" onclick="showStudentProfile('${contestant.user_id}')">
+    <div class="contestant">
         <img src="${contestant.photo}" alt="${contestant.name}" class="contestant-img">
         <div class="contestant-info">
             <div class="contestant-name">${contestant.name}</div>
-            <button class="profile-view-btn"><i class="fas fa-user"></i> View Profile</button>
+            <button class="view-profile-btn" onclick="showStudentProfile('${contestant.user_id}')">View Profile</button>
         </div>
     </div>
     <div class="votes">${contestant.votes}</div>
