@@ -574,6 +574,44 @@
             transform: translateX(0);
         }
 
+        /* Guest Message in Sidebar */
+        .guest-message {
+            padding: 15px;
+            background: rgba(253, 181, 21, 0.2);
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            border-left: 4px solid #FDB515;
+        }
+
+        .guest-message p {
+            margin: 0 0 10px 0;
+            font-size: 0.9rem;
+        }
+
+        .sign-in-button {
+            display: inline-block;
+            background: #FDB515;
+            color: #003262;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .sign-in-button:hover {
+            background: #e0a814;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .disabled-link {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         /* Toggle Button */
         .sidebar-toggle {
             position: fixed;
@@ -819,17 +857,13 @@
 <!-- Toast Notification -->
 <div class="toast" id="toast"></div>
 
-<!-- The Sidebar -->
+<!-- The Sidebar with dynamic content based on login status -->
 <aside class="sidebar hidden" id="sidebar">
     <h3>Dashboard</h3>
-    <ul>
-        <li><a href="mainPage.html"><i class="fas fa-home"></i> Home</a></li>
-        <li><a href="formPage.html"><i class="fas fa-user-plus"></i> Join the Pageant</a></li>
-        <li><a href="vote.html"><i class="fas fa-vote-yea"></i> Vote</a></li>
-        <li><a href="rule.html"><i class="fas fa-gavel"></i> Rules</a></li>
-        <li><a href="profile.html"><i class="fas fa-user-circle"></i> My Profile</a></li>
-        <li><a id="logoffButton" class="btn btn-danger w-100"><i class="fas fa-sign-out-alt"></i> Log Off</a></li>
-    </ul>
+    <div id="sidebarContent">
+        <!-- This will be populated dynamically based on login status -->
+        <div class="loader" style="margin: 20px auto;"></div>
+    </div>
 </aside>
 
 <div class="container">
@@ -875,10 +909,46 @@
         });
     }
 
-    /**
-     * Toggles the sidebar between hidden and shown
-     */
-    document.getElementById("logoffButton").addEventListener("click", async () => {
+    // Check login status and update sidebar accordingly
+    function updateSidebar() {
+        const loggedInUserId = getCookieValue("user_id");
+        const sidebarContent = document.getElementById("sidebarContent");
+
+        if (loggedInUserId) {
+            // User is logged in - show full menu
+            sidebarContent.innerHTML = `
+                <ul>
+                    <li><a href="mainPage.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="formPage.html"><i class="fas fa-user-plus"></i> Join the Pageant</a></li>
+                    <li><a href="vote.html"><i class="fas fa-vote-yea"></i> Vote</a></li>
+                    <li><a href="rule.html"><i class="fas fa-gavel"></i> Rules</a></li>
+                    <li><a href="profile.html"><i class="fas fa-user-circle"></i> My Profile</a></li>
+                    <li><a id="logoffButton" class="btn btn-danger w-100"><i class="fas fa-sign-out-alt"></i> Log Off</a></li>
+                </ul>
+            `;
+
+            // Re-attach logout event listener
+            document.getElementById("logoffButton").addEventListener("click", handleLogout);
+        } else {
+            // User is not logged in - show limited menu with message
+            sidebarContent.innerHTML = `
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a class="disabled-link"><i class="fas fa-user-plus"></i> Join the Pageant</a></li>
+                    <li><a class="disabled-link"><i class="fas fa-vote-yea"></i> Vote</a></li>
+                    <li><a class="disabled-link"><i class="fas fa-gavel"></i> Rules</a></li>
+                    <li><a class="disabled-link"><i class="fas fa-user-circle"></i> My Profile</a></li>
+                </ul>
+                <div class="guest-message">
+                    <p>You are browsing as a guest. Please sign in to access all features.</p>
+                    <a href="sign-in.html" class="sign-in-button"><i class="fas fa-sign-in-alt"></i> Sign In</a>
+                </div>
+            `;
+        }
+    }
+
+    // Function to handle logout
+    async function handleLogout() {
         try {
             const response = await fetch("https://server1.misscal.net/logout", {
                 method: "POST",
@@ -898,7 +968,11 @@
             console.error("Error logging out:", error);
             alert("An error occurred while logging out.");
         }
-    });
+    }
+
+    /**
+     * Toggles the sidebar between hidden and shown
+     */
     function toggleSidebar() {
         const sidebar = document.getElementById("sidebar");
         sidebar.classList.toggle("show");
@@ -1076,7 +1150,10 @@
                         card.style.opacity = "0"; // Start with opacity 0 for the animation
 
                         // Add class badge
-
+                        const badge = document.createElement('div');
+                        badge.className = 'card-badge';
+                        badge.innerHTML = `<strong>Class of:</strong> ${student.year || 'Student'}`;
+                        card.appendChild(badge);
 
                         // Create favorite button with enhanced animation
                         const favoriteBtn = document.createElement('div');
@@ -1435,6 +1512,9 @@
 
     // Initialize tooltips and other UI enhancements
     document.addEventListener("DOMContentLoaded", function() {
+        // Update sidebar based on login status
+        updateSidebar();
+
         // Check URL for search parameters and automatically search if present
         const urlParams = new URLSearchParams(window.location.search);
         const searchQuery = urlParams.get('q');
