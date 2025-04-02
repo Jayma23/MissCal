@@ -1853,7 +1853,7 @@
         document.getElementById('loaderContainer').style.display = 'flex';
 
         // Use the existing getStudent endpoint which already accepts a userId parameter
-        fetch(`https://server1.misscal.net/searchStudents?userId=${userId}`)
+        fetch(`https://server1.misscal.net/getStudent?userId=${userId}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to load profile');
