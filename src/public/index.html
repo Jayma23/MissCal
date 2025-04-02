@@ -1846,6 +1846,102 @@
 
     // Mock data for demo purposes
 
+    // Add this function to display the student profile
+    // New function to show student profile from the leaderboard
+    function showStudentProfile(userId) {
+        // Show loader
+        document.getElementById('loaderContainer').style.display = 'flex';
+
+        // Use the existing getStudent endpoint which already accepts a userId parameter
+        fetch(`https://server1.misscal.net/getStudent?userId=${userId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load profile');
+                }
+                return response.json();
+            })
+            .then(student => {
+                // Hide loader
+                document.getElementById('loaderContainer').style.display = 'none';
+
+                // Format photo URL if it exists
+                let photoHtml = '';
+                if (student.photo) {
+                    photoHtml = `
+          <div class="profile-avatar">
+            <img src="https://server1.misscal.net/${student.photo}" alt="${student.name}">
+          </div>`;
+                }
+
+                // Build social media links if they exist
+                let socialLinks = '';
+                if (student.instagram) socialLinks += `<a href="https://instagram.com/${student.instagram}" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>`;
+                if (student.linkedin) socialLinks += `<a href="${student.linkedin}" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>`;
+                if (student.facebook) socialLinks += `<a href="${student.facebook}" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>`;
+                if (student.github) socialLinks += `<a href="https://github.com/${student.github}" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>`;
+                if (student.tiktok) socialLinks += `<a href="https://tiktok.com/@${student.tiktok}" target="_blank" class="social-icon"><i class="fab fa-tiktok"></i></a>`;
+
+                // Create the profile modal content
+                const profileHTML = `
+        <div class="profile-header">
+          ${photoHtml}
+          <div class="profile-title">
+            <h2 class="profile-name">${student.name || 'Unnamed Contestant'}</h2>
+            <p class="profile-subtitle">${student.major || ''} ${student.year ? '- Year ' + student.year : ''}</p>
+            ${student.gpa ? `<p class="profile-subtitle">GPA: ${student.gpa}</p>` : ''}
+          </div>
+        </div>
+
+        <div class="profile-sections">
+          ${student.campaign_line ? `
+          <div class="profile-section">
+            <h3 class="section-title">Campaign Line</h3>
+            <p>${student.campaign_line}</p>
+          </div>` : ''}
+
+          ${student.personal_story ? `
+          <div class="profile-section">
+            <h3 class="section-title">Personal Story</h3>
+            <p>${student.personal_story}</p>
+          </div>` : ''}
+
+          ${student.experience ? `
+          <div class="profile-section">
+            <h3 class="section-title">Experience</h3>
+            <p>${student.experience}</p>
+          </div>` : ''}
+
+          ${student.organizations ? `
+          <div class="profile-section">
+            <h3 class="section-title">Organizations</h3>
+            <p>${student.organizations}</p>
+          </div>` : ''}
+        </div>
+
+        ${socialLinks ? `
+        <div class="profile-social">
+          <h3 class="section-title">Connect With ${student.name}</h3>
+          <div class="social-icons">${socialLinks}</div>
+        </div>` : ''}
+
+        <div class="profile-actions">
+          <button class="profile-action-btn" onclick="voteForContestant('${userId}')">
+            <i class="fas fa-heart"></i> Vote
+          </button>
+        </div>
+      `;
+
+                // Set content and show modal
+                document.getElementById('profileContent').innerHTML = profileHTML;
+                openProfileModal();
+            })
+            .catch(error => {
+                console.error('Error loading student profile:', error);
+                document.getElementById('loaderContainer').style.display = 'none';
+                showToast('Failed to load student profile', 'error');
+            });
+    }
+
     function updateVoteButtonFunctionality() {
         // Update loadLeaderboard function to support email voting
         window.loadLeaderboard = async function() {

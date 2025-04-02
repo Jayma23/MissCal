@@ -976,6 +976,7 @@ app.get("/getCurrentStudent", (req, res) => {
             gpa: student.gpa,
             year: student.year,
             votes: student.votes,
+            entry_id: student.entry_id,
             personal_story: student.personal_story,
             campaign_line: student.campaign_line,
             experience: student.experience,
