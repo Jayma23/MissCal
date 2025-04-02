@@ -58,6 +58,7 @@ const PUBLIC_PATHS = [
     "/verify-email",
     "/vote-by-email",
     "/verify-vote",
+    "/getStudent",
     "/searchStudents",
     "/create-password",
     "/getTop20Leaderboard"
