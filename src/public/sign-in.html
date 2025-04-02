@@ -145,6 +145,19 @@
             padding: 15px 0;
             font-size: 0.9rem;
         }
+        .btn-home {
+            background: #FDB515;
+            color: #003262;
+            transition: 0.3s;
+            font-weight: 600;
+            border-radius: 50px;
+            margin-top: 10px;
+        }
+
+        .btn-home:hover {
+            background: #e0a814;
+            transform: scale(1.05);
+        }
 
         @keyframes fadeInUp {
             from {
@@ -194,6 +207,9 @@
 
             <button type="submit" class="btn btn-custom w-100" id="signInBtn">Sign In</button>
         </form>
+        <a href="index.html" class="btn btn-home w-100">
+            <i class="bi bi-house-fill me-2"></i>Back to Home
+        </a>
         <p class="signup-prompt">Don't have an account? <a href="signup.html">Sign Up</a></p>
     </div>
 </main>
