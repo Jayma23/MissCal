@@ -59,6 +59,7 @@ const PUBLIC_PATHS = [
     "/vote-by-email",
     "/verify-vote",
     "/getStudent",
+    "/getPublicStudentProfile",
     "/searchStudents",
     "/create-password",
     "/getTop20Leaderboard"
@@ -2239,6 +2240,73 @@ app.get('/getAllContestants', async (req, res) => {
         console.error('Error in getAllContestants:', error);
         res.status(500).json({ error: 'An error occurred while fetching contestants' });
     }
+});
+// New endpoint for public student profiles - no authentication required
+app.get("/getPublicStudentProfile", (req, res) => {
+    const userId = req.query.userId;
+
+    if (!userId) {
+        return res.status(400).json({ message: "User ID is required." });
+    }
+
+    const query = `
+        SELECT name, major, gpa, year, campaign_line, personal_story,
+               experience, organizations, photos, votes,
+               instagram, linkedin, facebook, github, tiktok
+        FROM ContestEntries
+        WHERE user_id = $1
+    `;
+
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ message: "Database error." });
+        }
+
+        if (results.rows.length === 0) {
+            return res.status(404).json({ message: "Student not found." });
+        }
+
+        const student = results.rows[0];
+
+        // Process photos - handle both array and string formats
+        let photo = "";
+        try {
+            if (typeof student.photos === 'string') {
+                // Try to parse as JSON first
+                try {
+                    const photosArray = JSON.parse(student.photos || "[]");
+                    photo = photosArray.length > 0 ? photosArray[0] : "";
+                } catch (e) {
+                    // Not valid JSON, use as direct string path
+                    photo = student.photos;
+                }
+            } else if (Array.isArray(student.photos)) {
+                photo = student.photos.length > 0 ? student.photos[0] : "";
+            }
+        } catch (error) {
+            console.error("Error parsing photos:", error);
+            photo = "";
+        }
+
+        res.json({
+            name: student.name,
+            major: student.major,
+            gpa: student.gpa,
+            year: student.year,
+            campaign_line: student.campaign_line,
+            personal_story: student.personal_story,
+            experience: student.experience,
+            organizations: student.organizations,
+            photo,
+            votes: student.votes,
+            instagram: student.instagram,
+            linkedin: student.linkedin,
+            facebook: student.facebook,
+            github: student.github,
+            tiktok: student.tiktok,
+        });
+    });
 });
 
 // API endpoint to count entries
