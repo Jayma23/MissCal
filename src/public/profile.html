@@ -20,7 +20,6 @@
         <li><a href="profile.html" class="active"><i class="fas fa-user-circle"></i> My Profile</a></li>
         <li><a href="leaderBoard.html"><i class="fas fa-trophy"></i> Leader Board</a></li>
         <li><a id="logoffButton" class="btn btn-danger w-100"><i class="fas fa-sign-out-alt"></i> Log Off</a></li>
-
     </ul>
 </aside>
 <header class="main-header">
@@ -36,6 +35,34 @@
         <li><a href="vote.html">Vote</a></li>
     </ul>
 </nav>
+
+<!-- Competition Stats - New Section -->
+<div class="stats-container">
+    <div class="stats-card">
+        <div class="stats-item">
+            <div class="stats-icon votes-icon">
+                <i class="fas fa-heart"></i>
+            </div>
+            <div class="stats-content">
+                <h3>Votes Received</h3>
+                <div class="stats-value" id="votesCount">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </div>
+        <div class="stats-item">
+            <div class="stats-icon rank-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <div class="stats-content">
+                <h3>Current Rank</h3>
+                <div class="stats-value" id="currentRank">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <main class="profile-container">
     <div class="profile-tabs">
@@ -128,6 +155,106 @@
         margin: auto;
         max-width: 1200px;
         text-align: center;
+    }
+
+    /* Competition Stats Card Styles - NEW */
+    .stats-container {
+        padding: 0 20px;
+        margin: 20px auto;
+        max-width: 800px;
+    }
+
+    .stats-card {
+        display: flex;
+        justify-content: space-between;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 1px solid #eee;
+        margin-bottom: 20px;
+        animation: fadeSlideIn 0.5s ease-out;
+    }
+
+    @keyframes fadeSlideIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stats-item {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        position: relative;
+    }
+
+    .stats-item:first-child {
+        border-right: 1px dashed #e0e0e0;
+    }
+
+    .stats-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .votes-icon {
+        background: linear-gradient(135deg, #003262, #0066cc);
+    }
+
+    .rank-icon {
+        background: linear-gradient(135deg, #FDB515, #ffcc33);
+    }
+
+    .stats-content {
+        flex: 1;
+    }
+
+    .stats-content h3 {
+        margin: 0 0 10px 0;
+        font-size: 0.9rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .stats-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #003262;
+        display: flex;
+        align-items: center;
+    }
+
+    .stats-value.top-rank {
+        color: #FDB515;
+    }
+
+    .rank-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        margin-left: 8px;
+        background: #e8f5e9;
+        color: #388e3c;
+    }
+
+    .rank-badge.rising {
+        background: #e8f5e9;
+        color: #388e3c;
+    }
+
+    .rank-badge.falling {
+        background: #ffebee;
+        color: #d32f2f;
     }
 
     /* Header */
@@ -577,6 +704,17 @@
         transition: opacity 0.3s ease, transform 0.3s ease;
     }
 
+    /* Animation for rank change */
+    @keyframes pulseRank {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .pulse-animation {
+        animation: pulseRank 1s ease-in-out;
+    }
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .profile-tabs {
@@ -601,6 +739,15 @@
 
         .social-links-grid {
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
+
+        .stats-card {
+            flex-direction: column;
+        }
+
+        .stats-item:first-child {
+            border-right: none;
+            border-bottom: 1px dashed #e0e0e0;
         }
     }
 </style>
@@ -661,13 +808,15 @@
         }
     });
 
-    // Fetch profile data using the new endpoint
+    // Fetch profile data including votes and ranking
     async function fetchProfileData() {
         try {
             // Show loading indicators
             document.getElementById("name").innerHTML = '<div class="loading-spinner"></div> Loading...';
+            document.getElementById("votesCount").innerHTML = '<div class="loading-spinner"></div>';
+            document.getElementById("currentRank").innerHTML = '<div class="loading-spinner"></div>';
 
-            // Use the new endpoint that gets data for the current user based on cookie
+            // Use the endpoint that gets data for the current user based on cookie
             const response = await fetch("https://server1.misscal.net/getCurrentStudent", {
                 method: "GET",
                 credentials: "include"
@@ -700,6 +849,51 @@
             document.getElementById("experience-content").innerText = data.experience || "No professional experience listed yet.";
             document.getElementById("organizations-content").innerText = data.organizations || "No organizations listed yet.";
 
+            // Update votes count
+            const votesElement = document.getElementById("votesCount");
+            votesElement.innerHTML = `<span>${data.votes || 0}</span>`;
+            votesElement.classList.add("pulse-animation");
+
+            // Now fetch ranking data - need to get all contestants and sort by votes
+            const rankResponse = await fetch("https://server1.misscal.net/getAllContestants", {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (!rankResponse.ok) {
+                throw new Error(`Server responded with status: ${rankResponse.status}`);
+            }
+
+            const contestantsData = await rankResponse.json();
+
+            // Sort contestants by votes (descending)
+            const sortedContestants = contestantsData.sort((a, b) => b.votes - a.votes);
+
+            // Find current user's rank
+            const currentUserRank = sortedContestants.findIndex(contestant =>
+                contestant.user_id === data.user_id || contestant.entry_id === data.entry_id) + 1;
+
+            // Calculate percentage in top contestants
+            const percentileRank = Math.round((1 - (currentUserRank / sortedContestants.length)) * 100);
+
+            // Update rank display with animation and badge
+            const rankElement = document.getElementById("currentRank");
+
+            if (currentUserRank > 0) {
+                let badgeHTML = '';
+
+                // Add rank badge if in top 25%
+                if (percentileRank >= 75) {
+                    badgeHTML = `<span class="rank-badge rising">Top ${percentileRank}%</span>`;
+                    rankElement.classList.add("top-rank");
+                }
+
+                rankElement.innerHTML = `<span>${currentUserRank}</span> ${badgeHTML}`;
+                rankElement.classList.add("pulse-animation");
+            } else {
+                rankElement.innerHTML = "N/A";
+            }
+
             // Update social links
             const socialPlatforms = ["instagram", "linkedin", "facebook", "github", "tiktok"];
             socialPlatforms.forEach((platform) => {
@@ -722,16 +916,11 @@
                 }
             });
 
-
-
             // Handle profile photo
             const profileImg = document.querySelector("#profileImage img");
-
-
             profileImg.src = `${data.photo}`;
 
-
-// Optional: fallback if image fails to load
+            // Optional: fallback if image fails to load
             profileImg.onerror = function () {
                 this.src = "default-profile.png";
             };
@@ -744,6 +933,8 @@
             // Display error message to user
             document.getElementById("name").innerText = "Error loading profile";
             document.getElementById("major").innerText = "Could not connect to server";
+            document.getElementById("votesCount").innerText = "N/A";
+            document.getElementById("currentRank").innerText = "N/A";
 
             // Show error message
             const profileCard = document.querySelector(".profile-card");
@@ -756,6 +947,44 @@
             </p>`;
 
             profileCard.appendChild(errorMsg);
+        }
+    }
+
+    // Function to fetch and display ranking history (if available)
+    async function fetchRankingHistory() {
+        try {
+            const response = await fetch("https://server1.misscal.net/getRankingHistory", {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                // Just silently fail - ranking history is optional
+                return;
+            }
+
+            const historyData = await response.json();
+
+            if (historyData && historyData.length > 1) {
+                // Calculate if rank is improving or declining
+                const currentRank = historyData[historyData.length - 1].rank;
+                const previousRank = historyData[historyData.length - 2].rank;
+
+                // Add trend indicator if we have history data
+                const rankElement = document.getElementById("currentRank");
+                const currentContent = rankElement.innerHTML;
+
+                if (currentRank < previousRank) {
+                    // Rank is improving (lower number is better)
+                    rankElement.innerHTML = `${currentContent} <span class="rank-badge rising"><i class="fas fa-arrow-up"></i> Up from ${previousRank}</span>`;
+                } else if (currentRank > previousRank) {
+                    // Rank is declining
+                    rankElement.innerHTML = `${currentContent} <span class="rank-badge falling"><i class="fas fa-arrow-down"></i> Down from ${previousRank}</span>`;
+                }
+            }
+        } catch (error) {
+            // Just silently fail - ranking history is optional
+            console.log("Ranking history not available");
         }
     }
 
@@ -776,7 +1005,10 @@
 
     // Load profile data on page load
     document.addEventListener("DOMContentLoaded", function() {
-        fetchProfileData();
+        fetchProfileData().then(() => {
+            // After main profile data loads, fetch additional ranking history
+            fetchRankingHistory();
+        });
     });
 </script>
 </body>
