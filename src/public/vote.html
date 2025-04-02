@@ -642,6 +642,26 @@
     /**
      * Toggles the sidebar between hidden and shown
      */
+    function showToast(message, type = 'info') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = 'toast show';
+
+        // Set color based on type
+        if (type === 'success') {
+            toast.style.background = '#28a745';
+        } else if (type === 'error') {
+            toast.style.background = '#dc3545';
+        } else {
+            toast.style.background = '#003262';
+        }
+
+        setTimeout(() => {
+            toast.className = 'toast';
+        }, 3000);
+    }
+
+    // Email voting modal functionality
     const emailVoteModal = document.getElementById('emailVoteModal');
     const emailVoteModalClose = document.getElementById('emailVoteModalClose');
     const emailVoteForm = document.getElementById('emailVoteForm');
@@ -729,8 +749,10 @@
         }
     });
 
-    // Update the searchStudents function to modify how vote buttons are created
-    function searchStudents() {
+    // Modify the existing searchStudents function to add email voting
+    const originalSearchStudents = window.searchStudents;
+
+    window.searchStudents = function() {
         const query = document.getElementById("searchInput").value.trim();
         if (!query) {
             showToast("Please enter a name or major to search.", "error");
@@ -772,7 +794,7 @@
                         card.className = "student-card";
                         card.style.animationDelay = `${index * 0.1}s`;
 
-                        // Create favorite button as before
+                        // Create favorite button
                         const favoriteBtn = document.createElement('div');
                         favoriteBtn.style.position = 'absolute';
                         favoriteBtn.style.top = '10px';
@@ -807,8 +829,7 @@
                             }
                         });
 
-                        // Create other elements as before
-                        // Photo, name, major, etc.
+                        // Create other elements
                         const img = document.createElement("img");
                         img.src = student.photo
                         img.alt = student.name
@@ -832,7 +853,7 @@
                         const yearEl = document.createElement("p");
                         yearEl.innerHTML = `<strong>Year:</strong> ${student.year || "N/A"}`;
 
-                        // Other fields as before
+                        // Other fields
                         const personalStoryEl = document.createElement("p");
                         personalStoryEl.innerHTML = `<strong>Personal Story:</strong> ${student.personal_story || "N/A"}`;
 
@@ -874,7 +895,8 @@
 
                         const toggleButton = document.createElement("button");
                         toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
-                        toggleButton.onclick = () => {
+                        toggleButton.onclick = (e) => {
+                            e.stopPropagation();
                             if (extraFields.style.display === "none") {
                                 extraFields.style.display = "block";
                                 toggleButton.innerHTML = '<i class="fas fa-chevron-up"></i> Show Less';
@@ -886,13 +908,17 @@
 
                         buttonGroup.appendChild(toggleButton);
 
+                        // Get the cookie value for user_id
+                        const loggedInUserId = getCookieValue("user_id");
+
                         // Modified voting options based on login status
                         if (loggedInUserId) {
                             // For logged-in users - regular voting
                             const voteButton = document.createElement("button");
                             voteButton.className = "vote-button";
                             voteButton.innerHTML = '<i class="fas fa-heart"></i> Vote';
-                            voteButton.onclick = async () => {
+                            voteButton.onclick = async (e) => {
+                                e.stopPropagation();
                                 voteButton.style.animation = 'pulse 0.5s';
                                 setTimeout(() => {
                                     voteButton.style.animation = '';
@@ -935,7 +961,8 @@
                             const voteByEmailButton = document.createElement("button");
                             voteByEmailButton.className = "vote-button";
                             voteByEmailButton.innerHTML = '<i class="fas fa-envelope"></i> Vote by Email';
-                            voteByEmailButton.onclick = () => {
+                            voteByEmailButton.onclick = (e) => {
+                                e.stopPropagation();
                                 openEmailVoteModal(student.userId, student.name);
                             };
                             buttonGroup.appendChild(voteByEmailButton);
@@ -945,7 +972,8 @@
                             loginButton.style.marginTop = "10px";
                             loginButton.style.backgroundColor = "#003262";
                             loginButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In to Vote';
-                            loginButton.onclick = () => {
+                            loginButton.onclick = (e) => {
+                                e.stopPropagation();
                                 window.location.href = "/sign-in.html";
                             };
                             buttonGroup.appendChild(loginButton);
@@ -976,6 +1004,18 @@
             console.error("Error fetching students:", error);
             showToast("An error occurred while fetching students.", "error");
         }
+    };
+
+    // Function to get cookie value
+    function getCookieValue(name) {
+        const cookies = document.cookie.split(";");
+        for (let c of cookies) {
+            c = c.trim();
+            if (c.startsWith(name + "=")) {
+                return c.substring(name.length + 1, c.length);
+            }
+        }
+        return null;
     }
 </script>
 </body>
