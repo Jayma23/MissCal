@@ -56,6 +56,7 @@
                     <h3 id="name">Loading...</h3>
                     <p><span class="badge">Class of <span id="year">Loading...</span></span></p>
                     <p class="votes-badge"><i class="fas fa-heart"></i> <span id="votes">Loading...</span> votes</p>
+                    <p class="rank-badge"><i class="fas fa-trophy"></i> Rank: <span id="rank">Loading...</span></p>
                 </div>
             </div>
             <div class="profile-body">
@@ -637,6 +638,85 @@
     .votes-highlight {
         animation: pulse 1s ease;
     }
+    .stats-container {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 5px;
+    }
+
+    /* Votes badge styling */
+    .votes-badge {
+        background: #003262;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        display: inline-block;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .votes-badge i {
+        color: #FDB515;
+        margin-right: 5px;
+    }
+
+    .votes-badge:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Rank badge styling */
+    .rank-badge {
+        background: #FDB515;
+        color: #003262;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        display: inline-block;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .rank-badge i {
+        color: #003262;
+        margin-right: 5px;
+    }
+
+    .rank-badge:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Animation for vote count */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .votes-highlight {
+        animation: pulse 1s ease;
+    }
+
+    /* Special styling for top 3 ranks */
+    .rank-1 {
+        background: linear-gradient(45deg, #FFD700, #FDB515);
+        font-weight: bold;
+    }
+
+    .rank-2 {
+        background: linear-gradient(45deg, #C0C0C0, #e0e0e0);
+        font-weight: bold;
+    }
+
+    .rank-3 {
+        background: linear-gradient(45deg, #CD7F32, #b87333);
+        font-weight: bold;
+    }
 </style>
 
 <script>
@@ -700,6 +780,8 @@
         try {
             // Show loading indicators
             document.getElementById("name").innerHTML = '<div class="loading-spinner"></div> Loading...';
+            document.getElementById("votes").innerHTML = '<div class="loading-spinner"></div>';
+            document.getElementById("rank").innerHTML = '<div class="loading-spinner"></div>';
 
             // Use the new endpoint that gets data for the current user based on cookie
             const response = await fetch("https://server1.misscal.net/getCurrentStudent", {
@@ -728,6 +810,58 @@
             document.getElementById("campaign_line").innerText = data.campaign_line || "Not provided";
 
             // Story tab
+            try {
+                const rankResponse = await fetch("https://server1.misscal.net/getAllContestants", {
+                    method: "GET",
+                    credentials: "include"
+                });
+
+                if (rankResponse.ok) {
+                    const allContestants = await rankResponse.json();
+
+                    // Sort contestants by votes (highest to lowest)
+                    const sortedContestants = allContestants.sort((a, b) => b.votes - a.votes);
+
+                    // Find current contestant's position
+                    const currentEntryId = data.entry_id;
+                    const rank = sortedContestants.findIndex(contestant => contestant.entry_id === currentEntryId) + 1;
+
+                    // Display rank
+                    const rankElement = document.getElementById("rank");
+                    rankElement.innerText = rank;
+
+                    // Add animation to rank
+                    rankElement.parentElement.classList.add("votes-highlight");
+                    setTimeout(() => {
+                        rankElement.parentElement.classList.remove("votes-highlight");
+                    }, 1000);
+
+                    // Add suffix to rank number (1st, 2nd, 3rd, etc.)
+                    let rankText = rank.toString();
+                    if (rank % 10 === 1 && rank !== 11) {
+                        rankText += "st";
+                    } else if (rank % 10 === 2 && rank !== 12) {
+                        rankText += "nd";
+                    } else if (rank % 10 === 3 && rank !== 13) {
+                        rankText += "rd";
+                    } else {
+                        rankText += "th";
+                    }
+
+                    rankElement.innerText = rankText;
+
+                    // Show special styling for top 3 ranks
+                    if (rank <= 3) {
+                        rankElement.parentElement.classList.add(`rank-${rank}`);
+                    }
+                } else {
+                    // If we couldn't get the rank info
+                    document.getElementById("rank").innerText = "N/A";
+                }
+            } catch (error) {
+                console.error("Error fetching rank data:", error);
+                document.getElementById("rank").innerText = "N/A";
+            }
             document.getElementById("personal_story").innerText = data.personal_story || "No personal story provided yet.";
 
             // Experience tab
@@ -736,6 +870,7 @@
 
             // Update social links
             const votesElement = document.getElementById("votes");
+
             votesElement.innerText = data.votes || "0";
             votesElement.parentElement.classList.add("votes-highlight");
             const socialPlatforms = ["instagram", "linkedin", "facebook", "github", "tiktok"];

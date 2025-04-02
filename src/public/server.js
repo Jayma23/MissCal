@@ -2198,6 +2198,45 @@ app.get('/stats', async (req, res) => {
 app.get('/get-csrf-token', csrfProtection, (req, res) => {
     res.json({ csrfToken: req.csrfToken() });
 });
+app.get('/getAllContestants', async (req, res) => {
+    try {
+        // Check if user is authenticated
+        if (!req.cookies.user_id) {
+            return res.status(401).json({ error: 'You must be logged in to access this resource' });
+        }
+
+        // Connect to the database and query all contestants
+        const client = await db.connect();
+        try {
+            // Query the contestants table, selecting only necessary fields for ranking
+            const query = `
+        SELECT 
+          entry_id, 
+          name, 
+          votes, 
+          year,
+          major
+        FROM 
+          contestentries 
+        WHERE 
+          form_submitted = true
+        ORDER BY 
+          votes DESC
+      `;
+
+            const result = await client.query(query);
+
+            // Return the array of contestants
+            res.json(result.rows);
+        } finally {
+            // Release the client back to the pool
+            client.release();
+        }
+    } catch (error) {
+        console.error('Error in getAllContestants:', error);
+        res.status(500).json({ error: 'An error occurred while fetching contestants' });
+    }
+});
 
 // API endpoint to count entries
 
