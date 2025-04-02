@@ -779,9 +779,7 @@
     async function fetchProfileData() {
         try {
             // Show loading indicators
-            document.getElementById("name").innerHTML = '<div class="loading-spinner"></div> Loading...';
-            document.getElementById("votes").innerHTML = '<div class="loading-spinner"></div>';
-            document.getElementById("rank").innerHTML = '<div class="loading-spinner"></div>';
+
 
             // Use the new endpoint that gets data for the current user based on cookie
             const response = await fetch("https://server1.misscal.net/getCurrentStudent", {
@@ -803,6 +801,9 @@
             const data = await response.json();
 
             // Update basic info fields
+
+            document.getElementById("votes").innerHTML = data.votes || "Not provided";
+            document.getElementById("rank").innerHTML = '<div class="loading-spinner"></div>';
             document.getElementById("name").innerText = data.name || "Not provided";
             document.getElementById("major").innerText = data.major || "Not provided";
             document.getElementById("gpa").innerText = data.gpa || "Not provided";
