@@ -2179,7 +2179,7 @@
 
             try {
                 // Fetch data from the API endpoint
-                const response = await fetch("api/getTop20Leaderboard");
+                const response = await fetch("/api/getTop20Leaderboard");
                 const data = await response.json();
 
                 // Clear loader
