@@ -40,6 +40,29 @@ app.use(helmet.contentSecurityPolicy({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(bodyParser.json());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+            imgSrc: ["'self'", "data:", "https://server1.misscal.net"],
+            connectSrc: ["'self'", "https://server1.misscal.net"],
+            fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
+            objectSrc: ["'none'"],
+            mediaSrc: ["'self'"],
+            frameSrc: ["'none'"],
+        },
+    },
+    xssFilter: true,
+    noSniff: true,
+    referrerPolicy: { policy: "same-origin" },
+    hsts: {
+        maxAge: 15552000,
+        includeSubDomains: true,
+        preload: true
+    }
+}));
 
 // CORS setup
 app.use(cors({
@@ -101,11 +124,11 @@ app.use((req, res, next) => {
 
 // Email transporter setup
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    service: "mail.privateemail.com",
     auth: {
-        user: process.env.GMAIL_USER,
+        user: process.env.GMAIL_USER1,
         // For Gmail, you'll need to create an App Password in your Google Account
-        pass: process.env.GMAIL_PASS// Replace with your app password
+        pass: process.env.GMAIL_PASS1// Replace with your app password
 
 
     }
