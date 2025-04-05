@@ -124,11 +124,13 @@ app.use((req, res, next) => {
 
 // Email transporter setup
 const transporter = nodemailer.createTransport({
-    service: "mail.privateemail.com",
+    host: "smtp.zoho.com",
+    port: 465,
+    secure: true,
     auth: {
-        user: process.env.GMAIL_USER1,
+        user: process.env.ZOHO_USER,
         // For Gmail, you'll need to create an App Password in your Google Account
-        pass: process.env.GMAIL_PASS1// Replace with your app password
+        pass: process.env.ZOHO_PASS// Replace with your app password
 
 
     }
@@ -450,7 +452,7 @@ app.post("/signup", async (req, res) => {
         const verificationLink = `https://server1.misscal.net/verify-email?token=${verificationToken}`;
 
         const mailOptions = {
-            from: '"Miss Cal" <mikejamesma23248@gmail.com>',
+            from: '"Miss Cal" <messages-noreply@misscal.net>',
             to: email,
             subject: "Verify Your Email for Miss Cal",
             text: `Hello ${full_name},\n\nThank you for signing up for Miss Cal! Please verify your email by clicking the link below:\n\n${verificationLink}\n\nThis link will expire in 24 hours.\n\nBest regards,\nMiss Cal Team`,
@@ -1327,7 +1329,7 @@ app.post("/forgot-password", async (req, res) => {
 
         // Send the email with the reset link
         const mailOptions = {
-            from: '"Miss Cal" <noreply@misscal.net>',
+            from: '"Miss Cal" <messages-noreply@misscal.net>',
             to: email,
             subject: "Password Reset for Miss Cal",
             text: `Hello ${userName},\n\nYou have requested to reset your password for Miss Cal. Please click the link below to reset your password. This link will expire in 1 hour.\n\n${resetLink}\n\nIf you did not request a password reset, please ignore this email.\n\nBest regards,\nMiss Cal Team`,
@@ -1482,7 +1484,7 @@ app.post("/vote-by-email", async (req, res) => {
         const voteLink = `https://server1.misscal.net/verify-vote?token=${voteToken}`;
 
         const mailOptions = {
-            from: '"Miss Cal" <mikejamesma23248@gmail.com>',
+            from: '"Miss Cal" <messages-noreply@misscal.net>',
             to: email,
             subject: "Verify Your Vote for Miss Cal",
             text: `Thank you for voting in the Miss Cal pageant! Please click the link below to verify your vote:\n\n${voteLink}\n\nThis link will expire in 24 hours.\n\nIf you did not attempt to vote, please ignore this email.\n\nBest regards,\nMiss Cal Team`,
@@ -2162,7 +2164,7 @@ app.post("/resend-verification", async (req, res) => {
         const verificationLink = `https://server1.misscal.net/verify-email?token=${newToken}`;
 
         const mailOptions = {
-            from: '"Miss Cal" <mikejamesma23248@gmail.com>',
+            from: '"Miss Cal" <messages-noreply@misscal.net>',
             to: email,
             subject: "Verify Your Email for Miss Cal",
             text: `Hello ${pendingUser.full_name},\n\nHere is your new verification link for Miss Cal. Please verify your email by clicking the link below:\n\n${verificationLink}\n\nThis link will expire in 24 hours.\n\nBest regards,\nMiss Cal Team`,
