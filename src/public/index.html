@@ -258,6 +258,17 @@
         </div>
     </div>
 </div>
+<div class="modal" id="photoModal">
+    <div class="photo-modal-content">
+        <button class="modal-close" id="photoModalClose"><i class="fas fa-times"></i></button>
+        <div class="photo-container">
+            <img id="enlargedPhoto" src="" alt="Contestant Photo">
+        </div>
+        <div class="photo-info">
+            <h3 id="photoContestantName">Contestant Name</h3>
+        </div>
+    </div>
+</div>
 
 <style>
     :root {
@@ -789,7 +800,15 @@
         height: 120px;
         border-radius: 50%;
         object-fit: cover;
-        border: 2px solid var(--california-gold);
+        border: 3px solid var(--california-gold);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .contestant-img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        border-width: 4px;
     }
 
     .contestant-info {
@@ -1262,6 +1281,14 @@
             margin-right: 0;
             margin-bottom: 15px;
         }
+        .contestant-img {
+            width: 90px;
+            height: 90px;
+        }
+
+        .leaderboard-header, .leaderboard-item {
+            grid-template-columns: 60px 1fr 80px 100px;
+        }
     }
 
     .profile-section {
@@ -1454,6 +1481,14 @@
             .countdown {
                 flex-wrap: wrap;
                 justify-content: center;
+            }
+            .contestant-img {
+                width: 80px;
+                height: 80px;
+            }
+
+            .leaderboard-header, .leaderboard-item {
+                grid-template-columns: 50px 1fr 70px;
             }
         }
     .login-prompt {
@@ -1768,6 +1803,74 @@
             grid-template-columns: 60px 1fr 80px 100px;
         }
     }
+    .photo-modal-content {
+        background-color: transparent;
+        width: auto;
+        max-width: 90%;
+        position: relative;
+        margin: 50px auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .photo-container {
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        max-width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #enlargedPhoto {
+        max-width: 100%;
+        max-height: 80vh;
+        object-fit: contain;
+        border: 3px solid var(--california-gold);
+        border-radius: 5px;
+    }
+
+    .photo-info {
+        background-color: var(--berkeley-blue);
+        padding: 10px 20px;
+        margin-top: 10px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .photo-info h3 {
+        color: white;
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    body.dark-mode .photo-info {
+        background-color: #333;
+    }
+
+    #photoModalClose {
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        font-size: 2rem;
+        color: white;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+
+    @media (max-width: 768px) {
+        .photo-modal-content {
+            max-width: 95%;
+        }
+
+        #photoModalClose {
+            top: -30px;
+            right: -10px;
+        }
+    }
     </style>
 <script>
     function voteForContestant(contestantId) {
@@ -1870,6 +1973,11 @@
     const emailVoteConfirmation = document.getElementById("emailVoteConfirmation");
     const candidateIdInput = document.getElementById("candidateIdInput");
     const candidateNameInput = document.getElementById("candidateNameInput");
+    const photoModal = document.getElementById('photoModal');
+    const photoModalClose = document.getElementById('photoModalClose');
+    const enlargedPhoto = document.getElementById('enlargedPhoto');
+    const photoContestantName = document.getElementById('photoContestantName');
+
 
 
     // Dark mode toggle
@@ -1937,6 +2045,26 @@
         profileModal.style.display = "none";
         document.body.style.overflow = ""; // Restore scrolling
     }
+    function openPhotoModal(photoUrl, contestantName) {
+        enlargedPhoto.src = photoUrl;
+        photoContestantName.textContent = contestantName;
+        photoModal.style.display = "flex";
+        document.body.style.overflow = "hidden"; // Prevent scrolling behind modal
+    }
+
+    // Close photo modal when clicking the close button
+    photoModalClose.addEventListener("click", () => {
+        photoModal.style.display = "none";
+        document.body.style.overflow = ""; // Restore scrolling
+    });
+
+    // Close photo modal when clicking outside the image
+    photoModal.addEventListener("click", (e) => {
+        if (e.target === photoModal) {
+            photoModal.style.display = "none";
+            document.body.style.overflow = ""; // Restore scrolling
+        }
+    });
 
     // Close modal on click
     modalClose.addEventListener("click", closeProfileModal);
@@ -2023,6 +2151,24 @@
                     <i class="fas fa-sign-in-alt"></i> Sign in to Vote
                 </button>`;
                 }
+                item.innerHTML = `
+                <div class="rank ${rankClass}">${i + 1}</div>
+                <div class="contestant">
+                    <img src="${photoUrl}" alt="${contestant.name}" class="contestant-img"
+                        onclick="openPhotoModal('${photoUrl}', '${contestant.name}'); event.stopPropagation();"
+                        style="cursor: pointer;">
+                    <div class="contestant-info">
+                        <div class="contestant-name">${contestant.name}</div>
+                        <button class="view-profile-btn" onclick="showStudentProfile('${contestant.user_id}')">View Profile</button>
+                    </div>
+                </div>
+                <div class="votes">${contestant.votes}</div>
+                ${buttonHtml}
+            `;
+                const photoUrl = contestant.photo.startsWith('http')
+                    ? contestant.photo
+                    : `https://server1.misscal.net/${contestant.photo}`;
+
 
                 item.innerHTML = `
             <div class="rank ${rankClass}">${i + 1}</div>
@@ -2357,6 +2503,7 @@
 
         // Load the leaderboard
         loadLeaderboard();
+
 
         // Add animation classes to elements when they come into view
         const observer = new IntersectionObserver((entries) => {
