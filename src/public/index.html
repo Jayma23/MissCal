@@ -2016,6 +2016,28 @@
             display: block;
         }
     }
+    .floating-close-button {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--berkeley-blue);
+        color: white;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        z-index: 2500;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        .floating-close-button {
+            display: flex;
+        }
     }
     </style>
 <script>
@@ -2862,6 +2884,38 @@
                         showToast('Failed to load student profile', 'error');
                     });
             };
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const floatingCloseButton = document.getElementById('floatingCloseButton');
+
+        if (floatingCloseButton) {
+            floatingCloseButton.addEventListener('click', function() {
+                // Check for open modals and close them
+                const profileModal = document.getElementById('profileModal');
+                const photoModal = document.getElementById('photoModal');
+                const emailVoteModal = document.getElementById('emailVoteModal');
+
+                if (profileModal && profileModal.style.display === 'block' || profileModal.style.display === 'flex') {
+                    closeProfileModal();
+                    return;
+                }
+
+                if (photoModal && photoModal.style.display === 'block' || photoModal.style.display === 'flex') {
+                    photoModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                    return;
+                }
+
+                if (emailVoteModal && emailVoteModal.style.display === 'block' || emailVoteModal.style.display === 'flex') {
+                    emailVoteModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                    return;
+                }
+
+                // If no modals are open, act as a back button
+                window.history.back();
+            });
         }
     });
 </script>
