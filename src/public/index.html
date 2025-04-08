@@ -1916,14 +1916,106 @@
     }
 
     @media (max-width: 768px) {
-        .photo-modal-content {
-            max-width: 95%;
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1500;
+            overflow-y: auto; /* Enable scrolling */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
         }
 
-        #photoModalClose {
-            top: -30px;
-            right: -10px;
+        /* Modal content positioning */
+        .modal-content {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 95%;
+            max-height: none;
+            margin: 15px auto 60px;
+            padding-bottom: 50px; /* Space for close button */
         }
+
+        /* Make photo modal work properly on mobile */
+        .photo-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 90%;
+        }
+
+        /* Make close button always visible and fixed at bottom */
+        .modal .modal-close {
+            position: fixed !important;
+            bottom: 15px !important;
+            right: 15px !important;
+            top: auto !important;
+            background: var(--berkeley-blue) !important;
+            color: white !important;
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 2500 !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+            opacity: 1 !important;
+        }
+
+        /* Profile container layouts for mobile */
+        .profile-container {
+            overflow-y: visible;
+            padding-bottom: 40px;
+        }
+
+        /* Fix header layout on mobile */
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+            padding: 20px 15px;
+            gap: 10px;
+        }
+
+        .profile-avatar {
+            margin: 0 auto 10px;
+        }
+
+        .profile-title {
+            width: 100%;
+        }
+
+        /* Fix tabs layout on mobile */
+        .profile-tabs {
+            grid-template-columns: 1fr;
+            gap: 15px;
+            padding: 15px;
+        }
+    }
+
+    /* Add a pull-to-refresh hint */
+    .pull-hint {
+        text-align: center;
+        padding: 10px;
+        color: #777;
+        font-size: 0.9rem;
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .pull-hint {
+            display: block;
+        }
+    }
     }
     </style>
 <script>
@@ -2604,6 +2696,172 @@
                     window.history.back();
                 }
             });
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fix for profile modal scrolling
+        const fixProfileModal = function() {
+            const profileModal = document.getElementById('profileModal');
+            const modalContent = profileModal.querySelector('.modal-content');
+
+            // Function to close profile modal
+            window.closeProfileModal = function() {
+                profileModal.style.display = "none";
+                document.body.style.overflow = ""; // Restore scrolling
+
+                // Reset modal scroll position when closing
+                setTimeout(() => {
+                    if (modalContent) {
+                        modalContent.scrollTop = 0;
+                    }
+                }, 300);
+            };
+
+            // Open profile modal with proper positioning
+            window.openProfileModal = function() {
+                profileModal.style.display = "block";
+                document.body.style.overflow = "hidden"; // Prevent background scrolling
+
+                // Ensure modal is scrolled to top when opening
+                if (modalContent) {
+                    modalContent.scrollTop = 0;
+                }
+
+                // Add pull-to-refresh hint for mobile
+                const pullHint = document.createElement('div');
+                pullHint.className = 'pull-hint';
+                pullHint.innerHTML = 'Scroll down to view more';
+
+                // Add hint only on mobile
+                if (window.innerWidth <= 768) {
+                    const profileContainer = document.querySelector('.profile-container');
+                    if (profileContainer && !profileContainer.querySelector('.pull-hint')) {
+                        profileContainer.insertBefore(pullHint, profileContainer.firstChild);
+                    }
+                }
+            };
+
+            // Add swipe down to close functionality for mobile
+            let touchStartY = 0;
+            let touchEndY = 0;
+
+            profileModal.addEventListener('touchstart', function(e) {
+                touchStartY = e.changedTouches[0].screenY;
+            }, {passive: true});
+
+            profileModal.addEventListener('touchend', function(e) {
+                touchEndY = e.changedTouches[0].screenY;
+                handleSwipe();
+            }, {passive: true});
+
+            function handleSwipe() {
+                // If swiped down near the top of the modal
+                if (touchEndY - touchStartY > 100 && modalContent.scrollTop < 50) {
+                    closeProfileModal();
+                }
+            }
+        };
+
+        // Initialize the fixes
+        fixProfileModal();
+
+        // Improve modal display for showStudentProfile function
+        const originalShowStudentProfile = window.showStudentProfile;
+        if (typeof originalShowStudentProfile === 'function') {
+            window.showStudentProfile = function(userId) {
+                // Show loader
+                document.getElementById('loaderContainer').style.display = 'flex';
+
+                // Use the public endpoint
+                fetch(`https://server1.misscal.net/getPublicStudentProfile?userId=${userId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to load profile');
+                        }
+                        return response.json();
+                    })
+                    .then(student => {
+                        // Hide loader
+                        document.getElementById('loaderContainer').style.display = 'none';
+
+                        // Format photo URL if it exists
+                        let photoHtml = '';
+                        if (student.photo) {
+                            photoHtml = `
+                            <div class="profile-avatar">
+                                <img src="https://server1.misscal.net/${student.photo}" alt="${student.name}">
+                            </div>`;
+                        }
+
+                        // Build social media links if they exist
+                        let socialLinks = '';
+                        if (student.instagram) socialLinks += `<a href="https://instagram.com/${student.instagram}" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>`;
+                        if (student.linkedin) socialLinks += `<a href="${student.linkedin}" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>`;
+                        if (student.facebook) socialLinks += `<a href="${student.facebook}" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>`;
+                        if (student.github) socialLinks += `<a href="https://github.com/${student.github}" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>`;
+                        if (student.tiktok) socialLinks += `<a href="https://tiktok.com/@${student.tiktok}" target="_blank" class="social-icon"><i class="fab fa-tiktok"></i></a>`;
+
+                        // Create the profile modal content with improved styling for mobile
+                        const profileHTML = `
+                        <div class="profile-container">
+                            <div class="profile-header">
+                                ${photoHtml}
+                                <div class="profile-title">
+                                    <h2 class="profile-name">${student.name || 'Unnamed Contestant'}</h2>
+                                    <p class="profile-subtitle">${student.major || ''} ${student.year ? '- Year ' + student.year : ''}</p>
+                                    ${student.gpa ? `<p class="profile-subtitle">GPA: ${student.gpa}</p>` : ''}
+                                    <div class="votes-badge">Votes: ${student.votes || 0}</div>
+                                </div>
+                            </div>
+
+                            <div class="profile-tabs">
+                                <div class="profile-section">
+                                    <h3 class="section-heading">Campaign Line</h3>
+                                    <div class="section-content">
+                                        <p>${student.campaign_line || 'No campaign line provided'}</p>
+                                    </div>
+                                </div>
+
+                                <div class="profile-section">
+                                    <h3 class="section-heading">Personal Story</h3>
+                                    <div class="section-content">
+                                        <p>${student.personal_story || 'No personal story provided'}</p>
+                                    </div>
+                                </div>
+
+                                <div class="profile-section">
+                                    <h3 class="section-heading">Experience</h3>
+                                    <div class="section-content">
+                                        <p>${student.experience || 'No experience information provided'}</p>
+                                    </div>
+                                </div>
+
+                                <div class="profile-section">
+                                    <h3 class="section-heading">Organizations</h3>
+                                    <div class="section-content">
+                                        <p>${student.organizations || 'No organizations listed'}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${socialLinks ? `
+                            <div class="profile-footer">
+                                <h3 class="connect-heading">Connect With ${student.name}</h3>
+                                <div class="social-links">${socialLinks}</div>
+                            </div>` : ''}
+                        </div>
+                        `;
+
+                        // Set content and show modal
+                        document.getElementById('profileContent').innerHTML = profileHTML;
+                        openProfileModal();
+                    })
+                    .catch(error => {
+                        console.error('Error loading student profile:', error);
+                        document.getElementById('loaderContainer').style.display = 'none';
+                        showToast('Failed to load student profile', 'error');
+                    });
+            };
         }
     });
 </script>
