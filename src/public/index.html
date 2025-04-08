@@ -254,7 +254,9 @@
     <div class="modal-content">
         <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
         <div id="profileContent">
-            <!-- Student profile content will be loaded here -->
+            <div class="mobile-close-button" id="mobileCloseButton">
+                <i class="fas fa-times"></i>
+            </div>
         </div>
     </div>
 </div>
@@ -1447,6 +1449,27 @@
                 padding: 6px 12px;
                 font-size: 0.9rem;
             }
+            .mobile-close-button {
+                display: flex;
+            }
+
+            /* Move modals' close buttons to bottom for easier access */
+            .modal-close {
+                top: auto !important;
+                bottom: 15px !important;
+                right: 15px !important;
+            }
+
+            #photoModalClose {
+                top: auto !important;
+                bottom: -40px !important;
+                right: 10px !important;
+            }
+
+            /* Adjust modal positioning for better mobile experience */
+            .modal-content, .photo-modal-content {
+                margin: 20px auto 80px !important; /* Add more bottom space */
+            }
         }
 
         @media (max-width: 576px) {
@@ -1490,7 +1513,38 @@
             .leaderboard-header, .leaderboard-item {
                 grid-template-columns: 50px 1fr 70px;
             }
+            .navbar ul li a {
+                padding: 10px 15px; /* Larger touch target */
+            }
+
+            .vote-btn, .login-prompt, .view-profile-btn {
+                padding: 8px 12px; /* Slightly larger buttons */
+                min-height: 36px; /* Minimum height for better tapping */
+            }
+
+            /* Better spacing in the leaderboard items */
+            .leaderboard-item {
+                padding: 12px 10px;
+                gap: 8px;
+            }
         }
+    .mobile-close-button {
+        display: none; /* Hidden by default, shown only on mobile */
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--berkeley-blue);
+        color: white;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        z-index: 2000;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+    }
     .login-prompt {
         background: var(--berkeley-blue);
         color: white;
@@ -2523,5 +2577,33 @@
         setTimeout(() => {
             showToast("Welcome to Miss Cal! Check out our top contestants.", "info");
         }, 1000);
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileCloseButton = document.getElementById('mobileCloseButton');
+
+        if (mobileCloseButton) {
+            mobileCloseButton.addEventListener('click', function() {
+                // Check if any modals are open
+                const openModals = document.querySelectorAll('.modal[style*="display: flex"]');
+
+                if (openModals.length > 0) {
+                    // Close the open modal
+                    for (let modal of openModals) {
+                        if (modal.id === 'profileModal') {
+                            closeProfileModal();
+                        } else if (modal.id === 'photoModal') {
+                            photoModal.style.display = 'none';
+                            document.body.style.overflow = '';
+                        } else if (modal.id === 'emailVoteModal') {
+                            emailVoteModal.style.display = 'none';
+                            document.body.style.overflow = '';
+                        }
+                    }
+                } else {
+                    // If no modals are open, act as a back button
+                    window.history.back();
+                }
+            });
+        }
     });
 </script>
